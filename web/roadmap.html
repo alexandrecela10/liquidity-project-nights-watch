@@ -96,6 +96,7 @@
     <a href="diagram.html">Data architecture</a>
     <a href="lifecycle.html">Lifecycle</a>
     <a href="roadmap.html" class="active">Data roadmap</a>
+    <a href="dictionary.html">Dictionary</a>
   </nav>
 </div>
 
@@ -144,7 +145,7 @@
     var s=document.createElement('script'); s.src=srcs[0];
     s.onload=done; s.onerror=function(){loadSpec(srcs.slice(1),done);};
     document.head.appendChild(s); }
-  loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
+  loadSpec(['../spec/ontology.js','ontology.js'], function(){ init(); });
 
   var PHASES = ['Now','Medium','Later'];
   var PHASE = 'All';

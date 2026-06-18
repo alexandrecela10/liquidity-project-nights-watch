@@ -6,15 +6,16 @@ Real-time cash monitoring & early-warning for Liquidity's **Credit team**: catch
 
 Synthetic data only. One company (**Sahel AgriCorp**) mirrors the numeric distribution of the provided real bank export — **$9.31M total cash but only $796K transferable** — as the worked example.
 
-## What's here (five outputs, one product)
+## What's here (six outputs, one product)
 
 | Output | Where | What it answers |
 |---|---|---|
 | **Ontology & data architecture** | [`docs/ontology.md`](docs/ontology.md), [`docs/schema.sql`](docs/schema.sql) | The golden level of detail + the level of detail of each input + the bronze→silver standardisation. |
 | **Interactive data-architecture diagram** | `web/diagram.html` | Explore Source → Bronze → Standardisation → Silver → Golden; click an input to trace its lineage. |
 | **Lifecycle mock** | `web/lifecycle.html` | A new bank file → a High warning → a credit-team action → the updated database, step by step. |
-| **Credit-team product** | `web/product.html` | At-risk companies ranked worst-first; understand why; loan follow-up; P1–P4 action; log it. |
+| **Credit-team product** | `web/product.html` | At-risk companies ranked worst-first; understand why; loan follow-up; recoverability (first-pass → financials-enhanced); worst-case T1 forecast + expected range; P1–P4 action; log it. Hover any key metric for as-at date · formula · raw source(s) · evidence · lineage. |
 | **Data roadmap** | `web/roadmap.html` | What each horizon (Now/Medium/Later) unlocks and how the See→Decide→Act workflow deepens; deep-linkable via `?h=Now`. |
+| **Data & formula dictionary** | `web/dictionary.html` | Every metric with its formula, as-at date, raw source file(s) and evidence, plus the raw-source-files registry. The desk hover popovers link straight into it. |
 
 ### Live site (GitHub Pages)
 Enable once in **Settings → Pages → Build and deployment → Deploy from a branch → Branch: `devin/nights-watch-spec` (or rename it to `main`), folder: `/ (root)` → Save**. The root [`index.html`](index.html) redirects to the landing page, so the site is served at:
@@ -26,7 +27,7 @@ https://alexandrecela10.github.io/liquidity-project-nights-watch/
 (`.nojekyll` is included so the static files are served as-is.)
 
 ## Single source of truth
-All four outputs read from one spec, [`spec/ontology.json`](spec/ontology.json) — the data model, the synthetic portfolio, the lifecycle scenario, and the brand. The interactive pages load it via the generated `spec/ontology.js`:
+All outputs read from one spec, [`spec/ontology.json`](spec/ontology.json) — the data model, the synthetic portfolio, the lifecycle scenario, and the brand. The interactive pages load it via the generated `spec/ontology.js`:
 
 ```bash
 python3 scripts/build_spec.py     # regenerate spec/ontology.js from spec/ontology.json
