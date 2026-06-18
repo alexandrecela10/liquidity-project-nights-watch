@@ -827,6 +827,19 @@ window.NW_SPEC = {
         "next_payment_date": "2026-07-15",
         "cash_to_repay_t1": 700000
       },
+      "recoverability": {
+        "label": "Partial",
+        "score": 0.55,
+        "savable_usd": 3300000,
+        "read": "Senior secured and the cash is trapped, not gone — recoverable if EUR convertibility or a bridge is restored before T1. A sweep problem, not insolvency."
+      },
+      "forecast": {
+        "coverage_t1": 0.41,
+        "lead_days": 0,
+        "status": "breached",
+        "drivers": "EUR sweep · 12% cash coupon",
+        "read": "FX unresolved — modelled cash at T1 stays ~0.41; the secured workout path is the lever."
+      },
       "principal_at_risk": 6000000,
       "action": {
         "priority": "P1",
@@ -863,6 +876,19 @@ window.NW_SPEC = {
         "next_payment_date": "2026-07-20",
         "cash_to_repay_t1": 720000
       },
+      "recoverability": {
+        "label": "Weak",
+        "score": 0.3,
+        "savable_usd": 960000,
+        "read": "Two prior misses plus restricted NGN — a structural convertibility gap, so only a fraction of the exposure looks recoverable."
+      },
+      "forecast": {
+        "coverage_t1": 0.63,
+        "lead_days": 0,
+        "status": "breached",
+        "drivers": "NGN restriction · 14% floating coupon",
+        "read": "Convertibility gap widens at T1 and the floating coupon adds pressure — modelled ~0.63."
+      },
       "principal_at_risk": 3200000,
       "action": {
         "priority": "P1",
@@ -897,6 +923,19 @@ window.NW_SPEC = {
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-08-01",
         "cash_to_repay_t1": 900000
+      },
+      "recoverability": {
+        "label": "Partial",
+        "score": 0.6,
+        "savable_usd": 1320000,
+        "read": "At the line on a large secured balance; a 13-week cashflow will confirm whether the gap is timing or structural."
+      },
+      "forecast": {
+        "coverage_t1": 0.92,
+        "lead_days": 0,
+        "status": "breached",
+        "drivers": "energy input cost · receivables timing",
+        "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in — prepare workout options now."
       },
       "principal_at_risk": 2200000,
       "action": {
@@ -933,6 +972,19 @@ window.NW_SPEC = {
         "next_payment_date": "2026-07-28",
         "cash_to_repay_t1": 400000
       },
+      "recoverability": {
+        "label": "Strong",
+        "score": 0.78,
+        "savable_usd": 700000,
+        "read": "A receivables-timing wobble, not a structural hole — collections are expected to close most of the gap."
+      },
+      "forecast": {
+        "coverage_t1": 0.97,
+        "lead_days": 18,
+        "status": "pre-breach",
+        "drivers": "receivables timing slips",
+        "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip — ~18 days of lead time to act."
+      },
       "principal_at_risk": 900000,
       "action": {
         "priority": "P2",
@@ -967,6 +1019,19 @@ window.NW_SPEC = {
         "next_payment_date": "2026-08-10",
         "cash_to_repay_t1": 200000
       },
+      "recoverability": {
+        "label": "Strong",
+        "score": 0.88,
+        "savable_usd": 158000,
+        "read": "Comfortable coverage on a small exposure with healthy operations."
+      },
+      "forecast": {
+        "coverage_t1": 1.24,
+        "lead_days": 0,
+        "status": "clear",
+        "drivers": "stable",
+        "read": "Holds above the high-risk line through T1."
+      },
       "principal_at_risk": 180000,
       "action": {
         "priority": "P3",
@@ -999,6 +1064,19 @@ window.NW_SPEC = {
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-08-15",
         "cash_to_repay_t1": 140000
+      },
+      "recoverability": {
+        "label": "Strong",
+        "score": 0.92,
+        "savable_usd": 0,
+        "read": "Healthy coverage; no principal currently at risk."
+      },
+      "forecast": {
+        "coverage_t1": 2.0,
+        "lead_days": 0,
+        "status": "clear",
+        "drivers": "stable",
+        "read": "Comfortable through T1."
       },
       "principal_at_risk": 0,
       "action": {
@@ -1033,6 +1111,19 @@ window.NW_SPEC = {
         "next_payment_date": "2026-09-01",
         "cash_to_repay_t1": 0
       },
+      "recoverability": {
+        "label": "Strong",
+        "score": 0.95,
+        "savable_usd": 0,
+        "read": "Next payment is PIK — no cash due, so there is nothing to recover."
+      },
+      "forecast": {
+        "coverage_t1": 2.9,
+        "lead_days": 0,
+        "status": "clear",
+        "drivers": "PIK · no cash due",
+        "read": "No cash leaves the borrower at T1."
+      },
       "principal_at_risk": 0,
       "action": {
         "priority": "P4",
@@ -1065,6 +1156,19 @@ window.NW_SPEC = {
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-09-05",
         "cash_to_repay_t1": 300000
+      },
+      "recoverability": {
+        "label": "Strong",
+        "score": 0.96,
+        "savable_usd": 0,
+        "read": "Strong coverage, mostly hard-currency cash."
+      },
+      "forecast": {
+        "coverage_t1": 4.1,
+        "lead_days": 0,
+        "status": "clear",
+        "drivers": "stable",
+        "read": "Comfortable; mostly hard-currency cash."
       },
       "principal_at_risk": 0,
       "action": {
@@ -1256,41 +1360,224 @@ window.NW_SPEC = {
       "difficulty": "Medium"
     }
   ],
+  "data_unlocks": {
+    "Now": {
+      "title": "Banking + loan data",
+      "datasets": [
+        "Company banking snapshots",
+        "Loan structure (CRM)"
+      ],
+      "summary": "Stand up the coverage signal and the loan follow-up immediately — enough to triage worst-first and log the action."
+    },
+    "Medium": {
+      "title": "Financial statements",
+      "datasets": [
+        "Balance sheet",
+        "Cashflow statements"
+      ],
+      "summary": "Read recoverability: who can actually repay. Unlocks the P1–P4 action framework and tells a timing wobble apart from a structural hole."
+    },
+    "Later": {
+      "title": "Forecasting + external signals",
+      "datasets": [
+        "Revenue-lifecycle data",
+        "Rates & input-cost feeds"
+      ],
+      "summary": "Model cash at T1 forward and stress it for rates and input costs — warn before the breach and size the response from scenarios."
+    }
+  },
   "workflow": [
     {
       "step": "See",
       "tag": "Triage",
-      "phase": "Now",
-      "what": "List of companies with higher warning level. Ranked by coverage ratio + size.",
-      "inputs": "Signal + loan principal (bank account size fallback)"
+      "phases": {
+        "Now": {
+          "what": "Rank every company worst-first by coverage ratio and money at risk.",
+          "analysis": "Reactive — flag once coverage is already thin.",
+          "metrics": [
+            "coverage ratio",
+            "principal at risk",
+            "data freshness"
+          ],
+          "actions": [
+            "Open the worst-first queue"
+          ]
+        },
+        "Medium": {
+          "what": "Re-rank by savable money — money at stake × can-they-recover.",
+          "analysis": "Triage the biggest recoverable losses first, not just the biggest exposures.",
+          "metrics": [
+            "recoverability score"
+          ],
+          "actions": [
+            "Sort by expected savable money"
+          ]
+        },
+        "Later": {
+          "what": "Surface companies whose forecast cash at T1 will breach before coverage even dips.",
+          "analysis": "Proactive — buy lead time before the shortfall lands.",
+          "metrics": [
+            "forecast coverage at T1",
+            "lead time to breach"
+          ],
+          "actions": [
+            "Pre-breach watchlist"
+          ]
+        }
+      }
     },
     {
       "step": "Understand",
       "tag": "Why",
-      "phase": "Now",
-      "what": "The cash story: balance trend, transferable vs trapped, runway — plus whether the company has been at risk before.",
-      "inputs": "Signal inputs + labelled history"
+      "phases": {
+        "Now": {
+          "what": "The cash story: balance trend, transferable vs trapped, runway, prior issues.",
+          "analysis": "Where the cash has been.",
+          "metrics": [
+            "transferable vs trapped",
+            "runway days",
+            "worst-serviced floor"
+          ],
+          "actions": [
+            "Read the why panel"
+          ]
+        },
+        "Medium": {
+          "what": "Add balance-sheet & cashflow context — leverage, liquidity, quality of burn.",
+          "analysis": "Tell a timing wobble apart from a structural hole.",
+          "metrics": [
+            "leverage / liquidity",
+            "burn quality (CFS)"
+          ],
+          "actions": [
+            "Classify timing vs structural shortfall"
+          ]
+        },
+        "Later": {
+          "what": "Modelled inflows/outflows with rate & input-cost sensitivity.",
+          "analysis": "Explain why cash will move next, not just where it has been.",
+          "metrics": [
+            "modelled inflows / outflows",
+            "rate & input-cost sensitivity"
+          ],
+          "actions": [
+            "Run a cash scenario"
+          ]
+        }
+      }
     },
     {
       "step": "Prioritise",
       "tag": "Work order",
-      "phase": "Medium",
-      "what": "Order by money at stake × can-they-recover — so the biggest savable money is worked first (the action framework).",
-      "inputs": "Principal + recoverability read (Balance Sheet, CFS)"
+      "phases": {
+        "Now": {
+          "what": "Rough order by coverage and exposure size.",
+          "analysis": "Good enough to start the day.",
+          "metrics": [
+            "coverage × exposure"
+          ],
+          "actions": [
+            "Provisional work order"
+          ]
+        },
+        "Medium": {
+          "what": "Order by money at stake × can-they-recover — the P1–P4 action framework.",
+          "analysis": "Work the biggest savable money first.",
+          "metrics": [
+            "recoverability read",
+            "P1–P4 quadrant"
+          ],
+          "actions": [
+            "Assign P1–P4 priority"
+          ]
+        },
+        "Later": {
+          "what": "Probability-weighted by forecast scenarios — expected-loss ranking.",
+          "analysis": "Prioritise on probability-adjusted savable money.",
+          "metrics": [
+            "expected loss",
+            "scenario probability"
+          ],
+          "actions": [
+            "Expected-loss work order"
+          ]
+        }
+      }
     },
     {
       "step": "Decide",
       "tag": "What to do",
-      "phase": "Medium",
-      "what": "Loan context — seniority, security, cash vs PIK, covenants — which sets the action.",
-      "inputs": "Loan structure, Balance Sheet"
+      "phases": {
+        "Now": {
+          "what": "Decide the basics: cash vs PIK, what is due and when.",
+          "analysis": "Is there even a cash payment to defend?",
+          "metrics": [
+            "cash vs PIK",
+            "next payment"
+          ],
+          "actions": [
+            "Confirm the immediate ask"
+          ]
+        },
+        "Medium": {
+          "what": "Full loan context — seniority, security, covenants — sets the action.",
+          "analysis": "Match the playbook to the structure.",
+          "metrics": [
+            "seniority / security",
+            "covenant headroom"
+          ],
+          "actions": [
+            "Pick the structured action (workout, covenant review)"
+          ]
+        },
+        "Later": {
+          "what": "Scenario-tested decisions — size the bridge or pre-empt the covenant from the forecast.",
+          "analysis": "Decide ahead of the event.",
+          "metrics": [
+            "bridge sizing",
+            "pre-emptive covenant trigger"
+          ],
+          "actions": [
+            "Pre-position bridge / covenant action"
+          ]
+        }
+      }
     },
     {
       "step": "Act",
       "tag": "& record",
-      "phase": "Now",
-      "what": "Capture the action and the outcome — the labelled history that trains the model.",
-      "inputs": "Action log"
+      "phases": {
+        "Now": {
+          "what": "Log the action and the outcome — the labelled history starts here.",
+          "analysis": "Capture what was done.",
+          "metrics": [
+            "action log entry"
+          ],
+          "actions": [
+            "Log action + outcome"
+          ]
+        },
+        "Medium": {
+          "what": "Outcomes feed the recoverability read — closing the loop on who recovers.",
+          "analysis": "Learn which actions actually work.",
+          "metrics": [
+            "outcome → recoverability"
+          ],
+          "actions": [
+            "Tag resolution outcome"
+          ]
+        },
+        "Later": {
+          "what": "Labelled history trains the forecast model — the desk compounds.",
+          "analysis": "Every logged action sharpens the next forecast.",
+          "metrics": [
+            "labelled training signal"
+          ],
+          "actions": [
+            "Feed the model"
+          ]
+        }
+      }
     }
   ]
 };
