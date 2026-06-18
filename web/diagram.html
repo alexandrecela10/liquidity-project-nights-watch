@@ -182,6 +182,7 @@
     <a href="diagram.html" class="active">Data architecture</a>
     <a href="lifecycle.html">Lifecycle</a>
     <a href="roadmap.html">Data roadmap</a>
+    <a href="dictionary.html">Dictionary</a>
   </nav>
 </div>
 
@@ -234,7 +235,7 @@
     s.onerror = function(){ loadSpec(srcs.slice(1), done); };
     document.head.appendChild(s);
   }
-  loadSpec(['ontology.js', '../spec/ontology.js'], function(err){
+  loadSpec(['../spec/ontology.js', 'ontology.js'], function(err){
     if(err || !window.NW_SPEC){ document.getElementById('dg-lede').textContent = 'Could not load the spec (window.NW_SPEC).'; return; }
     try { init(window.NW_SPEC); }
     catch(e){ console.error(e); }

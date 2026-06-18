@@ -257,7 +257,7 @@
       "runway_days": 38, "deteriorating": true, "prior_issues": 1, "data_freshness_days": 0, "worst_serviced_coverage": 0.80,
       "loan": {"loan_id": "LN-SAHEL-1", "principal": 6000000, "seniority": "Senior secured", "coupon_rate": 0.12, "cash_vs_pik": "cash", "next_payment_date": "2026-07-15", "cash_to_repay_t1": 700000},
       "recoverability": {"label": "Partial", "score": 0.55, "savable_usd": 3300000, "read": "Senior secured and the cash is trapped, not gone \u2014 recoverable if EUR convertibility or a bridge is restored before T1. A sweep problem, not insolvency."},
-      "forecast": {"coverage_t1": 0.41, "lead_days": 0, "status": "breached", "drivers": "EUR sweep \u00b7 12% cash coupon", "read": "FX unresolved \u2014 modelled cash at T1 stays ~0.41; the secured workout path is the lever."},
+      "forecast": {"coverage_t1": 0.41, "coverage_t1_worst": 0.18, "coverage_t1_best": 0.60, "lead_days": 0, "status": "breached", "drivers": "EUR sweep \u00b7 12% cash coupon", "read": "FX unresolved \u2014 modelled cash at T1 stays ~0.41; the secured workout path is the lever."},
       "principal_at_risk": 6000000,
       "action": {"priority": "P1", "title": "Roll up sleeves — protect the coupon", "why": "Largest exposure; the shortfall is an FX/sweep problem that is still fixable before T1.", "steps": ["Call treasurer: why did the EUR operating account drop to zero?", "Arrange FX conversion or a short bridge to fund the $700K due", "Confirm the coupon funding source in writing before 2026-07-15"]},
       "is_worked_example": true },
@@ -266,7 +266,7 @@
       "runway_days": 52, "deteriorating": true, "prior_issues": 2, "data_freshness_days": 1, "worst_serviced_coverage": 0.74,
       "loan": {"loan_id": "LN-LAGOS-1", "principal": 3200000, "seniority": "Senior", "coupon_rate": 0.14, "cash_vs_pik": "cash", "next_payment_date": "2026-07-20", "cash_to_repay_t1": 720000},
       "recoverability": {"label": "Weak", "score": 0.30, "savable_usd": 960000, "read": "Two prior misses plus restricted NGN \u2014 a structural convertibility gap, so only a fraction of the exposure looks recoverable."},
-      "forecast": {"coverage_t1": 0.63, "lead_days": 0, "status": "breached", "drivers": "NGN restriction \u00b7 14% floating coupon", "read": "Convertibility gap widens at T1 and the floating coupon adds pressure \u2014 modelled ~0.63."},
+      "forecast": {"coverage_t1": 0.63, "coverage_t1_worst": 0.40, "coverage_t1_best": 0.78, "lead_days": 0, "status": "breached", "drivers": "NGN restriction \u00b7 14% floating coupon", "read": "Convertibility gap widens at T1 and the floating coupon adds pressure \u2014 modelled ~0.63."},
       "principal_at_risk": 3200000,
       "action": {"priority": "P1", "title": "Roll up sleeves — confirm NGN convertibility", "why": "Two prior misses + high principal; NGN is restricted so the headline cash overstates capacity.", "steps": ["Confirm how much NGN can actually be converted this week", "Request a cash bridge from the sponsor", "Escalate to the deal lead"]} },
     { "company_id": "C-DAR", "name": "Dar Telecom", "jurisdiction": "Tanzania", "label": "Medium",
@@ -274,7 +274,7 @@
       "runway_days": 70, "deteriorating": true, "prior_issues": 0, "data_freshness_days": 2, "worst_serviced_coverage": 0.90,
       "loan": {"loan_id": "LN-DAR-1", "principal": 4500000, "seniority": "Senior secured", "coupon_rate": 0.11, "cash_vs_pik": "cash", "next_payment_date": "2026-08-01", "cash_to_repay_t1": 900000},
       "recoverability": {"label": "Partial", "score": 0.60, "savable_usd": 1320000, "read": "At the line on a large secured balance; a 13-week cashflow will confirm whether the gap is timing or structural."},
-      "forecast": {"coverage_t1": 0.92, "lead_days": 0, "status": "breached", "drivers": "energy input cost \u00b7 receivables timing", "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in \u2014 prepare workout options now."},
+      "forecast": {"coverage_t1": 0.92, "coverage_t1_worst": 0.70, "coverage_t1_best": 1.02, "lead_days": 0, "status": "breached", "drivers": "energy input cost \u00b7 receivables timing", "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in \u2014 prepare workout options now."},
       "principal_at_risk": 2200000,
       "action": {"priority": "P2", "title": "Structured workout prep", "why": "Coverage hovering at 1.0 on a large balance; trend is down.", "steps": ["Request a 13-week cashflow", "Review covenants", "Prepare options ahead of T1"]} },
     { "company_id": "C-NAIROBI", "name": "Nairobi Logistics", "jurisdiction": "Kenya", "label": "Medium",
@@ -282,7 +282,7 @@
       "runway_days": 61, "deteriorating": true, "prior_issues": 0, "data_freshness_days": 1, "worst_serviced_coverage": 0.95,
       "loan": {"loan_id": "LN-NAIROBI-1", "principal": 1800000, "seniority": "Senior", "coupon_rate": 0.13, "cash_vs_pik": "cash", "next_payment_date": "2026-07-28", "cash_to_repay_t1": 400000},
       "recoverability": {"label": "Strong", "score": 0.78, "savable_usd": 700000, "read": "A receivables-timing wobble, not a structural hole \u2014 collections are expected to close most of the gap."},
-      "forecast": {"coverage_t1": 0.97, "lead_days": 18, "status": "pre-breach", "drivers": "receivables timing slips", "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip \u2014 ~18 days of lead time to act."},
+      "forecast": {"coverage_t1": 0.97, "coverage_t1_worst": 0.82, "coverage_t1_best": 1.08, "lead_days": 18, "status": "pre-breach", "drivers": "receivables timing slips", "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip \u2014 ~18 days of lead time to act."},
       "principal_at_risk": 900000,
       "action": {"priority": "P2", "title": "Structured — tighten reporting", "why": "Coverage thinning; receivables timing is the swing factor.", "steps": ["Confirm receivables collection timing", "Move to weekly cash reporting"]} },
     { "company_id": "C-KAMPALA", "name": "Kampala Power", "jurisdiction": "Uganda", "label": "Low",
@@ -290,7 +290,7 @@
       "runway_days": 95, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 2, "worst_serviced_coverage": 1.05,
       "loan": {"loan_id": "LN-KAMPALA-1", "principal": 900000, "seniority": "Senior", "coupon_rate": 0.12, "cash_vs_pik": "cash", "next_payment_date": "2026-08-10", "cash_to_repay_t1": 200000},
       "recoverability": {"label": "Strong", "score": 0.88, "savable_usd": 158000, "read": "Comfortable coverage on a small exposure with healthy operations."},
-      "forecast": {"coverage_t1": 1.24, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Holds above the high-risk line through T1."},
+      "forecast": {"coverage_t1": 1.24, "coverage_t1_worst": 1.05, "coverage_t1_best": 1.35, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Holds above the high-risk line through T1."},
       "principal_at_risk": 180000,
       "action": {"priority": "P3", "title": "Lightweight nudge", "why": "Comfortable but small; cheap to keep an eye on.", "steps": ["Email CFO for an updated forecast"]} },
     { "company_id": "C-ACCRA", "name": "Accra Retail", "jurisdiction": "Ghana", "label": "Low",
@@ -298,7 +298,7 @@
       "runway_days": 140, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 6, "worst_serviced_coverage": 1.20,
       "loan": {"loan_id": "LN-ACCRA-1", "principal": 600000, "seniority": "Senior", "coupon_rate": 0.12, "cash_vs_pik": "cash", "next_payment_date": "2026-08-15", "cash_to_repay_t1": 140000},
       "recoverability": {"label": "Strong", "score": 0.92, "savable_usd": 0, "read": "Healthy coverage; no principal currently at risk."},
-      "forecast": {"coverage_t1": 2.00, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable through T1."},
+      "forecast": {"coverage_t1": 2.00, "coverage_t1_worst": 1.70, "coverage_t1_best": 2.20, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable through T1."},
       "principal_at_risk": 0,
       "action": {"priority": "P3", "title": "Standard monitoring", "why": "Healthy coverage, low principal.", "steps": ["Monthly check-in only"]} },
     { "company_id": "C-KIGALI", "name": "Kigali Agro", "jurisdiction": "Rwanda", "label": "None",
@@ -306,7 +306,7 @@
       "runway_days": 210, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 1, "worst_serviced_coverage": 1.10,
       "loan": {"loan_id": "LN-KIGALI-1", "principal": 1200000, "seniority": "Senior", "coupon_rate": 0.10, "cash_vs_pik": "pik", "next_payment_date": "2026-09-01", "cash_to_repay_t1": 0},
       "recoverability": {"label": "Strong", "score": 0.95, "savable_usd": 0, "read": "Next payment is PIK \u2014 no cash due, so there is nothing to recover."},
-      "forecast": {"coverage_t1": 2.90, "lead_days": 0, "status": "clear", "drivers": "PIK \u00b7 no cash due", "read": "No cash leaves the borrower at T1."},
+      "forecast": {"coverage_t1": 2.90, "coverage_t1_worst": 2.70, "coverage_t1_best": 3.05, "lead_days": 0, "status": "clear", "drivers": "PIK \u00b7 no cash due", "read": "No cash leaves the borrower at T1."},
       "principal_at_risk": 0,
       "action": {"priority": "P4", "title": "Handle leanly", "why": "Next payment is PIK — no cash due. Automated monitoring is enough.", "steps": ["Automated monitoring only"]} },
     { "company_id": "C-CASA", "name": "Casablanca Foods", "jurisdiction": "Morocco", "label": "None",
@@ -314,7 +314,7 @@
       "runway_days": 320, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 0, "worst_serviced_coverage": 1.40,
       "loan": {"loan_id": "LN-CASA-1", "principal": 2000000, "seniority": "Senior secured", "coupon_rate": 0.09, "cash_vs_pik": "cash", "next_payment_date": "2026-09-05", "cash_to_repay_t1": 300000},
       "recoverability": {"label": "Strong", "score": 0.96, "savable_usd": 0, "read": "Strong coverage, mostly hard-currency cash."},
-      "forecast": {"coverage_t1": 4.10, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable; mostly hard-currency cash."},
+      "forecast": {"coverage_t1": 4.10, "coverage_t1_worst": 3.70, "coverage_t1_best": 4.40, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable; mostly hard-currency cash."},
       "principal_at_risk": 0,
       "action": {"priority": "P4", "title": "Handle leanly", "why": "Strong coverage, mostly hard-currency cash.", "steps": ["Automated monitoring only"]} }
   ],
@@ -338,26 +338,86 @@
     "action": { "priority": "P1", "action_taken": "Contacted treasurer; arranging FX conversion / bridge to fund the $700K coupon; confirming funding source before 2026-07-15.", "actor": "credit-team", "outcome": "pending" }
   },
 
+  "evidence": {
+    "intro": "Every metric traces back to a raw source file. Synthetic data only; the bank export mirrors the numeric distribution of the provided real file.",
+    "files": [
+      { "id": "f_bank", "file": "bank_export_2026-07-08.xlsx", "type": "Bank balance export (Excel)", "horizon": "Now", "as_at": "2026-07-08", "grain": "one row per account per snapshot", "rows": 62, "feeds": ["M1", "M2", "M3", "coverage ratio", "transferable vs trapped", "runway days", "data freshness", "worst-serviced floor"], "sample": "62 accounts \u00b7 22 currencies \u00b7 $9.31M total; EUR operating account FI-EA354EF2 reads $0; only $796K (hard ccy) transferable." },
+      { "id": "f_crm", "file": "crm_loans_2026-07-05.csv", "type": "CRM loan structure", "horizon": "Now", "as_at": "2026-07-05", "grain": "one row per loan", "rows": 8, "feeds": ["M4", "M5", "principal at risk", "cash vs PIK", "next payment", "seniority / security", "recoverability (first-pass)"], "sample": "LN-SAHEL-1 \u00b7 $6.0M senior secured \u00b7 12% cash coupon \u00b7 next 2026-07-15 \u00b7 $700K due." },
+      { "id": "f_pay", "file": "payment_schedule_2026-07-05.csv", "type": "Payment schedule", "horizon": "Now", "as_at": "2026-07-05", "grain": "one row per loan per payment", "rows": 24, "feeds": ["cash to repay at T1", "next payment"], "sample": "LN-SAHEL-1 \u00b7 2026-07-15 \u00b7 $700,000 \u00b7 cash." },
+      { "id": "f_labels", "file": "missed_payments.csv", "type": "Missed-payment history (labels)", "horizon": "Now", "as_at": "2026-06-30", "grain": "one row per labelled event", "rows": 5, "feeds": ["prior issues", "recoverability (first-pass)"], "sample": "Lagos FinServe: 2 prior misses; Sahel AgriCorp: 1." },
+      { "id": "f_fx", "file": "fx_rates_2026-07-08.csv", "type": "FX reference (controlled)", "horizon": "Now", "as_at": "2026-07-08", "grain": "one row per currency per date", "rows": 22, "feeds": ["balance_usd (re-derived)", "M1", "coverage ratio"], "sample": "EUR/XAF/NGN \u2026 \u2192 USD. The single source of truth for USD \u2014 the export's own USD column is never trusted." },
+      { "id": "f_convert", "file": "convertibility_areaer.csv", "type": "Convertibility reference (IMF AREAER)", "horizon": "Now", "as_at": "2026-Q2", "grain": "one row per currency", "rows": 22, "feeds": ["transferable vs trapped", "recoverability (first-pass)"], "sample": "USD/EUR/GBP = transferable; XAF/TZS/NGN/KES/UGX = restricted." },
+      { "id": "f_bs", "file": "balance_sheet_2026-06.csv", "type": "Balance sheet", "horizon": "Medium", "as_at": "2026-06-30", "grain": "one row per company per period", "rows": 8, "feeds": ["recoverability (enhanced)", "leverage / liquidity"], "sample": "Net leverage and current/quick ratios per company." },
+      { "id": "f_cfs", "file": "cashflow_2026-06.csv", "type": "Cashflow statement", "horizon": "Medium", "as_at": "2026-06-30", "grain": "one row per company per period", "rows": 8, "feeds": ["recoverability (enhanced)", "burn quality (CFS)", "free cash after commitments", "M6"], "sample": "Cash from ops, mandatory debt service, free cash after commitments." },
+      { "id": "f_lifecycle", "file": "revenue_lifecycle_2026-06.csv", "type": "Business-lifecycle / revenue", "horizon": "Later", "as_at": "2026-06-30", "grain": "one row per company per period", "rows": 8, "feeds": ["M6 forecast", "worst-case at T1", "modelled inflows / outflows"], "sample": "Contracts pipeline, product-usage index, forecast inflows." },
+      { "id": "f_ext", "file": "external_rates_costs_2026-07-07.csv", "type": "External rate & cost forecasts", "horizon": "Later", "as_at": "2026-07-07", "grain": "one row per as-of date", "rows": 1, "feeds": ["M7", "worst-case at T1", "rate & input-cost sensitivity"], "sample": "Rate curve (bps) + energy input-cost index used to stress floating coupons." }
+    ],
+    "metrics": {
+      "coverage-trend": { "label": "Coverage trend", "horizon": "Now", "formula": "sign of \u0394 coverage across recent snapshots (worsening / stable)", "as_at": "2026-07-08", "files": ["f_bank"], "note": "Direction of coverage over the recent snapshot history." },
+      "prior-issues": { "label": "Prior issues", "horizon": "Now", "formula": "count of labelled past missed payments", "as_at": "2026-06-30", "files": ["f_labels"], "note": "Labelled missed-payment events per company. Lagos: 2; Sahel: 1." },
+      "coupon-rate": { "label": "Coupon", "horizon": "Now", "formula": "contractual coupon rate on the loan", "as_at": "2026-07-05", "files": ["f_crm"], "note": "From the CRM loan record. Sahel: 12% cash coupon." },
+      "cash-due-t1": { "label": "Cash due at T1", "horizon": "Now", "formula": "scheduled cash coupon / amortisation due at the next payment date (PIK \u21d2 0)", "as_at": "2026-07-05", "files": ["f_crm", "f_pay"], "note": "Sahel: $700,000 due 2026-07-15." },
+      "coverage-ratio": { "label": "Coverage ratio", "horizon": "Now", "formula": "projected transferable cash at T1 \u00f7 cash due at T1", "as_at": "2026-07-08", "files": ["f_bank", "f_crm", "f_fx"], "note": "Projected transferable cash at T1 \u00f7 cash to repay at T1. Sahel: 0.46." },
+      "principal-at-risk": { "label": "Principal at risk", "horizon": "Now", "formula": "outstanding principal on the loan exposed at the next payment (T1)", "as_at": "2026-07-05", "files": ["f_crm"], "note": "Outstanding principal exposed on the loan. Sahel: $6.0M." },
+      "data-freshness": { "label": "Data freshness", "horizon": "Now", "formula": "today \u2212 last snapshot date (worst account across the company)", "as_at": "2026-07-08", "files": ["f_bank"], "note": "now - last_updated per account; a stale feed is itself a risk flag." },
+      "transferable-vs-trapped": { "label": "Transferable vs trapped", "horizon": "Now", "formula": "\u03a3 hard-ccy balances (transferable) vs \u03a3 restricted-ccy balances (trapped); USD re-derived from the FX table, never the export's own USD column", "as_at": "2026-07-08", "files": ["f_bank", "f_convert", "f_fx"], "note": "Hard-ccy (transferable) vs restricted (trapped). Sahel: $325K of $9.31M." },
+      "runway-days": { "label": "Runway", "horizon": "Now", "formula": "transferable cash \u00f7 transferable-cash burn per day (from the snapshot history)", "as_at": "2026-07-01 \u2192 2026-07-08", "files": ["f_bank"], "note": "Transferable-cash burn/day across snapshots \u2192 days of runway. Sahel: 38d." },
+      "worst-serviced-floor": { "label": "Worst-serviced floor", "horizon": "Now", "formula": "min(coverage) across history at which a scheduled payment was still met", "as_at": "2026-07-08", "files": ["f_bank", "f_crm"], "note": "Coverage of the single worst-serviced obligation, not the blended average." },
+      "recoverability-first-pass": { "label": "Recoverability (first-pass)", "horizon": "Now", "formula": "0.35 + 0.20\u00b7senior + 0.20\u00b7secured \u2212 0.12\u00b7prior_misses \u2212 0.10\u00b7(1 \u2212 transferable share), clamped to [0.10, 0.97] \u2192 Strong / Partial / Weak", "as_at": "2026-07-08", "files": ["f_crm", "f_convert", "f_labels"], "note": "Loan seniority/security + transferable-vs-trapped + prior-miss history - no financials. Sahel: Partial (~0.55)." },
+      "savable-money-first-pass": { "label": "Savable money (first-pass)", "horizon": "Now", "formula": "principal at risk \u00d7 first-pass recoverability score", "as_at": "2026-07-08", "files": ["f_crm", "f_convert", "f_labels"], "note": "Principal at risk \u00d7 first-pass recoverability. Sahel: ~ $3.3M." },
+      "p1-p4-provisional": { "label": "P1\u2013P4 (provisional)", "horizon": "Now", "formula": "quadrant(money at stake, first-pass recoverability)", "as_at": "2026-07-08", "files": ["f_crm", "f_convert", "f_labels"], "note": "Money at stake \u00d7 first-pass recoverability \u2192 provisional P1\u2013P4 posture." },
+      "coverage-exposure": { "label": "Coverage \u00d7 exposure", "horizon": "Now", "formula": "coverage rank \u00d7 exposure size \u2014 a rough work-order proxy", "as_at": "2026-07-08", "files": ["f_bank", "f_crm"], "note": "Rough work-order proxy: coverage \u00d7 exposure size." },
+      "recoverability-enhanced": { "label": "Recoverability (financials-enhanced)", "horizon": "Medium", "formula": "first-pass adjusted by net leverage, current/quick ratio and burn quality \u2192 separates a timing wobble from a structural hole", "as_at": "2026-06-30", "files": ["f_bs", "f_cfs"], "note": "Adds leverage/liquidity + burn quality to confirm timing vs structural." },
+      "savable-money-sharpened": { "label": "Savable money (sharpened)", "horizon": "Medium", "formula": "principal at risk \u00d7 financials-backed recoverability score", "as_at": "2026-06-30", "files": ["f_bs", "f_cfs", "f_crm"], "note": "Savable money re-scored with financials-backed recoverability." },
+      "p1-p4-firmed": { "label": "P1\u2013P4 (firmed)", "horizon": "Medium", "formula": "quadrant(money at stake, financials-backed recoverability)", "as_at": "2026-06-30", "files": ["f_bs", "f_cfs"], "note": "Provisional P1\u2013P4 firmed once the financials land." },
+      "leverage-liquidity": { "label": "Leverage & liquidity", "horizon": "Medium", "formula": "net debt \u00f7 EBITDA; current assets \u00f7 current liabilities", "as_at": "2026-06-30", "files": ["f_bs"], "note": "Net leverage and current/quick ratios from the balance sheet." },
+      "burn-quality-cfs": { "label": "Burn quality", "horizon": "Medium", "formula": "cash from operations \u00f7 mandatory debt service", "as_at": "2026-06-30", "files": ["f_cfs"], "note": "Cash from ops vs mandatory debt service - quality of the burn." },
+      "forecast-coverage-at-t1-base": { "label": "Forecast @ T1 (base case)", "horizon": "Later", "formula": "modelled (transferable cash + forecast inflows \u2212 forecast outflows) at T1 \u00f7 cash due at T1", "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle"], "note": "Base-case modelled coverage at T1 (inflows - outflows). Sahel base: 0.41." },
+      "worst-case-coverage-at-t1": { "label": "Worst-case @ T1", "horizon": "Later", "formula": "base case re-run under stress: FX stays blocked + a rate / energy spike", "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle", "f_ext"], "note": "Stress scenario (FX stays blocked + rate/energy spike). Sahel worst: 0.18." },
+      "forecast-range-worst-base": { "label": "Expected range (worst\u2013base)", "horizon": "Later", "formula": "[ worst-case coverage , base-case coverage ] at T1", "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle", "f_ext"], "note": "Expected range worst \u2192 best around the base. Sahel: 0.18 - 0.60 (base 0.41)." },
+      "lead-time-to-breach": { "label": "Lead time to breach", "horizon": "Later", "formula": "days from today until modelled coverage crosses 1.00", "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle"], "note": "Days from now until forecast coverage crosses 1.0." },
+      "modelled-inflows-outflows": { "label": "Modelled inflows / outflows", "horizon": "Later", "formula": "forward cash flows from revenue-lifecycle + cashflow (not a static run-down)", "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle"], "note": "Forward inflows and outflows, not a static run-down." },
+      "rate-input-cost-sensitivity": { "label": "Rate & input-cost sensitivity", "horizon": "Later", "formula": "\u0394 floating coupon (rate curve) + \u0394 operating margin (energy / input-cost index)", "as_at": "2026-07-07", "files": ["f_ext"], "note": "Floating-coupon + margin sensitivity to the rate curve + input-cost index." },
+      "cash-vs-pik": { "label": "Cash vs PIK", "horizon": "Now", "formula": "loan flag \u2014 PIK \u21d2 cash due at T1 = 0 (paid in kind)", "as_at": "2026-07-05", "files": ["f_crm", "f_pay"], "note": "PIK = no cash due at T1; only cash coupons need defending." },
+      "next-payment": { "label": "Next payment", "horizon": "Now", "formula": "next scheduled payment date & amount from the loan / payment schedule", "as_at": "2026-07-05", "files": ["f_crm", "f_pay"], "note": "Next scheduled payment date + amount due. Sahel: 2026-07-15, $700K." },
+      "seniority-security": { "label": "Seniority & security", "horizon": "Now", "formula": "rank in the capital stack + collateral attached to the loan", "as_at": "2026-07-05", "files": ["f_crm"], "note": "Rank in the capital stack + collateral; sets recovery and the playbook." },
+      "action-log-entry": { "label": "Action log entry", "horizon": "Live", "formula": "appended in-app: { company, priority, outcome, note, timestamp } \u2192 labelled history", "as_at": "live", "files": [], "note": "Generated in-app: every action + outcome is logged - the labelled history starts here." }
+    }
+  },
+
   "signal_capabilities": [
-    { "id": "M1", "item": "Current transferable cash", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Proxy: local-currency cash likely to be exchangeable.", "confidence": "4/5", "difficulty": "Low" },
-    { "id": "M2", "item": "History of transferable cash", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Collect all the snapshots.", "confidence": "4/5", "difficulty": "Low" },
-    { "id": "M3", "item": "Proxy of transferable cash at T1", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Project from historical cash trend (burn rate + runway).", "confidence": "2.5/5", "difficulty": "Medium" },
-    { "id": "M4", "item": "Time of next repayment", "source": "Loan structure (fallback: tomorrow)", "availability": "If in CRM", "phase": "Now", "method": "Read from record.", "confidence": "5/5", "difficulty": "Low" },
-    { "id": "M5", "item": "Coupon / cash to repay at T1", "source": "Loan structure", "availability": "If in CRM", "phase": "Now", "method": "Read from record; flag cash vs PIK (PIK = no cash due).", "confidence": "5/5", "difficulty": "Low" },
-    { "id": "M6", "item": "Robust forecast of cash at T1", "source": "Cashflow statements + revenue-lifecycle data", "availability": "Later", "phase": "Later", "method": "Model inflows and outflows, not just run-down.", "confidence": "4/5", "difficulty": "High" },
-    { "id": "M7", "item": "Rates + input-cost forecasts (e.g. energy)", "source": "External sources", "availability": "Later", "phase": "Later", "method": "Adjust floating-rate payments & margin pressure.", "confidence": "3/5", "difficulty": "Medium" }
+    { "id": "M1", "item": "Current transferable cash", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Proxy: local-currency cash likely to be exchangeable.", "confidence": "4/5", "difficulty": "Low",
+      "evidence": { "as_at": "2026-07-08", "files": ["f_bank", "f_fx", "f_convert"], "sample": "Sum of USD/EUR/GBP balances re-derived via FX = $324,857; the EUR operating row now reads $0." } },
+    { "id": "M2", "item": "History of transferable cash", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Collect all the snapshots.", "confidence": "4/5", "difficulty": "Low",
+      "evidence": { "as_at": "2026-07-01 \u2192 2026-07-08", "files": ["f_bank"], "sample": "Transferable cash $795,714 \u2192 $324,857 across snapshots \u2192 burn/day, runway 38d." } },
+    { "id": "M3", "item": "Proxy of transferable cash at T1", "source": "Company banking data", "availability": "Now", "phase": "Now", "method": "Project from historical cash trend (burn rate + runway).", "confidence": "2.5/5", "difficulty": "Medium",
+      "evidence": { "as_at": "projected to 2026-07-15 (T1)", "files": ["f_bank", "f_crm"], "sample": "Trend projected to the next payment date \u2192 coverage proxy 0.46." } },
+    { "id": "M4", "item": "Time of next repayment", "source": "Loan structure (fallback: tomorrow)", "availability": "If in CRM", "phase": "Now", "method": "Read from record.", "confidence": "5/5", "difficulty": "Low",
+      "evidence": { "as_at": "2026-07-05", "files": ["f_crm", "f_pay"], "sample": "LN-SAHEL-1 next payment 2026-07-15." } },
+    { "id": "M5", "item": "Coupon / cash to repay at T1", "source": "Loan structure", "availability": "If in CRM", "phase": "Now", "method": "Read from record; flag cash vs PIK (PIK = no cash due).", "confidence": "5/5", "difficulty": "Low",
+      "evidence": { "as_at": "2026-07-05", "files": ["f_crm", "f_pay"], "sample": "$700,000 cash coupon due (cash, not PIK)." } },
+    { "id": "R1", "item": "Recoverability \u2014 first-pass", "source": "Loan structure + convertibility + prior misses", "availability": "Now", "phase": "Now", "method": "Seniority/security + transferable-vs-trapped + prior-miss history \u2192 can-they-recover proxy. No financials needed.", "confidence": "3/5", "difficulty": "Low",
+      "evidence": { "as_at": "2026-07-08", "files": ["f_crm", "f_convert", "f_labels"], "sample": "Sahel: senior secured + cash trapped (not gone) + 0 prior misses \u2192 Partial (~0.55), ~ $3.3M savable." } },
+    { "id": "R2", "item": "Recoverability \u2014 financials-enhanced", "source": "Balance sheet + cashflow statements", "availability": "Medium", "phase": "Medium", "method": "Add leverage, liquidity and burn quality to separate a timing wobble from a structural hole; firms up savable money and the P1\u2013P4 grade.", "confidence": "4/5", "difficulty": "Medium",
+      "evidence": { "as_at": "2026-06-30", "files": ["f_bs", "f_cfs"], "sample": "Balance-sheet leverage + cashflow burn quality confirm whether the gap is timing or structural." } },
+    { "id": "M6", "item": "Forecast of cash at T1 \u2014 base case", "source": "Cashflow statements + revenue-lifecycle data", "availability": "Later", "phase": "Later", "method": "Model inflows and outflows, not just run-down.", "confidence": "4/5", "difficulty": "High",
+      "evidence": { "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle"], "sample": "Sahel base-case modelled coverage at T1 ~ 0.41." } },
+    { "id": "M6w", "item": "Worst-case cash at T1 (+ expected range)", "source": "Cashflow + revenue-lifecycle + external stress", "availability": "Later", "phase": "Later", "method": "Stress the base case (FX stays blocked + rate/energy spike); report the expected range worst \u2192 best.", "confidence": "3/5", "difficulty": "High",
+      "evidence": { "as_at": "2026-06-30", "files": ["f_cfs", "f_lifecycle", "f_ext"], "sample": "Sahel worst-case coverage at T1 ~ 0.18; expected range 0.18 - 0.60 (base 0.41)." } },
+    { "id": "M7", "item": "Rates + input-cost forecasts (e.g. energy)", "source": "External sources", "availability": "Later", "phase": "Later", "method": "Adjust floating-rate payments & margin pressure.", "confidence": "3/5", "difficulty": "Medium",
+      "evidence": { "as_at": "2026-07-07", "files": ["f_ext"], "sample": "Floating 12-14% coupons stressed on the rate curve + energy input-cost index." } }
   ],
 
   "data_unlocks": {
     "Now": {
       "title": "Banking + loan data",
-      "datasets": ["Company banking snapshots", "Loan structure (CRM)"],
-      "summary": "Stand up the coverage signal and the loan follow-up immediately \u2014 enough to triage worst-first and log the action."
+      "datasets": ["Company banking snapshots", "Loan structure (CRM)", "Prior-miss history"],
+      "summary": "Stand up the coverage signal, the loan follow-up, and a first-pass recoverability read (from loan seniority/security, the transferable-vs-trapped split and prior-miss history \u2014 no financials needed) \u2014 enough to triage worst-first by savable money and log the action."
     },
     "Medium": {
       "title": "Financial statements",
       "datasets": ["Balance sheet", "Cashflow statements"],
-      "summary": "Read recoverability: who can actually repay. Unlocks the P1\u2013P4 action framework and tells a timing wobble apart from a structural hole."
+      "summary": "Sharpen recoverability with balance sheet + cashflow (leverage, liquidity, burn quality) \u2014 confirm who can actually repay, tell a timing wobble apart from a structural hole, and firm up the provisional P1\u2013P4 grade."
     },
     "Later": {
       "title": "Forecasting + external signals",
@@ -370,9 +430,9 @@
     {
       "step": "See", "tag": "Triage",
       "phases": {
-        "Now": { "what": "Rank every company worst-first by coverage ratio and money at risk.", "analysis": "Reactive \u2014 flag once coverage is already thin.", "metrics": ["coverage ratio", "principal at risk", "data freshness"], "actions": ["Open the worst-first queue"] },
-        "Medium": { "what": "Re-rank by savable money \u2014 money at stake \u00d7 can-they-recover.", "analysis": "Triage the biggest recoverable losses first, not just the biggest exposures.", "metrics": ["recoverability score"], "actions": ["Sort by expected savable money"] },
-        "Later": { "what": "Surface companies whose forecast cash at T1 will breach before coverage even dips.", "analysis": "Proactive \u2014 buy lead time before the shortfall lands.", "metrics": ["forecast coverage at T1", "lead time to breach"], "actions": ["Pre-breach watchlist"] }
+        "Now": { "what": "Rank worst-first by coverage and money at risk \u2014 and by first-pass savable money (money at risk \u00d7 first-pass recoverability).", "analysis": "Reactive on coverage, but already triaged by what's recoverable.", "metrics": ["coverage ratio", "principal at risk", "data freshness", "recoverability (first-pass)", "savable money (first-pass)"], "actions": ["Open the worst-first queue", "Sort by first-pass savable money"] },
+        "Medium": { "what": "Sharpen savable money with financials-backed recoverability.", "analysis": "Balance-sheet/cashflow confirm who can really recover \u2014 not just the structural proxy.", "metrics": ["recoverability (enhanced)", "savable money (sharpened)"], "actions": ["Re-rank by financials-backed savable money"] },
+        "Later": { "what": "Surface companies whose forecast cash at T1 will breach before coverage even dips \u2014 with a worst-case scenario and the expected range.", "analysis": "Proactive \u2014 buy lead time and size the downside, not just the central case.", "metrics": ["forecast coverage at T1 (base)", "worst-case coverage at T1", "forecast range (worst\u2013base)", "lead time to breach"], "actions": ["Pre-breach watchlist"] }
       }
     },
     {
@@ -386,8 +446,8 @@
     {
       "step": "Prioritise", "tag": "Work order",
       "phases": {
-        "Now": { "what": "Rough order by coverage and exposure size.", "analysis": "Good enough to start the day.", "metrics": ["coverage \u00d7 exposure"], "actions": ["Provisional work order"] },
-        "Medium": { "what": "Order by money at stake \u00d7 can-they-recover \u2014 the P1\u2013P4 action framework.", "analysis": "Work the biggest savable money first.", "metrics": ["recoverability read", "P1\u2013P4 quadrant"], "actions": ["Assign P1\u2013P4 priority"] },
+        "Now": { "what": "Order by coverage \u00d7 exposure, then assign a provisional P1\u2013P4 from first-pass recoverability.", "analysis": "Good enough to start the day and pick the posture.", "metrics": ["coverage \u00d7 exposure", "P1\u2013P4 (provisional)"], "actions": ["Provisional work order", "Assign provisional P1\u2013P4"] },
+        "Medium": { "what": "Re-grade the P1\u2013P4 quadrant with financials-backed recoverability \u2014 money at stake \u00d7 can-they-recover.", "analysis": "Firm up the provisional grade once the financials land.", "metrics": ["recoverability (enhanced)", "P1\u2013P4 (firmed)"], "actions": ["Re-grade P1\u2013P4 priority"] },
         "Later": { "what": "Probability-weighted by forecast scenarios \u2014 expected-loss ranking.", "analysis": "Prioritise on probability-adjusted savable money.", "metrics": ["expected loss", "scenario probability"], "actions": ["Expected-loss work order"] }
       }
     },

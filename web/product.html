@@ -208,6 +208,54 @@
   .sec.phase .ph-do { font-size:11.5px; color: var(--ink); margin-top:9px; }
   .sec.phase .ph-do b { color: var(--ink-700); }
 
+  /* ---- metric hover popover (the trust trail: as-at · formula · sources · evidence · lineage) ---- */
+  .m { cursor: help; }
+  .m > .m-i { display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; margin-left:5px;
+    font-family: var(--font); font-size:9px; font-weight:700; font-style:normal; line-height:1; color: var(--taupe);
+    background: var(--sand-500); border:1px solid var(--sand-700); border-radius:50%; vertical-align:1px; cursor:help; }
+  .m:hover > .m-i, .m:focus-visible > .m-i { background: var(--yellow); border-color: var(--yellow); color: var(--ink); }
+  .m:focus { outline: none; }
+  .m:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; border-radius: 3px; }
+  /* compact trigger used inside the dense ranked table (no badge, faint underline) */
+  .mt { cursor: help; border-bottom: 1px dotted var(--sand-700); }
+  tr:hover .mt, tr.sel .mt { border-bottom-color: var(--taupe); }
+  .mt:focus-visible { outline: 2px solid var(--ink); outline-offset: 1px; }
+  .rc-hint { font-weight:500; text-transform:none; letter-spacing:0; color: var(--taupe); font-size:9.5px; }
+
+  #mpop { position: fixed; z-index: 90; max-width: 344px; background: var(--white);
+    border:1px solid var(--sand-700); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg);
+    padding: 11px 13px; font-size: 12px; color: var(--ink); display: none; }
+  #mpop.on { display: block; }
+  #mpop .mpop-h { font-size: 12.5px; font-weight:700; color: var(--ink); margin-bottom:7px; }
+  #mpop .mpop-row { display:grid; grid-template-columns: 62px 1fr; gap: 9px; margin: 5px 0; align-items: baseline; }
+  #mpop .kk { font-size: 9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color: var(--taupe); }
+  #mpop .vv { font-size: 12px; color: var(--ink-700); line-height:1.42; }
+  #mpop .vv.mono { font-family: var(--mono); font-size: 11px; }
+  #mpop .mpop-src { display:inline-block; font-family: var(--mono); font-size: 10.5px; text-decoration:none;
+    color: var(--ink-700); background: var(--sand); border:1px solid var(--sand-500); border-radius:6px; padding:1px 6px; margin:0 4px 4px 0; }
+  #mpop .mpop-src:hover { background: var(--yellow); border-color: var(--yellow); }
+  #mpop .mpop-foot { display:flex; gap:14px; margin-top:9px; padding-top:8px; border-top:1px dashed var(--sand-500); }
+  #mpop .mpop-foot a { font-size: 11.5px; font-weight:600; text-decoration:none; color: var(--ink); }
+  #mpop .mpop-foot a:hover { text-decoration: underline; }
+
+  /* forecast expected range (worst → base → best) */
+  .rng { margin-top: 12px; }
+  .rng-bar { position: relative; height: 10px; border-radius: 5px; background: var(--sand-500); margin: 36px 0 4px; }
+  .rng-band { position:absolute; top:0; bottom:0; background: rgba(179,64,46,.22); border-radius:5px; }
+  .rng-tick { position:absolute; top:-5px; height:20px; width:2px; }
+  .rng-tick.worst { background: var(--risk-high); }
+  .rng-tick.base  { background: var(--ink); }
+  .rng-tick.best  { background: var(--risk-low); }
+  /* three vertical lanes so labels never collide when the scenarios cluster */
+  .rng-tick .lab { position:absolute; transform:translateX(-50%); font-family: var(--mono); font-size:9.5px; white-space:nowrap; }
+  .rng-tick.worst .lab { top:-16px; color: var(--risk-high); font-weight:700; }
+  .rng-tick.best  .lab { top:-31px; color: var(--risk-low); }
+  .rng-tick.base  .lab { top:17px; color: var(--ink); font-weight:700; }
+  .rng-1 { position:absolute; top:-3px; height:16px; width:2px; background: var(--ink); opacity:.45; }
+  .rng-1 .lab { position:absolute; top:31px; transform:translateX(-50%); font-size:9px; color: var(--taupe); white-space:nowrap; }
+  .rng-cap { font-size: 11.5px; color: var(--ink-700); margin-top: 30px; line-height:1.45; }
+  .rng-cap b { color: var(--risk-high); }
+
   @media (max-width: 1080px){
     .desk { grid-template-columns: 1fr; }
     .insp { position: static; }
@@ -226,6 +274,7 @@
     <a href="diagram.html">Data architecture</a>
     <a href="lifecycle.html">Lifecycle</a>
     <a href="roadmap.html">Data roadmap</a>
+    <a href="dictionary.html">Dictionary</a>
   </nav>
 </div>
 
@@ -307,7 +356,7 @@
     var s=document.createElement('script'); s.src=srcs[0];
     s.onload=done; s.onerror=function(){loadSpec(srcs.slice(1),done);};
     document.head.appendChild(s); }
-  loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
+  loadSpec(['../spec/ontology.js','ontology.js'], function(){ init(); });
 
   var LOG_KEY = 'nw_action_log_v1';
   var THRESH_KEY = 'nw_cov_threshold_v1';
@@ -318,7 +367,7 @@
   var PHASES = ['Now','Medium','Later'];
   var DESK_PHASE = 'Now';
   var selectedId = null;
-  var SPEC, PORTFOLIO, FRAMEWORK, RANKED, UNLOCKS;
+  var SPEC, PORTFOLIO, FRAMEWORK, RANKED, UNLOCKS, EV;
 
   function phaseIdx(p){ var i = PHASES.indexOf(p); return i<0 ? 0 : i; }
   function phaseReached(p){ return phaseIdx(DESK_PHASE) >= phaseIdx(p); }   // cumulative
@@ -350,8 +399,10 @@
     FRAMEWORK = SPEC.actions_framework;
     RANKED = PORTFOLIO.slice().sort(rank);
     UNLOCKS = SPEC.data_unlocks || {};
+    EV = SPEC.evidence || { metrics:{}, files:[] };
     THRESH = readThresh();
 
+    mpInit();
     bindPhase();
     renderSignal();
     paintPhase();          // KPIs + table + horizon note for the active phase
@@ -423,10 +474,13 @@
       { n: worst.toFixed(2), l: 'worst coverage' + (stale? ' · '+stale+' stale feed':''), alert: worst<THRESH }
     ];
 
-    // Medium — financial statements unlock recoverability → savable money
+    // Recoverable money at risk — available first-pass at Now, sharpened by financials at Medium
     if (phaseReached('Medium')){
       var savable = PORTFOLIO.reduce(function(s,c){ return s + (c.recoverability? c.recoverability.savable_usd : 0); }, 0);
       kpis.push({ n: usdM(savable), l: 'recoverable of money at risk', alert: false, sub: 'balance sheet + cashflow', is_new: unlockedHere('Medium') });
+    } else {
+      var fpSavable = PORTFOLIO.reduce(function(s,c){ return s + firstPassRecov(c).savable; }, 0);
+      kpis.push({ n: usdM(fpSavable), l: 'recoverable of money at risk', alert: false, sub: 'first-pass · loan + convertibility' });
     }
     // Later — forecasting + external signals unlock forward cash-at-T1
     if (phaseReached('Later')){
@@ -454,12 +508,134 @@
   function fcCellHtml(c){
     var f = c.forecast; if(!f) return '<span class="nw-muted">—</span>';
     var tag = f.status==='breached' ? '↓ short' : (f.status==='pre-breach' ? '↓ '+f.lead_days+'d lead' : '→ holds');
-    return '<span class="fc '+f.status+'" title="'+esc(f.read)+'">'+f.coverage_t1.toFixed(2)+'<span class="tag">'+tag+'</span></span>';
+    return tipc('forecast-coverage-at-t1-base',
+      '<span class="fc '+f.status+'">'+f.coverage_t1.toFixed(2)+'<span class="tag">'+tag+'</span></span>');
+  }
+
+  /* ---- first-pass recoverability (Now): loan structure + convertibility + prior misses, no financials ---- */
+  function fpLabel(s){ return s>=0.66 ? 'Strong' : (s>=0.45 ? 'Partial' : 'Weak'); }
+  function firstPassRecov(c){
+    var loan = c.loan || {};
+    var sen = loan.seniority || '';
+    var senior  = /senior/i.test(sen) ? 1 : 0;
+    var secured = /secured/i.test(sen) ? 1 : 0;
+    var isPik = (loan.cash_vs_pik || '').toLowerCase() === 'pik';
+    var share = c.total_cash_usd > 0 ? c.transferable_cash_usd / c.total_cash_usd : 0;
+    var par = c.principal_at_risk || 0;
+    if (isPik && (loan.cash_to_repay_t1 || 0) === 0)
+      return { label:'N/A', score:null, savable:0,
+        read:'Next payment is PIK — no cash is due at T1, so there is nothing to recover yet.' };
+    if (par === 0)
+      return { label:'Strong', score:0.92, savable:0,
+        read:sen + ' with no principal currently at risk and a ' + pct(share) + ' hard-currency share — a structure-only read of Strong.' };
+    var s = 0.35 + 0.20*senior + 0.20*secured - 0.12*(c.prior_issues||0) - 0.10*(1 - share);
+    s = Math.max(0.10, Math.min(0.97, s));
+    var prior = (c.prior_issues > 0) ? (c.prior_issues + ' prior miss' + (c.prior_issues>1?'es':'')) : 'no prior misses';
+    var trap = share < 0.25
+      ? 'cash is overwhelmingly trapped (recoverable only once convertibility or a bridge clears)'
+      : 'a ' + pct(share) + ' hard-currency share';
+    return { label:fpLabel(s), score:s, savable:Math.round(par*s),
+      read:sen + '; ' + prior + '; ' + trap + ' → structure-only read of ' + fpLabel(s) + ' (~' + s.toFixed(2) + '). Financials sharpen this next.' };
+  }
+  function recovPill(label){
+    return label==='N/A'
+      ? '<span class="nw-muted">n/a · PIK</span>'
+      : '<span class="recov"><span class="pill recov-'+label+'">'+esc(label)+'</span></span>';
+  }
+  function recovCellFirstPass(c){
+    var r = firstPassRecov(c);
+    if (r.label==='N/A') return tipc('recoverability-first-pass','<span class="nw-muted">n/a · PIK</span>');
+    return tipc('recoverability-first-pass',
+      '<span class="recov"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span>'+
+      (r.savable>0?'<span class="sv">'+usdM(r.savable)+'</span>':'')+'</span>');
   }
   function recovCellHtml(c){
     var r = c.recoverability; if(!r) return '<span class="nw-muted">—</span>';
-    return '<span class="recov" title="'+esc(r.read)+'"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span>'+
-           (r.savable_usd>0?'<span class="sv">'+usdM(r.savable_usd)+'</span>':'')+'</span>';
+    return tipc('recoverability-enhanced',
+      '<span class="recov"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span>'+
+      (r.savable_usd>0?'<span class="sv">'+usdM(r.savable_usd)+'</span>':'')+'</span>');
+  }
+
+  /* ---- forecast expected range bar (worst → base → best, 1.00 = breach line) ---- */
+  function rangeBar(f){
+    // domain 0..dmax, tightened to the company's own scenarios so the ticks spread out,
+    // while always keeping the 1.00 breach line on the bar
+    var dmax = Math.max(1.2, (f.coverage_t1_best || 0) + 0.2);
+    var sc = function(v){ return Math.max(0, Math.min(v/dmax, 1)) * 100; };
+    var w = sc(f.coverage_t1_worst), b = sc(f.coverage_t1), be = sc(f.coverage_t1_best);
+    var lo = Math.min(w,b), hi = Math.max(w,b), one = sc(1.0);
+    return '<div class="rng-bar">' +
+      '<div class="rng-band" style="left:'+lo+'%;width:'+(hi-lo)+'%"></div>' +
+      '<div class="rng-1" style="left:'+one+'%"><span class="lab">1.00</span></div>' +
+      '<div class="rng-tick worst" style="left:'+w+'%"><span class="lab">worst '+f.coverage_t1_worst.toFixed(2)+'</span></div>' +
+      '<div class="rng-tick base"  style="left:'+b+'%"><span class="lab">base '+f.coverage_t1.toFixed(2)+'</span></div>' +
+      '<div class="rng-tick best"  style="left:'+be+'%"><span class="lab">best '+f.coverage_t1_best.toFixed(2)+'</span></div>' +
+    '</div>';
+  }
+
+  /* ---- metric trust popover: as-at · formula · raw source(s) · evidence · lineage ---- */
+  function hasEv(slug){ return !!(EV && EV.metrics && EV.metrics[slug]); }
+  function tip(slug, inner){   // inline value + an "i" badge (inspector facts / titles)
+    if(!hasEv(slug)) return inner;
+    return '<span class="m" data-m="'+slug+'" tabindex="0">'+inner+'<span class="m-i" aria-hidden="true">i</span></span>';
+  }
+  function tipc(slug, inner){  // compact dotted-underline trigger (dense ranked table)
+    if(!hasEv(slug)) return inner;
+    return '<span class="mt" data-m="'+slug+'" tabindex="0">'+inner+'</span>';
+  }
+  function asAtFmt(iso){ if(!iso) return '—';
+    if(/\u2192|[A-Za-z]|Q/.test(String(iso))) return iso;   // ranges / quarters left verbatim
+    return fmtDate(iso); }
+  function mpFileChip(id){
+    var f = (EV.files||[]).filter(function(x){ return x.id===id; })[0];
+    return '<a class="mpop-src" href="dictionary.html#file-'+esc(id)+'" title="'+esc(f?f.type:'')+'">'+esc(f?f.file:id)+'</a>';
+  }
+  function mpHtml(slug){
+    var m = (EV.metrics||{})[slug]; if(!m) return '';
+    var srcs = (m.files||[]).map(mpFileChip).join(' ');
+    return '<div class="mpop-h">'+esc(m.label||slug)+'</div>' +
+      '<div class="mpop-row"><span class="kk">As at</span><span class="vv mono">'+esc(asAtFmt(m.as_at))+'</span></div>' +
+      (m.formula ? '<div class="mpop-row"><span class="kk">Formula</span><span class="vv mono">'+esc(m.formula)+'</span></div>' : '') +
+      (srcs ? '<div class="mpop-row"><span class="kk">Source</span><span class="vv">'+srcs+'</span></div>' : '') +
+      (m.note ? '<div class="mpop-row"><span class="kk">Evidence</span><span class="vv">'+esc(m.note)+'</span></div>' : '') +
+      '<div class="mpop-foot"><a href="dictionary.html#m-'+esc(slug)+'">Open in dictionary →</a><a href="diagram.html">Lineage →</a></div>';
+  }
+  var MP=null, MPcur=null, MPt=null;
+  function mClosest(el){ return (el && el.closest) ? el.closest('[data-m]') : null; }
+  function mpInit(){
+    if(MP) return;
+    MP = document.createElement('div'); MP.id='mpop'; MP.setAttribute('role','tooltip');
+    document.body.appendChild(MP);
+    MP.addEventListener('mouseenter', function(){ clearTimeout(MPt); });
+    MP.addEventListener('mouseleave', mpHideSoon);
+    document.addEventListener('mouseover', function(e){
+      var t = mClosest(e.target); if(!t) return; clearTimeout(MPt); mpShow(t);
+    });
+    document.addEventListener('mouseout', function(e){
+      var t = mClosest(e.target); if(!t) return;
+      var to = e.relatedTarget;
+      if(to && to.closest && (to.closest('#mpop') || mClosest(to)===t)) return;
+      mpHideSoon();
+    });
+    document.addEventListener('focusin', function(e){ var t = mClosest(e.target); if(t) mpShow(t); });
+    document.addEventListener('focusout', function(e){ var t = mClosest(e.target); if(t) mpHideSoon(); });
+    document.addEventListener('keydown', function(e){ if(e.key==='Escape') mpHide(); });
+    window.addEventListener('scroll', function(){ if(MPcur) mpHide(); }, true);
+    window.addEventListener('resize', function(){ if(MPcur) mpPos(MPcur); });
+  }
+  function mpShow(t){
+    var slug = t.getAttribute('data-m'); var html = mpHtml(slug); if(!html) return;
+    MP.innerHTML = html; MP.classList.add('on'); MPcur = t; mpPos(t);
+  }
+  function mpHide(){ if(MP) MP.classList.remove('on'); MPcur=null; }
+  function mpHideSoon(){ clearTimeout(MPt); MPt = setTimeout(mpHide, 180); }
+  function mpPos(t){
+    var r = t.getBoundingClientRect(); var w = MP.offsetWidth, h = MP.offsetHeight;
+    var left = Math.max(12, Math.min(r.left, window.innerWidth - w - 12));
+    var top = r.bottom + 8;
+    if(top + h > window.innerHeight - 12) top = r.top - h - 8;
+    if(top < 12) top = 12;
+    MP.style.left = Math.round(left)+'px'; MP.style.top = Math.round(top)+'px';
   }
 
   function renderTable(){
@@ -475,7 +651,9 @@
         (showFc ? '<th title="Modelled transferable cash at T1 ÷ cash due — forward-looking, includes rates &amp; input costs.">Forecast @ T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</th>' : '') +
         '<th title="Worst coverage at which this company still serviced a payment — its historical floor. Current below this = uncharted territory.">Worst serviced</th>' +
         '<th>Principal at risk</th>' +
-        (showRecov ? '<th title="Can they actually repay? Read from balance sheet + cashflow.">Recoverability'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</th>' : '') +
+        '<th>Recoverability' + (showRecov
+            ? (unlockedHere('Medium') ? ' <span class="nw-new">new</span>' : '')
+            : ' <span class="rc-hint">first-pass</span>') + '</th>' +
         '<th>Transferable / total</th>' +
         '<th>Trend</th>' +
         '<th>Prior</th>' +
@@ -495,28 +673,28 @@
         '<td class="l"><span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span></td>' +
         '<td>' +
           '<span class="covwrap">' +
-            '<span class="cov '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span>' +
+            tipc('coverage-ratio','<span class="cov '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span>') +
             '<span class="covbar"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></span>' +
           '</span>' +
         '</td>' +
         (showFc ? '<td>'+fcCellHtml(c)+'</td>' : '') +
         '<td>' + (typeof ws === 'number'
-            ? '<span class="wsc '+(uncharted?'uncharted':'safe')+'" title="'+(uncharted?'current coverage is below the worst level it has ever still serviced — uncharted territory':'has serviced payments down to this coverage before')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ uncharted':'held')+'</span></span>'
+            ? tipc('worst-serviced-floor','<span class="wsc '+(uncharted?'uncharted':'safe')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ uncharted':'held')+'</span></span>')
             : '<span class="nw-muted">—</span>') + '</td>' +
-        '<td><span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span></td>' +
-        (showRecov ? '<td>'+recovCellHtml(c)+'</td>' : '') +
+        '<td>'+tipc('principal-at-risk','<span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span>')+'</td>' +
+        '<td>' + (showRecov ? recovCellHtml(c) : recovCellFirstPass(c)) + '</td>' +
         '<td>' +
           '<span class="split-mini">' +
-            '<span class="bar" title="transferable vs trapped"><span style="width:'+trPct.toFixed(1)+'%"></span></span>' +
-            '<span class="txt">'+usdM(c.transferable_cash_usd)+' / '+usdM(c.total_cash_usd)+'</span>' +
+            '<span class="bar"><span style="width:'+trPct.toFixed(1)+'%"></span></span>' +
+            tipc('transferable-vs-trapped','<span class="txt">'+usdM(c.transferable_cash_usd)+' / '+usdM(c.total_cash_usd)+'</span>') +
           '</span>' +
         '</td>' +
-        '<td>' + (c.deteriorating
-            ? '<span class="arrow det" title="coverage trend worsening">↓ worsening</span>'
-            : '<span class="arrow stable" title="coverage stable">→ stable</span>') + '</td>' +
-        '<td><span class="pi '+(c.prior_issues>0?'has':'zero')+'" title="prior labelled misses">'+c.prior_issues+'</span></td>' +
-        '<td><span class="fresh '+(stale?'stale':'ok')+'" title="data freshness — a stale feed is itself a risk flag">'+
-            (stale?'⚠ ':'')+freshLabel(c.data_freshness_days)+'</span></td>' +
+        '<td>' + tipc('coverage-trend', c.deteriorating
+            ? '<span class="arrow det">↓ worsening</span>'
+            : '<span class="arrow stable">→ stable</span>') + '</td>' +
+        '<td>'+tipc('prior-issues','<span class="pi '+(c.prior_issues>0?'has':'zero')+'">'+c.prior_issues+'</span>')+'</td>' +
+        '<td>'+tipc('data-freshness','<span class="fresh '+(stale?'stale':'ok')+'">'+
+            (stale?'⚠ ':'')+freshLabel(c.data_freshness_days)+'</span>')+'</td>' +
       '</tr>';
     }).join('');
     var body = document.getElementById('rankBody');
@@ -563,7 +741,7 @@
     /* 1. WHY — coverage */
     html += '<div class="sec">';
     html += '<span class="panel-title">Why it\'s flagged</span>';
-    html += '<div class="cov-big"><span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span><span class="vs">coverage · high-risk below '+THRESH.toFixed(2)+'</span></div>';
+    html += '<div class="cov-big">'+tip('coverage-ratio','<span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span>')+'<span class="vs">coverage · high-risk below '+THRESH.toFixed(2)+'</span></div>';
     html += '<div class="cov-track"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></div>';
     if (c.coverage < 1.0){
       html += '<div class="cov-note">Projected transferable cash at T1 covers only <b>'+pct(c.coverage)+'</b> of the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+'. <span class="flag">≈ '+usd(shortfall)+' short</span></div>';
@@ -576,7 +754,7 @@
 
     /* 1b. transferable vs trapped */
     html += '<div class="sec">';
-    html += '<span class="panel-title">Transferable vs trapped cash</span>';
+    html += '<span class="panel-title">'+tip('transferable-vs-trapped','Transferable vs trapped cash')+'</span>';
     html += '<div class="split-bar"><div class="tr" style="width:'+trPct.toFixed(2)+'%"></div><div class="tp" style="width:'+tpPct.toFixed(2)+'%"></div></div>';
     html += '<div class="split-legend">' +
               '<span class="it"><span class="sw" style="background:var(--ink-700)"></span>Transferable <span class="v">'+usd(c.transferable_cash_usd)+'</span> <span class="nw-muted">('+usdM(c.transferable_cash_usd)+')</span></span>' +
@@ -587,24 +765,40 @@
 
     /* 1c. runway / trend / prior */
     html += '<div class="sec"><span class="panel-title">Context</span><div class="facts">';
-    html += fact('Runway', c.runway_days + ' days', 'transferable cash at current burn');
-    html += fact('Trend', c.deteriorating ? '↓ deteriorating' : '→ stable', 'coverage direction', c.deteriorating?'var(--risk-high)':'var(--ink)');
-    html += fact('Prior issues', String(c.prior_issues), 'labelled past misses', c.prior_issues>0?'var(--risk-medium)':'var(--ink)');
-    html += fact('Data freshness', freshLabel(c.data_freshness_days), stale?'stale — verify before acting':'feed is current', stale?'var(--risk-high)':'var(--ink)');
-    html += fact('Worst serviced', (typeof ws === 'number' ? ws.toFixed(2) : '—'), uncharted?'below its own floor — uncharted':'lowest coverage it still paid at', uncharted?'var(--risk-high)':'var(--ink)');
+    html += fact('Runway', tip('runway-days', c.runway_days + ' days'), 'transferable cash at current burn', null, true);
+    html += fact('Trend', tip('coverage-trend', c.deteriorating ? '↓ deteriorating' : '→ stable'), 'coverage direction', c.deteriorating?'var(--risk-high)':'var(--ink)', true);
+    html += fact('Prior issues', tip('prior-issues', String(c.prior_issues)), 'labelled past misses', c.prior_issues>0?'var(--risk-medium)':'var(--ink)', true);
+    html += fact('Data freshness', tip('data-freshness', freshLabel(c.data_freshness_days)), stale?'stale — verify before acting':'feed is current', stale?'var(--risk-high)':'var(--ink)', true);
+    html += fact('Worst serviced', tip('worst-serviced-floor', (typeof ws === 'number' ? ws.toFixed(2) : '—')), uncharted?'below its own floor — uncharted':'lowest coverage it still paid at', uncharted?'var(--risk-high)':'var(--ink)', true);
     html += '</div></div>';
 
-    /* 2a. MEDIUM unlock — recoverability (balance sheet + cashflow) */
+    /* 1d. NOW — first-pass recoverability (loan structure + convertibility + prior misses, no financials) */
+    if (!phaseReached('Medium')){
+      var fp = firstPassRecov(c);
+      html += '<div class="sec">';
+      html += '<span class="panel-title">Recoverability (first-pass)</span>';
+      html += '<div class="facts" style="margin-top:8px;">';
+      html += fact('First-pass', tip('recoverability-first-pass', recovPill(fp.label)), 'loan structure + convertibility + prior misses', null, true);
+      html += fact('Savable money', tip('savable-money-first-pass', fp.savable>0?usd(fp.savable):'—'), 'recoverable of the principal at risk', fp.savable>0?'var(--ink)':'var(--taupe)', true);
+      html += '</div>';
+      html += '<div style="font-size:12px;color:var(--ink-700);line-height:1.45;margin-top:10px;">'+esc(fp.read)+'</div>';
+      html += '<div style="font-size:11.5px;color:var(--taupe);line-height:1.45;margin-top:8px;">Available today from loan + bank data. <b>Medium</b> sharpens it with balance-sheet &amp; cashflow to separate a timing wobble from a structural hole.</div>';
+      html += '</div>';
+    }
+
+    /* 2a. MEDIUM unlock — recoverability sharpened: first-pass → financials-enhanced */
     if (phaseReached('Medium') && c.recoverability){
       var r = c.recoverability;
+      var fpm = firstPassRecov(c);
       html += '<div class="sec phase">';
-      html += '<span class="panel-title">Recoverability — can they actually repay?'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</span>';
+      html += '<span class="panel-title">Recoverability — timing wobble or structural hole?'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</span>';
       html += '<div class="facts" style="margin-top:8px;">';
-      html += fact('Recoverability', '<span class="recov"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span></span>', 'read from balance sheet + cashflow', null, true);
-      html += fact('Savable money', r.savable_usd>0?usd(r.savable_usd):'—', 'recoverable of the principal at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)');
+      html += fact('First-pass', tip('recoverability-first-pass', recovPill(fpm.label)), 'structure + convertibility (Now)', null, true);
+      html += fact('Enhanced', tip('recoverability-enhanced', recovPill(r.label)), 'balance sheet + cashflow', null, true);
+      html += fact('Savable money', tip('savable-money-sharpened', r.savable_usd>0?usd(r.savable_usd):'—'), 'recoverable of the principal at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)', true);
       html += '</div>';
       html += '<div class="ph-read">'+esc(r.read)+'</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> classify the shortfall as timing vs structural, then prioritise P1–P4 by savable money.</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> the financials separate a <b>timing wobble</b> from a <b>structural hole</b> — classify the shortfall, then prioritise P1–P4 by savable money.</div>';
       html += '</div>';
     }
 
@@ -615,23 +809,26 @@
       html += '<div class="sec phase">';
       html += '<span class="panel-title">Forecast &amp; scenarios — modelled cash at T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</span>';
       html += '<div class="facts" style="margin-top:8px;">';
-      html += fact('Forecast @ T1', f.coverage_t1.toFixed(2), 'modelled coverage vs spot '+c.coverage.toFixed(2), f.coverage_t1<1.0?'var(--risk-high)':'var(--risk-low)');
-      html += fact('Lead time to breach', leadTxt, 'warning before a shortfall', f.status==='clear'?'var(--ink)':'var(--risk-medium)');
-      html += fact('Drivers', esc(f.drivers), 'what moves it next', null, true);
+      html += fact('Base @ T1', tip('forecast-coverage-at-t1-base', f.coverage_t1.toFixed(2)), 'modelled coverage vs spot '+c.coverage.toFixed(2), f.coverage_t1<1.0?'var(--risk-high)':'var(--risk-low)', true);
+      html += fact('Worst @ T1', tip('worst-case-coverage-at-t1', f.coverage_t1_worst.toFixed(2)), 'FX stays blocked + rate / energy spike', 'var(--risk-high)', true);
+      html += fact('Lead time to breach', tip('lead-time-to-breach', leadTxt), 'warning before a shortfall', f.status==='clear'?'var(--ink)':'var(--risk-medium)', true);
       html += '</div>';
-      html += '<div class="ph-read">'+esc(f.read)+'</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> run a rate / input-cost scenario and size the bridge from the forecast gap.</div>';
+      html += '<div class="rng">'+rangeBar(f) +
+        '<div class="rng-cap">Expected range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1 (worst \u2192 base). Best case '+f.coverage_t1_best.toFixed(2)+' if FX frees up. <b>Size the bridge against the worst case</b>, not the mid-point.</div>' +
+      '</div>';
+      html += '<div class="ph-read">'+esc(f.read)+'. Drivers: '+esc(f.drivers)+'.</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> size the bridge against the <b>worst-case</b> gap, then re-run as rates / input costs move.</div>';
       html += '</div>';
     }
 
     /* 3. FOLLOW-UP — loan structure */
     html += '<div class="sec"><span class="panel-title">Loan follow-up</span><div class="facts">';
-    html += fact('Seniority', esc(loan.seniority));
+    html += fact('Seniority', tip('seniority-security', esc(loan.seniority)), null, null, true);
     html += fact('Principal', usd(loan.principal));
-    html += fact('Coupon', pct(loan.coupon_rate));
-    html += fact('Type', isPik ? '<span class="badge pik">PIK</span> no cash due' : '<span class="badge cash">CASH</span> coupon', null, null, true);
-    html += fact('Next payment', fmtDate(loan.next_payment_date));
-    html += fact('Cash to repay (T1)', isPik && loan.cash_to_repay_t1===0 ? '$0 · PIK' : usd(loan.cash_to_repay_t1), isPik && loan.cash_to_repay_t1===0 ? 'paid in kind — no cash leaves the borrower' : null);
+    html += fact('Coupon', tip('coupon-rate', pct(loan.coupon_rate)), null, null, true);
+    html += fact('Type', tip('cash-vs-pik', isPik ? '<span class="badge pik">PIK</span> no cash due' : '<span class="badge cash">CASH</span> coupon'), null, null, true);
+    html += fact('Next payment', tip('next-payment', fmtDate(loan.next_payment_date)), null, null, true);
+    html += fact('Cash to repay (T1)', tip('cash-due-t1', isPik && loan.cash_to_repay_t1===0 ? '$0 · PIK' : usd(loan.cash_to_repay_t1)), isPik && loan.cash_to_repay_t1===0 ? 'paid in kind — no cash leaves the borrower' : null, null, true);
     html += '</div></div>';
 
     /* 4. RECOMMENDED ACTION */

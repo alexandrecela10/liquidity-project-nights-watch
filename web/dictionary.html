@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data &amp; formula dictionary — Project Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .dict-wrap { max-width: 1240px; margin: 0 auto; padding: 18px 22px 50px; }
+  .dict-head { margin: 6px 0 14px; }
+  .dict-head h1 { font-size: 25px; }
+  .dict-head .lede { color: var(--taupe); font-size: 13.5px; margin-top: 5px; max-width: 78ch; }
+
+  .dict-controls { display:flex; align-items:center; gap:12px 16px; flex-wrap:wrap; margin: 16px 0; }
+  .dseg { display:inline-flex; background: var(--white); border:1px solid var(--sand-500); border-radius:999px; padding:3px; box-shadow: var(--shadow); }
+  .dseg button { font-family: var(--font); font-size: 12.5px; font-weight:600; color: var(--taupe); background:transparent; border:none; cursor:pointer; padding:6px 14px; border-radius:999px; }
+  .dseg button:hover { color: var(--ink); }
+  .dseg button.on { background: var(--ink); color: var(--sand); }
+  .dsearch { flex:1; min-width: 220px; max-width: 360px; }
+  .dsearch input { width:100%; font-family: var(--font); font-size: 13px; color: var(--ink); background: var(--white);
+    border:1px solid var(--sand-700); border-radius: var(--radius-sm); padding: 9px 12px; }
+  .dsearch input:focus { outline: 2px solid var(--yellow); outline-offset:0; border-color: var(--ink); }
+  .dcount { font-size: 11.5px; color: var(--taupe); }
+
+  .sect-title { font-size: 12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color: var(--taupe); margin: 26px 0 10px; }
+
+  table.dict { width:100%; border-collapse: collapse; font-size: 12.5px; background: var(--white);
+    border:1px solid var(--sand-500); border-radius: var(--radius); overflow:hidden; }
+  table.dict thead th { position: sticky; top:0; z-index:2; background: var(--sand-500); color: var(--taupe);
+    font-size: 10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; text-align:left;
+    padding: 9px 12px; border-bottom:1px solid var(--sand-700); white-space:nowrap; }
+  table.dict tbody td { padding: 11px 12px; border-bottom:1px solid var(--sand-500); vertical-align: top; }
+  table.dict tbody tr:last-child td { border-bottom:none; }
+  table.dict tbody tr:target { background:#fbf3d6; box-shadow: inset 3px 0 0 var(--yellow); }
+  table.dict tbody tr.hide { display:none; }
+
+  .m-name { font-weight:600; }
+  .m-slug { font-family: var(--mono); font-size: 10.5px; color: var(--taupe); display:block; margin-top:2px; }
+  .m-formula { font-family: var(--mono); font-size: 11.5px; color: var(--ink-700); line-height:1.45; }
+  .m-asat { font-family: var(--mono); font-size: 11.5px; white-space:nowrap; }
+  .m-note { color: var(--ink-700); line-height:1.45; max-width: 42ch; }
+  .src-chip { display:inline-block; font-family: var(--mono); font-size: 10.5px; text-decoration:none;
+    color: var(--ink-700); background: var(--sand); border:1px solid var(--sand-500); border-radius:6px;
+    padding: 1px 7px; margin: 0 4px 4px 0; white-space:nowrap; }
+  .src-chip:hover { background: var(--yellow); border-color: var(--yellow); }
+  .feeds-cell .src-chip { background:#eef1ec; border-color:#dde3da; cursor:default; }
+
+  .f-name { font-family: var(--mono); font-size: 11.5px; font-weight:600; }
+  .f-num { font-family: var(--mono); text-align:right; }
+  .f-sample { color: var(--taupe); line-height:1.4; max-width: 40ch; }
+
+  .foot { color: var(--taupe); font-size: 11.5px; margin-top: 26px; padding-top: 14px; border-top: 1px solid var(--sand-500); }
+  @media (max-width: 900px){ .m-note, .f-sample { max-width: none; } }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="roadmap.html">Data roadmap</a>
+    <a href="dictionary.html" class="active">Dictionary</a>
+  </nav>
+</div>
+
+<div class="dict-wrap">
+  <div class="dict-head">
+    <h1>Data &amp; formula dictionary</h1>
+    <p class="lede">Every metric on the credit desk, with its plain-English <b>formula</b>, the date it is <b>as at</b>, the <b>raw source file(s)</b> it derives from, and the <b>evidence</b> behind it. The hover popovers on the desk link straight into this page — so any number traces back to where it came from. Synthetic data only.</p>
+  </div>
+
+  <div class="dict-controls">
+    <div class="dseg" id="hzSeg" role="tablist" aria-label="Filter by data horizon">
+      <button type="button" data-hz="All" class="on" role="tab">All</button>
+      <button type="button" data-hz="Now" role="tab">Now</button>
+      <button type="button" data-hz="Medium" role="tab">Medium</button>
+      <button type="button" data-hz="Later" role="tab">Later</button>
+    </div>
+    <div class="dsearch"><input id="dq" type="search" placeholder="Search metric, formula or evidence…" aria-label="Search the dictionary"></div>
+    <span class="dcount" id="dcount"></span>
+  </div>
+
+  <div class="sect-title">Metrics &amp; formulas</div>
+  <table class="dict">
+    <thead><tr>
+      <th style="width:17%">Metric</th>
+      <th style="width:9%">Horizon</th>
+      <th style="width:28%">Formula</th>
+      <th style="width:9%">As at</th>
+      <th style="width:15%">Raw source(s)</th>
+      <th style="width:22%">Evidence</th>
+    </tr></thead>
+    <tbody id="mBody"></tbody>
+  </table>
+
+  <div class="sect-title">Raw source files</div>
+  <table class="dict">
+    <thead><tr>
+      <th style="width:16%">File</th>
+      <th style="width:15%">Type</th>
+      <th style="width:7%">Horizon</th>
+      <th style="width:8%">As-of</th>
+      <th style="width:16%">Grain</th>
+      <th style="width:5%">Rows</th>
+      <th style="width:16%">Feeds</th>
+      <th style="width:17%">Sample</th>
+    </tr></thead>
+    <tbody id="fBody"></tbody>
+  </table>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+  function loadSpec(srcs, done){ if(!srcs.length) return done(new Error('no spec'));
+    var s=document.createElement('script'); s.src=srcs[0];
+    s.onload=done; s.onerror=function(){ loadSpec(srcs.slice(1), done); };
+    document.head.appendChild(s); }
+  loadSpec(['../spec/ontology.js','ontology.js'], function(){ init(); });
+
+  var EV, FILES, FILE_BY_ID = {}, HZ = 'All';
+
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtDate(iso){ if(!iso) return '—';
+    if(/\u2192/.test(iso) || /[A-Za-z]/.test(iso) || /Q/.test(iso)) return iso;  // ranges / quarters left as-is
+    var d=new Date(iso+'T00:00:00');
+    return isNaN(d) ? iso : d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  function hzChip(h){ var cls = (h==='Now'||h==='Medium'||h==='Later') ? 'nw-phase-'+h : '';
+    return '<span class="nw-phase '+cls+'">'+esc(h||'—')+'</span>'; }
+
+  function init(){
+    EV = (window.NW_SPEC && window.NW_SPEC.evidence) || { metrics:{}, files:[] };
+    FILES = EV.files || [];
+    FILES.forEach(function(f){ FILE_BY_ID[f.id] = f; });
+    renderMetrics();
+    renderFiles();
+    bindControls();
+    var meta = window.NW_SPEC.meta || {};
+    document.getElementById('foot').textContent =
+      (meta.note ? meta.note + ' · ' : '') + (meta.product||'Project Night\u2019s Watch') + (meta.version?' ('+meta.version+')':'') + '.';
+    if (location.hash) { var t=document.querySelector(location.hash); if(t) t.scrollIntoView(); }
+  }
+
+  function srcChips(ids){
+    return (ids||[]).map(function(id){
+      var f = FILE_BY_ID[id]; var name = f ? f.file : id;
+      return '<a class="src-chip" href="#file-'+esc(id)+'" title="'+esc(f?f.type:'')+'">'+esc(name)+'</a>';
+    }).join('');
+  }
+
+  function renderMetrics(){
+    var m = EV.metrics || {};
+    var order = { Now:0, Medium:1, Later:2, Live:3 };
+    var rows = Object.keys(m).map(function(slug){ var o=m[slug]; o._slug=slug; return o; });
+    rows.sort(function(a,b){
+      var ha=order[a.horizon]==null?9:order[a.horizon], hb=order[b.horizon]==null?9:order[b.horizon];
+      if (ha!==hb) return ha-hb;
+      return (a.label||a._slug).localeCompare(b.label||b._slug);
+    });
+    document.getElementById('mBody').innerHTML = rows.map(function(o){
+      return '<tr id="m-'+esc(o._slug)+'" data-hz="'+esc(o.horizon||'')+'" '+
+               'data-text="'+esc(((o.label||'')+' '+o._slug+' '+(o.formula||'')+' '+(o.note||'')).toLowerCase())+'">' +
+        '<td><span class="m-name">'+esc(o.label||o._slug)+'</span><span class="m-slug">'+esc(o._slug)+'</span></td>' +
+        '<td>'+hzChip(o.horizon)+'</td>' +
+        '<td><span class="m-formula">'+esc(o.formula||'—')+'</span></td>' +
+        '<td><span class="m-asat">'+esc(fmtDate(o.as_at))+'</span></td>' +
+        '<td>'+(srcChips(o.files)||'<span class="nw-muted">—</span>')+'</td>' +
+        '<td><span class="m-note">'+esc(o.note||'—')+'</span></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function renderFiles(){
+    document.getElementById('fBody').innerHTML = FILES.map(function(f){
+      var feeds = (f.feeds||[]).map(function(x){ return '<span class="src-chip">'+esc(x)+'</span>'; }).join(' ');
+      return '<tr id="file-'+esc(f.id)+'">' +
+        '<td><span class="f-name">'+esc(f.file)+'</span></td>' +
+        '<td>'+esc(f.type)+'</td>' +
+        '<td>'+hzChip(f.horizon)+'</td>' +
+        '<td><span class="m-asat">'+esc(f.as_at)+'</span></td>' +
+        '<td>'+esc(f.grain)+'</td>' +
+        '<td class="f-num">'+esc(f.rows)+'</td>' +
+        '<td class="feeds-cell">'+(feeds||'<span class="nw-muted">—</span>')+'</td>' +
+        '<td><span class="f-sample">'+esc(f.sample)+'</span></td>' +
+      '</tr>';
+    }).join('');
+  }
+
+  function applyFilter(){
+    var q = (document.getElementById('dq').value||'').trim().toLowerCase();
+    var shown = 0, total = 0;
+    Array.prototype.forEach.call(document.querySelectorAll('#mBody tr'), function(tr){
+      total++;
+      var okHz = (HZ==='All') || (tr.getAttribute('data-hz')===HZ);
+      var okQ = !q || (tr.getAttribute('data-text').indexOf(q) >= 0);
+      var show = okHz && okQ;
+      tr.classList.toggle('hide', !show);
+      if (show) shown++;
+    });
+    document.getElementById('dcount').textContent = shown + ' of ' + total + ' metrics';
+  }
+
+  function bindControls(){
+    Array.prototype.forEach.call(document.querySelectorAll('#hzSeg button'), function(b){
+      b.addEventListener('click', function(){
+        HZ = b.getAttribute('data-hz');
+        Array.prototype.forEach.call(document.querySelectorAll('#hzSeg button'), function(x){ x.classList.toggle('on', x===b); });
+        applyFilter();
+      });
+    });
+    document.getElementById('dq').addEventListener('input', applyFilter);
+    applyFilter();
+  }
+</script>
+</body>
+</html>
