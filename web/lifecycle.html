@@ -1,0 +1,541 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lifecycle of a warning — Project Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* ---- page-specific (self-contained per the build contract) ---- */
+  .lc-head { padding: 30px 0 10px; display:flex; gap:26px; align-items:flex-end; justify-content:space-between; flex-wrap:wrap; }
+  .lc-head .k { font-size:12px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--taupe); }
+  .lc-head h1 { font-size:30px; line-height:1.08; max-width:20ch; margin-top:6px; }
+  .lc-head .sub { color:var(--taupe); font-size:14px; margin-top:10px; max-width:58ch; }
+  .lc-head .sub b { color:var(--ink); font-weight:600; }
+
+  /* new-file banner */
+  .lc-newfile { padding:16px 18px; max-width:430px; }
+  .lc-newfile .row1 { display:flex; align-items:center; gap:10px; }
+  .lc-newfile .fname { font-family:var(--mono); font-size:13px; font-weight:500; color:var(--ink-700); }
+  .lc-newfile .when { color:var(--taupe); font-size:12px; margin-left:auto; }
+  .lc-newfile .chg { color:var(--taupe); font-size:13px; margin-top:9px; line-height:1.45; }
+  .lc-newfile .rows { display:inline-block; margin-top:9px; font-family:var(--mono); font-size:11.5px; color:var(--ink); background:var(--sand-500); border-radius:999px; padding:2px 10px; }
+
+  /* layout */
+  .lc-grid { display:grid; grid-template-columns: minmax(0,1fr) 392px; gap:22px; align-items:start; margin-top:8px; }
+  @media (max-width: 1040px){ .lc-grid{ grid-template-columns:1fr; } .lc-aside{ position:static !important; } }
+
+  /* stepper */
+  .lc-stepper { display:flex; gap:0; position:relative; margin:2px 0 18px; }
+  .lc-step { flex:1 1 0; min-width:0; background:none; border:none; cursor:pointer; padding:0 4px; text-align:center; font-family:var(--font); position:relative; }
+  .lc-step:focus-visible { outline:2px solid var(--ink); outline-offset:3px; border-radius:8px; }
+  .lc-step .line { position:absolute; top:15px; left:-50%; width:100%; height:2px; background:var(--sand-700); z-index:0; }
+  .lc-step:first-child .line { display:none; }
+  .lc-step.done .line, .lc-step.current .line { background:var(--ink); }
+  .lc-step .dot { position:relative; z-index:1; width:30px; height:30px; border-radius:50%; margin:0 auto; display:flex; align-items:center; justify-content:center;
+                  background:var(--white); border:2px solid var(--sand-700); color:var(--taupe); font-size:12px; font-weight:700; transition:all .25s ease; }
+  .lc-step.done .dot { background:var(--ink); border-color:var(--ink); color:var(--sand); }
+  .lc-step.current .dot { border-color:var(--step-accent,var(--ink)); color:var(--step-accent,var(--ink)); box-shadow:0 0 0 4px var(--step-halo, rgba(7,39,8,.12)); transform:scale(1.12); }
+  .lc-step .lbl { display:block; font-size:11px; line-height:1.25; color:var(--taupe); margin-top:8px; max-width:13ch; margin-inline:auto; }
+  .lc-step.current .lbl { color:var(--ink); font-weight:600; }
+  .lc-step .lyr { display:block; font-size:9.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; margin-top:4px; color:var(--sand-700); }
+  .lc-step.current .lyr, .lc-step.done .lyr { color:var(--step-accent,var(--taupe)); }
+
+  /* controls */
+  .lc-controls { display:flex; align-items:center; gap:10px; margin-bottom:16px; }
+  .lc-controls .spacer { flex:1; }
+  .lc-progress { height:6px; background:var(--sand-500); border-radius:999px; overflow:hidden; flex:1 1 200px; max-width:340px; }
+  .lc-progress > i { display:block; height:100%; width:0; background:var(--ink); border-radius:999px; transition:width .4s ease; }
+  .lc-count { font-size:12.5px; color:var(--taupe); white-space:nowrap; min-width:128px; text-align:right; }
+  .lc-count b { color:var(--ink); }
+
+  /* step card */
+  .lc-stepcard { padding:20px 22px; border-left:5px solid var(--step-accent,var(--ink)); min-height:188px; transition:border-color .3s ease; }
+  .lc-stepcard .top { display:flex; align-items:center; gap:10px; }
+  .lc-stepcard h2 { font-size:19px; }
+  .lc-stepcard .detail { color:var(--taupe); font-size:14.5px; line-height:1.55; margin:12px 0 0; max-width:62ch; }
+  .lc-dbtitle { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--taupe); margin:18px 0 8px; }
+  .lc-writes { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:7px; }
+  .lc-writes li { display:flex; align-items:flex-start; gap:9px; font-family:var(--mono); font-size:12.5px; color:var(--ink); background:var(--sand); border:1px solid var(--sand-500); border-radius:8px; padding:8px 11px; opacity:0; transform:translateY(4px); animation:wIn .34s ease forwards; }
+  .lc-writes li .g { color:var(--risk-low); font-weight:700; flex:none; }
+  @keyframes wIn { to { opacity:1; transform:none; } }
+
+  /* warning + action cards */
+  .lc-event { padding:0; overflow:hidden; opacity:0; max-height:0; transition:opacity .35s ease, max-height .45s ease, margin .35s ease; margin-top:0; }
+  .lc-event.show { opacity:1; max-height:420px; margin-top:16px; }
+  .lc-event .hd { display:flex; align-items:center; gap:10px; padding:13px 18px; }
+  .lc-warn .hd { background:#f6e4e0; }
+  .lc-act .hd { background:var(--ink); color:var(--sand); }
+  .lc-event .hd .ttl { font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+  .lc-act .hd .ttl { color:var(--yellow); }
+  .lc-event .bd { padding:15px 18px; }
+  .lc-event .bd .reason { font-size:14px; line-height:1.55; color:var(--ink); }
+  .lc-metrics { display:flex; gap:24px; flex-wrap:wrap; margin-top:13px; }
+  .lc-metrics .m .v { font-size:18px; font-weight:700; font-family:var(--mono); }
+  .lc-metrics .m .l { font-size:11.5px; color:var(--taupe); }
+  .lc-act .bd .kv { display:flex; gap:10px; font-size:13.5px; margin-top:7px; }
+  .lc-act .bd .kv span:first-child { color:var(--taupe); min-width:108px; }
+
+  /* aside: before/after + ledger */
+  .lc-aside { position:sticky; top:78px; display:flex; flex-direction:column; gap:18px; }
+  .lc-ba { padding:18px 20px; }
+  .lc-ba .hd { display:flex; align-items:baseline; justify-content:space-between; }
+  .lc-ba .hd h3 { font-size:15px; }
+  .lc-ba .hd .as { font-size:11px; color:var(--taupe); font-family:var(--mono); }
+  .lc-cols { display:grid; grid-template-columns:1fr 22px 1fr; align-items:center; margin-top:6px; }
+  .lc-colhd { font-size:10.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--taupe); padding-bottom:4px; }
+  .lc-colhd.r { text-align:right; }
+  .ba-row { display:contents; }
+  .ba-row .rl { grid-column:1 / -1; font-size:11px; color:var(--taupe); margin:12px 0 2px; }
+  .ba-b, .ba-a { font-family:var(--mono); font-weight:600; font-size:15px; }
+  .ba-a { text-align:right; }
+  .ba-arrow { text-align:center; color:var(--sand-700); font-size:13px; }
+  .ba-after-pending .ba-a, .ba-after-pending .ba-pill-a { opacity:.32; filter:grayscale(.3); }
+  .ba-a.flash { animation:flash .9s ease; }
+  @keyframes flash { 0%{ background:var(--yellow);} 100%{ background:transparent; } }
+  .ba-pill-row { display:grid; grid-template-columns:1fr 22px 1fr; align-items:center; margin-top:2px; }
+  .ba-pill-a { justify-self:end; }
+  .ba-delta { grid-column:1 / -1; text-align:right; font-size:11px; color:var(--risk-high); font-weight:600; font-family:var(--mono); margin-top:2px; min-height:14px; }
+
+  /* coverage bar */
+  .cov-wrap { grid-column:1 / -1; margin-top:8px; }
+  .cov-track { position:relative; height:26px; background:var(--sand-500); border-radius:7px; overflow:hidden; }
+  .cov-fill { position:absolute; left:0; top:0; bottom:0; border-radius:7px 0 0 7px; transition:width .25s linear, background .25s linear; }
+  .cov-fill.b { background:rgba(94,125,82,.5); }
+  .cov-threshold { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); }
+  .cov-threshold::after { content:'1.00'; position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:9px; font-family:var(--mono); color:var(--ink); white-space:nowrap; }
+  .cov-threshold.alarm { animation:alarm .5s ease 3; }
+  @keyframes alarm { 50%{ background:var(--risk-high); box-shadow:0 0 0 3px rgba(179,64,46,.25); } }
+  .cov-legend { grid-column:1 / -1; display:flex; justify-content:space-between; font-family:var(--mono); font-size:12px; margin-top:7px; }
+  .cov-legend .now { font-weight:700; }
+
+  /* ledger */
+  .lc-ledger { padding:16px 18px; }
+  .lc-ledger .hd { display:flex; align-items:center; justify-content:space-between; }
+  .lc-ledger .hd h3 { font-size:14px; }
+  .lc-ledger .hd .cnt { font-size:11px; font-family:var(--mono); color:var(--taupe); }
+  .lc-log { list-style:none; margin:10px 0 0; padding:0; max-height:208px; overflow:auto; display:flex; flex-direction:column; gap:6px; }
+  .lc-log li { display:flex; gap:8px; align-items:flex-start; font-family:var(--mono); font-size:11.5px; line-height:1.4; padding:6px 8px; border-radius:7px; background:var(--sand); border:1px solid var(--sand-500); opacity:0; animation:wIn .3s ease forwards; }
+  .lc-log li .g { color:var(--risk-low); font-weight:700; flex:none; }
+  .lc-log .empty { color:var(--taupe); font-family:var(--font); font-size:12.5px; background:none; border:none; padding:2px; }
+
+  .lc-foot { color:var(--taupe); font-size:12.5px; padding:22px 0 50px; border-top:1px solid var(--sand-500); margin-top:26px; line-height:1.6; }
+  .lc-foot b { color:var(--ink); font-weight:600; }
+
+  /* page-specific layer chips not in theme (warning / action steps) */
+  .nw-layer-warning { background:#f6e4e0; color:var(--risk-high); }
+  .nw-layer-action  { background:var(--ink); color:var(--yellow); }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html" class="active">Lifecycle</a>
+  </nav>
+</div>
+
+<div class="nw-wrap">
+  <header class="lc-head">
+    <div>
+      <div class="k">End to end · play-through</div>
+      <h1 id="lc-title">Lifecycle of a warning</h1>
+      <p class="sub" id="lc-sub"></p>
+    </div>
+    <div class="lc-newfile nw-card" id="lc-newfile"></div>
+  </header>
+
+  <div class="lc-grid">
+    <main class="lc-main">
+      <div class="lc-stepper" id="lc-stepper"></div>
+
+      <div class="lc-controls">
+        <button class="nw-btn ghost" id="btn-back">‹ Back</button>
+        <button class="nw-btn accent" id="btn-play">▶ Play</button>
+        <button class="nw-btn" id="btn-next">Next ›</button>
+        <span class="spacer"></span>
+        <div class="lc-progress"><i id="lc-progress-bar"></i></div>
+        <span class="lc-count" id="lc-count"></span>
+      </div>
+
+      <section class="lc-stepcard nw-card" id="lc-stepcard">
+        <div class="top">
+          <span class="nw-layer" id="sc-layer"></span>
+          <h2 id="sc-title"></h2>
+        </div>
+        <p class="detail" id="sc-detail"></p>
+        <div class="lc-dbtitle">Database changes this step</div>
+        <ul class="lc-writes" id="sc-writes"></ul>
+      </section>
+
+      <section class="lc-event lc-warn nw-card" id="lc-warning">
+        <div class="hd">
+          <span class="nw-pill nw-risk-High" id="warn-pill">High</span>
+          <span class="ttl">Warning fired</span>
+        </div>
+        <div class="bd">
+          <p class="reason" id="warn-reason"></p>
+          <div class="lc-metrics">
+            <div class="m"><div class="v" id="warn-cov"></div><div class="l">coverage (signal)</div></div>
+            <div class="m"><div class="v" id="warn-par"></div><div class="l">principal at risk</div></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="lc-event lc-act nw-card" id="lc-action">
+        <div class="hd">
+          <span class="nw-pill" id="act-pill" style="background:var(--yellow);color:var(--ink);">P1</span>
+          <span class="ttl">Action logged</span>
+        </div>
+        <div class="bd">
+          <p class="reason" id="act-taken"></p>
+          <div class="kv"><span>actor</span><span id="act-actor" class="nw-mono"></span></div>
+          <div class="kv"><span>outcome</span><span id="act-outcome" class="nw-mono"></span></div>
+          <div class="kv"><span>record</span><span id="act-record" class="nw-mono"></span></div>
+        </div>
+      </section>
+    </main>
+
+    <aside class="lc-aside">
+      <div class="lc-ba nw-card">
+        <div class="hd">
+          <h3>Before vs after</h3>
+          <span class="as" id="ba-as"></span>
+        </div>
+        <div class="lc-cols">
+          <span class="lc-colhd">Before</span><span></span><span class="lc-colhd r">After</span>
+        </div>
+
+        <div id="ba-body"></div>
+      </div>
+
+      <div class="lc-ledger nw-card">
+        <div class="hd">
+          <h3>Database write log</h3>
+          <span class="cnt" id="ledger-cnt">0 writes</span>
+        </div>
+        <ul class="lc-log" id="lc-log"></ul>
+      </div>
+    </aside>
+  </div>
+
+  <p class="lc-foot" id="lc-foot"></p>
+</div>
+
+<script>
+  /* Resilient spec loader (works in-repo at web/ and flattened on Pages). */
+  function loadSpec(srcs, ok, fail){
+    if(!srcs.length){ return (fail||function(){})(); }
+    var s = document.createElement('script');
+    s.src = srcs[0];
+    s.onload = ok;
+    s.onerror = function(){ loadSpec(srcs.slice(1), ok, fail); };
+    document.head.appendChild(s);
+  }
+  loadSpec(['ontology.js','../spec/ontology.js'], init, function(){
+    document.querySelector('.nw-wrap').insertAdjacentHTML('afterbegin',
+      '<p style="color:var(--risk-high)">Could not load spec/ontology.js — run <code>python3 scripts/build_spec.py</code>.</p>');
+  });
+
+  /* ---------- helpers ---------- */
+  var fmtUSD = function(n){ return '$' + Math.round(n).toLocaleString('en-US'); };
+  var cov2   = function(n){ return Number(n).toFixed(2); };
+  var el     = function(id){ return document.getElementById(id); };
+
+  /* layer -> accent + soft halo (drives the per-step emphasis colour) */
+  var ACCENT = {
+    source:          { c:'var(--taupe)',      h:'rgba(111,95,86,.18)'  },
+    bronze:          { c:'#7a4a25',           h:'rgba(122,74,37,.18)'  },
+    standardisation: { c:'#caa400',           h:'rgba(255,222,67,.45)' },
+    silver:          { c:'#41514a',           h:'rgba(65,81,74,.18)'   },
+    gold:            { c:'var(--ink)',        h:'rgba(7,39,8,.16)'     },
+    warning:         { c:'var(--risk-high)',  h:'rgba(179,64,46,.22)'  },
+    action:          { c:'var(--ink)',        h:'rgba(7,39,8,.18)'     }
+  };
+  var LAYER_LABEL = {
+    source:'Source', bronze:'Bronze', standardisation:'Standardise',
+    silver:'Silver', gold:'Gold', warning:'Warning', action:'Action'
+  };
+
+  var COV_MAX = 1.5; /* coverage axis: 0 .. 1.5, threshold at 1.0 */
+  var covPct  = function(v){ return Math.min(100, Math.max(0, v / COV_MAX * 100)); };
+  var covColor= function(v){ return v < 1.0 ? 'var(--risk-high)' : 'var(--risk-low)'; };
+
+  /* ---------- state ---------- */
+  var L, STEPS, GOLD_I, WARN_I, ACT_I, cur = 0, playing = false, timer = null;
+  var covAnim = null;
+
+  function init(){
+    L = window.NW_SPEC.lifecycle;
+    STEPS = L.steps;
+    GOLD_I = STEPS.findIndex(function(s){ return s.layer === 'gold'; });   /* first gold = recompute */
+    WARN_I = STEPS.findIndex(function(s){ return s.layer === 'warning'; });
+    ACT_I  = STEPS.findIndex(function(s){ return s.layer === 'action'; });
+
+    el('lc-title').textContent = L.title;
+    el('lc-sub').innerHTML =
+      'One warning for <b>' + L.company_name + '</b>, end to end. ' +
+      'Honest by construction: the only thing that changed in the new file is the EUR operating account dropping to <b>$0</b> — every number below follows from that.';
+
+    renderNewFile();
+    renderStepper();
+    renderBeforeAfterShell();
+    renderWarningStatic();
+    renderActionStatic();
+
+    el('lc-foot').innerHTML =
+      'Lineage stays intact: every figure on this page traces back to <b>' + L.new_file.file_name +
+      '</b> (' + L.new_file.raw_rows + ' raw rows, ingested ' + L.new_file.ingested_at.slice(0,10) +
+      '). Synthetic data · all numbers read from <span class="nw-mono">NW_SPEC.lifecycle</span>.';
+
+    el('btn-back').onclick = function(){ stop(); go(cur - 1); };
+    el('btn-next').onclick = function(){ stop(); go(cur + 1); };
+    el('btn-play').onclick = togglePlay;
+    document.addEventListener('keydown', onKey);
+
+    go(0, false);
+  }
+
+  function renderNewFile(){
+    var f = L.new_file;
+    el('lc-newfile').innerHTML =
+      '<div class="row1"><span class="nw-layer nw-layer-source">New file</span>' +
+        '<span class="fname">' + f.file_name + '</span>' +
+        '<span class="when">' + f.ingested_at.replace('T',' ').replace('Z',' UTC') + '</span></div>' +
+      '<div class="chg">' + f.change + '</div>' +
+      '<div class="rows">' + f.raw_rows + ' raw rows</div>';
+  }
+
+  function renderStepper(){
+    var html = STEPS.map(function(s, i){
+      var ac = ACCENT[s.layer] || ACCENT.source;
+      return '<button class="lc-step" data-i="' + i + '" style="--step-accent:' + ac.c + ';--step-halo:' + ac.h + '">' +
+               '<span class="line"></span>' +
+               '<span class="dot">' + (i + 1) + '</span>' +
+               '<span class="lyr">' + (LAYER_LABEL[s.layer] || s.layer) + '</span>' +
+               '<span class="lbl">' + s.title + '</span>' +
+             '</button>';
+    }).join('');
+    var wrap = el('lc-stepper');
+    wrap.innerHTML = html;
+    Array.prototype.forEach.call(wrap.children, function(btn){
+      btn.onclick = function(){ stop(); go(parseInt(btn.dataset.i, 10)); };
+    });
+  }
+
+  /* ----- before/after panel ----- */
+  function renderBeforeAfterShell(){
+    var b = L.before, a = L.after;
+    el('ba-as').textContent = b.refresh_ts + ' → ' + a.refresh_ts;
+    var dropPct = Math.round((1 - a.transferable_cash_usd / b.transferable_cash_usd) * 100);
+
+    el('ba-body').innerHTML =
+      money('Transferable cash (M1)', b.transferable_cash_usd, a.transferable_cash_usd, '▼ ' + dropPct + '%') +
+      coverageBlock(b.coverage_ratio, a.coverage_ratio) +
+      labelBlock(b.ew_label, a.ew_label) +
+      money('Total cash', b.total_cash_usd, a.total_cash_usd, '') +
+      money('Cash to repay (T1)', b.cash_to_repay_t1, a.cash_to_repay_t1, 'unchanged', true);
+  }
+
+  function money(label, bv, av, delta, neutral){
+    var d = delta ? '<div class="ba-delta" style="' + (neutral ? 'color:var(--taupe)' : '') + '">' + delta + '</div>' : '';
+    return '<div class="ba-row">' +
+      '<div class="rl">' + label + '</div>' +
+      '<div class="ba-b">' + fmtUSD(bv) + '</div>' +
+      '<div class="ba-arrow">→</div>' +
+      '<div class="ba-a">' + fmtUSD(av) + '</div>' + d +
+    '</div>';
+  }
+
+  function labelBlock(bl, al){
+    return '<div class="ba-row"><div class="rl">Early-warning label</div></div>' +
+      '<div class="ba-pill-row">' +
+        '<span class="nw-pill nw-risk-' + bl + '">' + bl + '</span>' +
+        '<span class="ba-arrow">→</span>' +
+        '<span class="ba-pill-a nw-pill nw-risk-' + al + '">' + al + '</span>' +
+      '</div>';
+  }
+
+  function coverageBlock(bc, ac){
+    return '<div class="ba-row"><div class="rl">Coverage ratio — the signal</div></div>' +
+      '<div class="cov-wrap">' +
+        '<div class="cov-track">' +
+          '<div class="cov-fill b" style="width:' + covPct(bc) + '%"></div>' +
+          '<div class="cov-fill" id="cov-fill-a" style="width:' + covPct(bc) + '%;background:' + covColor(bc) + '"></div>' +
+          '<div class="cov-threshold" id="cov-threshold" style="left:' + covPct(1.0) + '%"></div>' +
+        '</div>' +
+        '<div class="cov-legend">' +
+          '<span>before <b>' + cov2(bc) + '</b></span>' +
+          '<span class="now">now <b id="cov-now">' + cov2(bc) + '</b></span>' +
+        '</div>' +
+      '</div>';
+  }
+
+  /* ----- warning / action static content ----- */
+  function renderWarningStatic(){
+    var w = L.warning;
+    el('warn-pill').textContent = w.ew_label;
+    el('warn-pill').className = 'nw-pill nw-risk-' + w.ew_label;
+    el('warn-reason').textContent = w.reason;
+    el('warn-cov').textContent = cov2(w.coverage_ratio);
+    el('warn-par').textContent = fmtUSD(w.principal_at_risk);
+  }
+  function renderActionStatic(){
+    var ac = L.action;
+    el('act-pill').textContent = ac.priority;
+    el('act-taken').textContent = ac.action_taken;
+    el('act-actor').textContent = ac.actor;
+    el('act-outcome').textContent = ac.outcome;
+    el('act-record').textContent = '+1 app.action_log';
+  }
+
+  /* ---------- navigation / render ---------- */
+  function go(i, animate){
+    if (animate === undefined) animate = true;
+    cur = Math.max(0, Math.min(STEPS.length - 1, i));
+    renderStep(animate);
+    renderStepperState();
+    renderControls();
+    renderLedger();
+    renderAfterState(animate);
+    renderEvents();
+  }
+
+  function renderStep(animate){
+    var s = STEPS[cur];
+    var ac = ACCENT[s.layer] || ACCENT.source;
+    var card = el('lc-stepcard');
+    card.style.setProperty('--step-accent', ac.c);
+
+    var chip = el('sc-layer');
+    chip.className = 'nw-layer nw-layer-' + s.layer;
+    chip.textContent = LAYER_LABEL[s.layer] || s.layer;
+
+    el('sc-title').textContent = s.title;
+    el('sc-detail').textContent = s.detail;
+
+    el('sc-writes').innerHTML = s.db_changes.map(function(c, k){
+      return '<li style="animation-delay:' + (animate ? k * 0.08 : 0) + 's"><span class="g">&#9656;</span><span>' + c + '</span></li>';
+    }).join('');
+  }
+
+  function renderStepperState(){
+    Array.prototype.forEach.call(el('lc-stepper').children, function(btn, i){
+      btn.classList.toggle('done', i < cur);
+      btn.classList.toggle('current', i === cur);
+    });
+  }
+
+  function renderControls(){
+    el('btn-back').disabled = (cur === 0);
+    el('btn-next').disabled = (cur === STEPS.length - 1);
+    el('lc-progress-bar').style.width = ((cur + 1) / STEPS.length * 100) + '%';
+    el('lc-count').innerHTML = 'Step <b>' + (cur + 1) + '</b> of ' + STEPS.length +
+      ' · ' + (LAYER_LABEL[STEPS[cur].layer] || STEPS[cur].layer);
+  }
+
+  /* cumulative DB write log (the database state visibly growing) */
+  function renderLedger(){
+    var ul = el('lc-log');
+    var items = [];
+    for (var i = 0; i <= cur; i++){
+      STEPS[i].db_changes.forEach(function(c){ items.push({ layer: STEPS[i].layer, txt: c, step: i }); });
+    }
+    if (!items.length){ ul.innerHTML = '<li class="empty">No writes yet.</li>'; }
+    else {
+      ul.innerHTML = items.map(function(it){
+        return '<li><span class="g">&#9656;</span><span>' + it.txt + '</span></li>';
+      }).join('');
+    }
+    el('ledger-cnt').textContent = items.length + (items.length === 1 ? ' write' : ' writes');
+    ul.scrollTop = ul.scrollHeight;
+  }
+
+  /* before/after "after" column: pending until Gold recompute, then animate */
+  function renderAfterState(animate){
+    var active = cur >= GOLD_I;
+    var body = el('ba-body');
+    body.classList.toggle('ba-after-pending', !active);
+
+    if (covAnim){ cancelAnimationFrame(covAnim); covAnim = null; }
+    var b = L.before, a = L.after;
+
+    if (!active){
+      setCoverage(b.coverage_ratio);
+      el('cov-threshold').classList.remove('alarm');
+      return;
+    }
+    if (animate){
+      el('cov-threshold').classList.remove('alarm');
+      void el('cov-threshold').offsetWidth;
+      el('cov-threshold').classList.add('alarm');
+      el('ba-as').textContent = b.refresh_ts + ' → ' + a.refresh_ts;
+      flashAfter();
+      animateCoverage(b.coverage_ratio, a.coverage_ratio, 950);
+    } else {
+      setCoverage(a.coverage_ratio);
+    }
+  }
+
+  function flashAfter(){
+    Array.prototype.forEach.call(document.querySelectorAll('.ba-a'), function(n){
+      n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash');
+    });
+  }
+
+  function setCoverage(v){
+    var fill = el('cov-fill-a');
+    fill.style.width = covPct(v) + '%';
+    fill.style.background = covColor(v);
+    el('cov-now').textContent = cov2(v);
+    el('cov-now').style.color = covColor(v);
+  }
+
+  function animateCoverage(from, to, dur){
+    var t0 = null;
+    setCoverage(from);
+    function frame(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);            /* easeOutCubic */
+      setCoverage(from + (to - from) * e);
+      if (p < 1) covAnim = requestAnimationFrame(frame);
+    }
+    covAnim = requestAnimationFrame(frame);
+  }
+
+  function renderEvents(){
+    el('lc-warning').classList.toggle('show', cur >= WARN_I);
+    el('lc-action').classList.toggle('show', cur >= ACT_I);
+  }
+
+  /* ---------- play / pause ---------- */
+  function togglePlay(){ playing ? stop() : play(); }
+  function play(){
+    if (cur >= STEPS.length - 1) go(0);          /* replay from start */
+    playing = true;
+    el('btn-play').innerHTML = '❚❚ Pause';
+    clearInterval(timer);
+    timer = setInterval(function(){
+      go(cur + 1);
+      if (cur >= STEPS.length - 1){ stop(); }
+    }, 2500);
+  }
+  function stop(){
+    playing = false;
+    clearInterval(timer); timer = null;
+    el('btn-play').innerHTML = (cur >= STEPS.length - 1) ? '↻ Replay' : '▶ Play';
+  }
+
+  function onKey(e){
+    if (e.key === 'ArrowRight'){ stop(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft'){ stop(); go(cur - 1); }
+    else if (e.key === ' '){ e.preventDefault(); togglePlay(); }
+  }
+</script>
+</body>
+</html>
