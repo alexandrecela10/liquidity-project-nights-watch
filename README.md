@@ -6,7 +6,7 @@ Real-time cash monitoring & early-warning for Liquidity's **Credit team**: catch
 
 Synthetic data only. One company (**Sahel AgriCorp**) mirrors the numeric distribution of the provided real bank export — **$9.31M total cash but only $796K transferable** — as the worked example.
 
-## What's here (four outputs, one product)
+## What's here (five outputs, one product)
 
 | Output | Where | What it answers |
 |---|---|---|
@@ -14,6 +14,7 @@ Synthetic data only. One company (**Sahel AgriCorp**) mirrors the numeric distri
 | **Interactive data-architecture diagram** | `web/diagram.html` | Explore Source → Bronze → Standardisation → Silver → Golden; click an input to trace its lineage. |
 | **Lifecycle mock** | `web/lifecycle.html` | A new bank file → a High warning → a credit-team action → the updated database, step by step. |
 | **Credit-team product** | `web/product.html` | At-risk companies ranked worst-first; understand why; loan follow-up; P1–P4 action; log it. |
+| **Data roadmap** | `web/roadmap.html` | What each horizon (Now/Medium/Later) unlocks and how the See→Decide→Act workflow deepens; deep-linkable via `?h=Now`. |
 
 ### Live site (GitHub Pages)
 Enable once in **Settings → Pages → Build and deployment → Deploy from a branch → Branch: `devin/nights-watch-spec` (or rename it to `main`), folder: `/ (root)` → Save**. The root [`index.html`](index.html) redirects to the landing page, so the site is served at:
