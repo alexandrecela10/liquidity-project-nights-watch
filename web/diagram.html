@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data architecture — Project Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* ---- page-specific (scoped dg-*) ---- */
+  .dg-head { padding: 26px 0 8px; }
+  .dg-head h1 { font-size: 30px; line-height: 1.08; max-width: 24ch; }
+  .dg-head .lede { color: var(--taupe); max-width: 78ch; margin-top: 10px; font-size: 15px; }
+  .dg-head .counts { margin-top: 12px; font-size: 12.5px; color: var(--taupe); }
+  .dg-head .counts b { color: var(--ink); }
+
+  /* control bar */
+  .dg-controls {
+    position: sticky; top: 56px; z-index: 30;
+    display: flex; flex-wrap: wrap; align-items: center; gap: 14px 22px;
+    padding: 12px 0; margin: 6px 0 4px;
+    background: linear-gradient(var(--sand) 70%, rgba(253,245,240,0));
+  }
+  .dg-ctl-group { display: flex; align-items: center; gap: 8px; }
+  .dg-ctl-group .lbl { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .05em; color: var(--taupe); }
+  .dg-seg { display: inline-flex; background: var(--white); border: 1px solid var(--sand-500); border-radius: 999px; padding: 3px; box-shadow: var(--shadow); }
+  .dg-seg button {
+    font-family: var(--font); font-size: 12.5px; font-weight: 600; color: var(--taupe);
+    background: transparent; border: none; cursor: pointer; padding: 6px 13px; border-radius: 999px;
+    transition: background .15s ease, color .15s ease;
+  }
+  .dg-seg button:hover { color: var(--ink); }
+  .dg-seg button.on { background: var(--ink); color: var(--sand); }
+  .dg-seg.accent button.on { background: var(--yellow); color: var(--ink); }
+  .dg-spacer { flex: 1 1 auto; }
+
+  /* selection callout */
+  .dg-callout {
+    display: flex; align-items: center; gap: 12px; flex-wrap: wrap;
+    padding: 11px 16px; margin-bottom: 14px; border-radius: var(--radius);
+    background: var(--white); border: 1px solid var(--sand-500); box-shadow: var(--shadow);
+    font-size: 13px;
+  }
+  .dg-callout.empty { color: var(--taupe); background: var(--sand-500); border-style: dashed; box-shadow: none; }
+  .dg-callout .trace-from { font-weight: 600; }
+  .dg-callout .kv { color: var(--taupe); }
+  .dg-callout .kv b { color: var(--ink); font-weight: 600; }
+  .dg-callout code { font-family: var(--mono); font-size: 12px; color: var(--ink-700); background: var(--sand-500); padding: 1px 6px; border-radius: 6px; }
+  .dg-callout .arrow { color: var(--sand-700); font-weight: 700; }
+  .dg-mchip { display:inline-flex; align-items:center; font-size:11px; font-weight:700; padding:2px 8px; border-radius:999px; background: var(--ink); color: var(--yellow); font-family: var(--mono); }
+
+  /* diagram scroller + lanes */
+  .dg-scroll { overflow-x: auto; overflow-y: hidden; padding: 4px 2px 18px; }
+  .dg-diagram { position: relative; display: flex; align-items: stretch; gap: 0; min-width: 1140px; }
+  .dg-links { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 3; overflow: visible; }
+
+  .dg-lane { display: flex; flex-direction: column; min-width: 0; z-index: 2; }
+  .dg-lane[data-layer="source"]          { flex: 0 0 196px; }
+  .dg-lane[data-layer="bronze"]          { flex: 0 0 144px; }
+  .dg-lane[data-layer="standardisation"] { flex: 1 1 300px; min-width: 300px; }
+  .dg-lane[data-layer="silver"]          { flex: 0 0 216px; }
+  .dg-lane[data-layer="gold"]            { flex: 0 0 226px; }
+
+  .dg-lane-head { padding: 0 10px 10px; }
+  .dg-lane-head .nw-layer { display: inline-block; }
+  .dg-lane-desc { color: var(--taupe); font-size: 11.5px; line-height: 1.4; margin: 7px 0 0; }
+  .dg-lane-body { display: flex; flex-direction: column; gap: 10px; padding: 4px 10px; height: 100%; }
+  .dg-lane[data-layer="standardisation"] .dg-lane-body { background: rgba(255,222,67,.12); border-radius: var(--radius); padding-top: 10px; padding-bottom: 12px; }
+
+  /* chevrons between lanes */
+  .dg-chev { flex: 0 0 18px; display: flex; align-items: center; justify-content: center; color: var(--sand-700); font-size: 17px; z-index: 2; transition: opacity .2s ease; }
+  .dg-diagram.has-sel .dg-chev { opacity: .25; }
+
+  /* nodes */
+  .dg-node {
+    background: var(--white); border: 1px solid var(--sand-500); border-radius: var(--radius-sm);
+    box-shadow: var(--shadow); padding: 11px 12px; position: relative;
+    transition: opacity .25s ease, box-shadow .2s ease, transform .15s ease, border-color .2s ease;
+  }
+  .dg-node .row { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .dg-node .nm { font-weight: 600; font-size: 13.5px; letter-spacing: -0.01em; }
+  .dg-node .grain { color: var(--taupe); font-size: 11.5px; margin-top: 5px; }
+  .dg-node .grain b { color: var(--ink-700); font-weight: 600; }
+  .dg-node .keyrule { font-family: var(--mono); font-size: 10.5px; color: var(--ink-700); background: var(--sand-500); border-radius: 6px; padding: 4px 7px; margin-top: 7px; word-break: break-word; line-height: 1.4; }
+  .dg-node .keyrule .k { color: var(--taupe); }
+
+  .dg-input { cursor: pointer; }
+  .dg-input:hover { transform: translateY(-2px); box-shadow: var(--shadow-lg); border-color: var(--sand-700); }
+  .dg-input.sel { border-color: var(--ink); box-shadow: 0 0 0 2px var(--ink), var(--shadow); }
+
+  /* highlighted (in lineage) / dimmed (out) */
+  .dg-node.hl { box-shadow: 0 0 0 2px var(--yellow), var(--shadow-lg); border-color: var(--ink-700); }
+  .dg-diagram.has-sel .dg-node:not(.hl) { opacity: .26; }
+  .dg-node.pdim { opacity: .26; }
+  .dg-diagram.has-sel .dg-node.hl.pdim { opacity: 1; }
+
+  /* fields (full detail) */
+  .dg-fields { list-style: none; margin: 9px 0 0; padding: 8px 0 0; border-top: 1px dashed var(--sand-500); display: none; }
+  .dg-diagram.detail .dg-fields { display: block; }
+  .dg-fields li { display: flex; align-items: baseline; gap: 7px; padding: 2.5px 0; font-size: 11.5px; line-height: 1.35; }
+  .dg-fields .fn { font-family: var(--mono); font-size: 11px; color: var(--ink-700); }
+  .dg-fields .ft { color: var(--sand-700); font-size: 10px; font-family: var(--mono); }
+  .dg-fields .note { color: var(--taupe); font-size: 10.5px; font-style: italic; }
+  .dg-key { font-size: 9px; font-weight: 700; letter-spacing: .03em; padding: 1px 5px; border-radius: 4px; text-transform: uppercase; }
+  .dg-key.pk { background: var(--ink); color: var(--yellow); }
+  .dg-key.fk { background: var(--sand-700); color: var(--white); }
+  .dg-field-hl { background: rgba(255,222,67,.34); border-radius: 5px; padding-left: 5px; margin-left: -5px; }
+
+  /* meta details shown only in full mode */
+  .dg-more { display: none; margin-top: 8px; }
+  .dg-diagram.detail .dg-more { display: block; }
+  .dg-more .cols { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 4px; }
+  .dg-tag { font-size: 10px; font-family: var(--mono); color: var(--taupe); background: var(--sand-500); border-radius: 5px; padding: 2px 6px; }
+  .dg-mini { font-size: 10.5px; color: var(--taupe); margin-top: 6px; line-height: 1.4; }
+  .dg-mini b { color: var(--ink-700); }
+
+  .dg-node-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+  .dg-node-top .nw-phase { margin-left: auto; }
+
+  /* bronze single node */
+  .dg-bronze { background: #f4e7da; border-color: #e0c6b1; height: 100%; display: flex; flex-direction: column; }
+  .dg-bronze .prov { font-family: var(--mono); font-size: 10px; color: #7a4a25; margin-top: 7px; }
+  .dg-bronze .raws { display: flex; flex-direction: column; gap: 5px; margin-top: 9px; }
+  .dg-bronze .raw { font-family: var(--mono); font-size: 10px; color: #7a4a25; background: rgba(255,255,255,.6); border-radius: 5px; padding: 3px 6px; }
+
+  /* standardisation steps */
+  .dg-std-step { border-left: 3px solid var(--sand-700); }
+  .dg-std-step.key { border-left-color: var(--ink); box-shadow: 0 0 0 1px var(--yellow), var(--shadow); }
+  .dg-std-step .stepnum { width: 19px; height: 19px; flex: 0 0 19px; border-radius: 50%; background: var(--ink); color: var(--yellow); font-size: 11px; font-weight: 700; display: flex; align-items: center; justify-content: center; font-family: var(--mono); }
+  .dg-std-step.key .stepnum { background: var(--yellow); color: var(--ink); }
+  .dg-std-step .star { font-size: 10px; font-weight: 700; color: var(--ink); background: var(--yellow); border-radius: 999px; padding: 1px 7px; }
+  .dg-std-step .transform { font-family: var(--mono); font-size: 10.5px; color: var(--ink-700); margin-top: 6px; }
+  .dg-std-step .transform .from { color: var(--taupe); }
+  .dg-std-step .transform .to { color: var(--ink); font-weight: 600; }
+  .dg-std-step .why { font-size: 11px; color: var(--taupe); margin-top: 6px; line-height: 1.42; }
+  .dg-std-step .why b { color: var(--ink-700); font-weight: 600; }
+  .dg-std-step .eg { font-family: var(--mono); font-size: 10px; color: var(--ink-700); background: var(--sand-500); border-radius: 5px; padding: 4px 6px; margin-top: 6px; line-height: 1.4; word-break: break-word; }
+  .dg-std-step .applies { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+  .dg-applies-tag { font-size: 9.5px; font-weight: 600; color: var(--taupe); background: var(--sand-500); border: 1px solid var(--sand-700); border-radius: 999px; padding: 1px 7px; }
+  .dg-applies-tag.on { background: var(--ink); color: var(--sand); border-color: var(--ink); }
+  .dg-refchip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; font-family: var(--mono); color: var(--taupe); margin-top: 4px; }
+  .dg-refchip .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--sand-700); }
+
+  /* gold lane */
+  .dg-gold { background: var(--ink); color: var(--sand); border-color: var(--ink); }
+  .dg-gold .nm { color: var(--white); }
+  .dg-gold .grain { color: var(--sand-700); }
+  .dg-gold .grain b { color: var(--sand); }
+  .dg-gold .keyrule { background: rgba(253,245,240,.10); color: var(--sand); }
+  .dg-gold .keyrule .k { color: var(--sand-700); }
+  .dg-gold .dg-fields { border-top-color: rgba(253,245,240,.18); }
+  .dg-gold .dg-fields .fn { color: var(--sand); }
+  .dg-gold .dg-fields .note { color: var(--sand-700); }
+  .dg-gold .dg-field-hl { background: rgba(255,222,67,.26); }
+  .dg-gold .dg-field-hl .fn { color: var(--yellow); }
+  .dg-metrics { display: flex; flex-direction: column; gap: 8px; margin-top: 4px; }
+  .dg-metric { background: var(--white); border: 1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 9px 11px; box-shadow: var(--shadow); transition: box-shadow .2s ease, opacity .2s ease; }
+  .dg-metric .mh { display: flex; align-items: center; gap: 7px; }
+  .dg-metric .mid { font-family: var(--mono); font-weight: 700; font-size: 11px; color: var(--ink); background: var(--yellow); border-radius: 6px; padding: 1px 7px; }
+  .dg-metric .mn { font-weight: 600; font-size: 12px; }
+  .dg-metric .mfield { font-family: var(--mono); font-size: 10px; color: var(--taupe); margin-top: 4px; }
+  .dg-metric .mmethod { font-size: 10.5px; color: var(--taupe); margin-top: 5px; line-height: 1.4; }
+  .dg-metric .conf { font-size: 10px; color: var(--taupe); margin-top: 5px; }
+  .dg-metric .conf b { color: var(--ink-700); }
+  .dg-metric.mhl { box-shadow: 0 0 0 2px var(--yellow), var(--shadow); }
+
+  .dg-foot { color: var(--taupe); font-size: 12px; padding: 8px 0 46px; }
+  .dg-foot code { font-family: var(--mono); }
+
+  @media (max-width: 900px) {
+    .dg-controls { top: 0; }
+    .dg-head h1 { font-size: 25px; }
+  }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html" class="active">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+  </nav>
+</div>
+
+<div class="nw-wrap">
+  <header class="dg-head">
+    <h1 id="dg-title">Source files → Bronze → Standardisation → Silver → Golden</h1>
+    <p class="lede" id="dg-lede"></p>
+    <p class="counts" id="dg-counts"></p>
+  </header>
+
+  <div class="dg-controls">
+    <div class="dg-ctl-group">
+      <span class="lbl">Phase</span>
+      <div class="dg-seg" id="dg-phase"></div>
+    </div>
+    <div class="dg-ctl-group">
+      <span class="lbl">Detail</span>
+      <div class="dg-seg accent" id="dg-detail">
+        <button data-detail="simple" class="on">Simple</button>
+        <button data-detail="full">Full detail</button>
+      </div>
+    </div>
+    <div class="dg-spacer"></div>
+    <button class="nw-btn ghost" id="dg-clear" style="display:none">Clear selection</button>
+  </div>
+
+  <div class="dg-callout empty" id="dg-callout"></div>
+
+  <div class="dg-scroll">
+    <div class="dg-diagram" id="dg-diagram">
+      <svg class="dg-links" id="dg-links" aria-hidden="true">
+        <defs>
+          <marker id="dg-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#13361a"></path>
+          </marker>
+        </defs>
+      </svg>
+    </div>
+  </div>
+
+  <p class="dg-foot" id="dg-foot"></p>
+</div>
+
+<script>
+  // ---- resilient spec loader (works in-repo web/ and flattened on Pages) ----
+  function loadSpec(srcs, done){
+    if(!srcs.length) return done(new Error('no spec'));
+    var s = document.createElement('script'); s.src = srcs[0];
+    s.onload = function(){ done(); };
+    s.onerror = function(){ loadSpec(srcs.slice(1), done); };
+    document.head.appendChild(s);
+  }
+  loadSpec(['ontology.js', '../spec/ontology.js'], function(err){
+    if(err || !window.NW_SPEC){ document.getElementById('dg-lede').textContent = 'Could not load the spec (window.NW_SPEC).'; return; }
+    try { init(window.NW_SPEC); }
+    catch(e){ console.error(e); }
+  });
+
+  function init(SPEC){
+    var diagram = document.getElementById('dg-diagram');
+    var links   = document.getElementById('dg-links');
+    var callout = document.getElementById('dg-callout');
+
+    var state = { input: null, phase: 'All', detail: 'simple' };
+
+    // ---- header copy from spec ----
+    document.getElementById('dg-lede').textContent = SPEC.meta.purpose;
+    document.getElementById('dg-counts').innerHTML =
+      '<b>' + SPEC.inputs.length + '</b> source inputs · <b>' + SPEC.layers.length + '</b> layers · <b>' +
+      SPEC.standardisation.length + '</b> standardisation steps · <b>' + SPEC.metrics.length + '</b> bank metrics';
+    document.getElementById('dg-foot').textContent =
+      SPEC.meta.note + '  Signal: ' + SPEC.meta.signal;
+
+    // ---- helpers ----
+    function h(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+    function entityByFeed(feed){
+      var key = String(feed).split('.').pop().replace(/_/g,'').toLowerCase();
+      return SPEC.entities.filter(function(e){ return e.name.replace(/_/g,'').toLowerCase() === key; })[0];
+    }
+    function inputName(id){ var i = SPEC.inputs.filter(function(x){ return x.id === id; })[0]; return i ? i.name : id; }
+    function goldEntity(){ return SPEC.entities.filter(function(e){ return e.golden; })[0]; }
+
+    // ---- lineage computation for a selected input ----
+    function lineageFor(inp){
+      var set = { inputs:{}, std:{}, entities:{}, goldFields:{}, metricIds:{} };
+      set.inputs[inp.id] = true;
+      set.bronze = true;
+      SPEC.standardisation.forEach(function(s){ if(s.applies_to.indexOf(inp.id) !== -1) set.std[s.step] = true; });
+      (inp.feeds || []).forEach(function(f){ var e = entityByFeed(f); if(e) set.entities[e.name] = true; });
+      var gold = goldEntity();
+      if(gold){
+        set.entities[gold.name] = true;
+        (gold.fields || []).forEach(function(fld){
+          (inp.metrics || []).forEach(function(m){
+            if(fld.metric && m.indexOf(fld.metric) !== -1){ set.goldFields[fld.name] = true; }
+            else if(m.indexOf(fld.name) !== -1){ set.goldFields[fld.name] = true; }
+          });
+        });
+      }
+      (inp.metrics || []).forEach(function(m){
+        ['M1','M2','M3'].forEach(function(mid){ if(m.indexOf(mid) !== -1) set.metricIds[mid] = true; });
+      });
+      return set;
+    }
+
+    // ---- build lanes ----
+    var laneBodies = {};   // layer id -> body element
+    SPEC.layers.forEach(function(layer, idx){
+      if(idx > 0){ var chev = h('div','dg-chev'); chev.textContent = '→'; diagram.appendChild(chev); }
+      var lane = h('div','dg-lane'); lane.setAttribute('data-layer', layer.id);
+      var head = h('div','dg-lane-head');
+      head.appendChild(h('span','nw-layer nw-layer-' + layer.id, layer.name));
+      head.appendChild(h('p','dg-lane-desc', layer.desc));
+      lane.appendChild(head);
+      var body = h('div','dg-lane-body'); lane.appendChild(body);
+      laneBodies[layer.id] = body;
+      diagram.appendChild(lane);
+    });
+
+    // ---- SOURCE lane: one card per input ----
+    var inputNodes = {};
+    SPEC.inputs.forEach(function(inp){
+      var card = h('div','dg-node dg-input'); card.id = 'in-' + inp.id;
+      var top = h('div','dg-node-top');
+      top.appendChild(h('span','nm', inp.name));
+      top.appendChild(h('span','nw-phase nw-phase-' + inp.phase, inp.phase));
+      card.appendChild(top);
+      var grain = h('p','grain'); grain.innerHTML = 'grain: <b>' + esc(inp.grain) + '</b>';
+      card.appendChild(grain);
+      var kr = h('div','keyrule'); kr.innerHTML = '<span class="k">id rule</span> ' + esc(inp.id_rule);
+      card.appendChild(kr);
+      // more (full detail)
+      var more = h('div','dg-more');
+      more.appendChild(line('cadence', inp.cadence));
+      var cols = h('div','cols');
+      (inp.example_columns || []).forEach(function(c){ cols.appendChild(h('span','dg-tag', c)); });
+      more.appendChild(cols);
+      var feedsTxt = (inp.feeds || []).join(', ');
+      var metTxt = (inp.metrics || []).join(', ');
+      var mini = h('p','dg-mini'); mini.innerHTML = '<b>feeds →</b> ' + esc(feedsTxt) + '<br><b>metrics →</b> ' + esc(metTxt);
+      more.appendChild(mini);
+      if(inp.real_sample_note){ more.appendChild(h('p','dg-mini', inp.real_sample_note)); }
+      card.appendChild(more);
+      card.addEventListener('click', function(){ selectInput(inp.id); });
+      laneBodies.source.appendChild(card);
+      inputNodes[inp.id] = card;
+    });
+
+    // ---- BRONZE lane: single raw-landing node ----
+    var bronzeNode = h('div','dg-node dg-bronze'); bronzeNode.id = 'node-bronze';
+    bronzeNode.appendChild(h('div','nm', 'Raw landing tables'));
+    bronzeNode.appendChild(h('p','grain', 'One immutable raw table per source. Never mutated — the drill-down target for every gold number.'));
+    var prov = h('div','prov'); prov.textContent = 'provenance: source · ingested_at · sha256'; bronzeNode.appendChild(prov);
+    var raws = h('div','raws');
+    SPEC.inputs.forEach(function(inp){ raws.appendChild(h('div','raw', inp.id + '_raw')); });
+    bronzeNode.appendChild(raws);
+    laneBodies.bronze.appendChild(bronzeNode);
+
+    // ---- STANDARDISATION lane: the centrepiece ----
+    var KEY_STEPS = { 2:true, 4:true, 5:true }; // NBFI id-resolution + FX re-derivation + convertibility
+    SPEC.standardisation.forEach(function(s){
+      var card = h('div','dg-node dg-std-step' + (KEY_STEPS[s.step] ? ' key' : ''));
+      card.id = 'std-' + s.step;
+      var top = h('div','dg-node-top');
+      top.appendChild(h('span','stepnum', String(s.step)));
+      top.appendChild(h('span','nm', s.name));
+      if(KEY_STEPS[s.step]) top.appendChild(h('span','star', 'key'));
+      card.appendChild(top);
+      var tr = h('div','transform');
+      tr.innerHTML = '<span class="from">' + esc(s.from) + '</span> → <span class="to">' + esc(s.to) + '</span>';
+      card.appendChild(tr);
+      var why = h('p','why'); why.innerHTML = '<b>' + esc(s.rule) + '</b>';
+      card.appendChild(why);
+      card.appendChild(h('p','why', s.why));
+      if(s.example){ card.appendChild(h('div','eg', s.example)); }
+      // reference data used by FX / convertibility steps
+      if(s.step === 4){ var r4 = h('div','dg-refchip'); r4.innerHTML = '<span class="dot"></span> uses ref.fx_rate'; card.appendChild(r4); }
+      if(s.step === 5){ var r5 = h('div','dg-refchip'); r5.innerHTML = '<span class="dot"></span> uses ref.convertibility (IMF AREAER)'; card.appendChild(r5); }
+      var applies = h('div','applies');
+      (s.applies_to || []).forEach(function(id){
+        var t = h('span','dg-applies-tag', inputName(id)); t.setAttribute('data-input', id);
+        applies.appendChild(t);
+      });
+      card.appendChild(applies);
+      laneBodies.standardisation.appendChild(card);
+    });
+
+    // ---- SILVER lane: silver-layer entities (spine first) ----
+    var entityNodes = {};
+    var silverEntities = SPEC.entities.filter(function(e){ return e.layer === 'silver'; })
+      .sort(function(a,b){ return (b.spine?1:0) - (a.spine?1:0); });
+    silverEntities.forEach(function(e){ laneBodies.silver.appendChild(entityCard(e)); });
+
+    // ---- GOLD lane: golden node(s) + the 3 metrics ----
+    var goldEntities = SPEC.entities.filter(function(e){ return e.layer === 'gold'; })
+      .sort(function(a,b){ return (b.golden?1:0) - (a.golden?1:0); });
+    goldEntities.forEach(function(e){ laneBodies.gold.appendChild(entityCard(e)); });
+
+    laneBodies.gold.appendChild(h('p','dg-lane-desc', 'The 3 bank metrics attached to the golden model:'));
+    var metricsWrap = h('div','dg-metrics');
+    var metricNodes = {};
+    SPEC.metrics.forEach(function(m){
+      var mc = h('div','dg-metric'); mc.id = 'metric-' + m.id;
+      var mh = h('div','mh'); mh.appendChild(h('span','mid', m.id)); mh.appendChild(h('span','mn', m.name)); mc.appendChild(mh);
+      mc.appendChild(h('div','mfield', '→ gold.' + m.gold_field));
+      mc.appendChild(h('p','mmethod', m.method));
+      var conf = h('p','conf'); conf.innerHTML = 'grain: ' + esc(m.grain) + ' · confidence <b>' + esc(m.confidence) + '</b>';
+      mc.appendChild(conf);
+      metricsWrap.appendChild(mc);
+      metricNodes[m.id] = mc;
+    });
+    metricsWrap.id = 'metrics-block';
+    laneBodies.gold.appendChild(metricsWrap);
+
+    // ---- entity card builder ----
+    function entityCard(e){
+      var isGold = e.layer === 'gold';
+      var card = h('div','dg-node ' + (isGold ? 'dg-gold dg-entity' : 'dg-entity'));
+      card.id = 'ent-' + e.name;
+      var top = h('div','dg-node-top');
+      var nm = h('span','nm', e.name);
+      top.appendChild(nm);
+      if(e.spine) top.appendChild(h('span','nw-pill nw-risk-Low', 'spine'));
+      if(e.golden) top.appendChild(h('span','nw-pill nw-risk-Medium', 'golden'));
+      top.appendChild(h('span','nw-phase nw-phase-' + e.phase, e.phase));
+      card.appendChild(top);
+      var grain = h('p','grain'); grain.innerHTML = 'grain: <b>' + esc(e.grain) + '</b>';
+      card.appendChild(grain);
+      var kr = h('div','keyrule'); kr.innerHTML = '<span class="k">key</span> ' + esc(e.key_rule);
+      card.appendChild(kr);
+      var ul = h('ul','dg-fields');
+      (e.fields || []).forEach(function(f){
+        var li = h('li'); li.setAttribute('data-field', f.name);
+        if(f.key){ li.appendChild(h('span','dg-key ' + (f.key.indexOf('PK') !== -1 ? 'pk' : 'fk'), f.key.indexOf('PK') !== -1 ? 'PK' : 'FK')); }
+        li.appendChild(h('span','fn', f.name));
+        li.appendChild(h('span','ft', f.type));
+        if(f.metric){ li.appendChild(h('span','dg-mchip', f.metric)); }
+        if(f.note){ li.appendChild(h('span','note', f.note)); }
+        ul.appendChild(li);
+      });
+      card.appendChild(ul);
+      entityNodes[e.name] = card;
+      return card;
+    }
+
+    function line(label, val){ var p = h('p','dg-mini'); p.innerHTML = '<b>' + esc(label) + ':</b> ' + esc(val); return p; }
+    function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+    // ---- phase filter buttons ----
+    var phases = ['All']; SPEC.inputs.concat(SPEC.entities).forEach(function(x){ if(x.phase && phases.indexOf(x.phase) === -1) phases.push(x.phase); });
+    var phaseSeg = document.getElementById('dg-phase');
+    phases.forEach(function(p){
+      var b = h('button', p === 'All' ? 'on' : '', p); b.setAttribute('data-phase', p);
+      b.addEventListener('click', function(){ state.phase = p; syncSeg(phaseSeg, 'data-phase', p); recompute(); });
+      phaseSeg.appendChild(b);
+    });
+
+    // ---- detail toggle ----
+    var detailSeg = document.getElementById('dg-detail');
+    detailSeg.querySelectorAll('button').forEach(function(b){
+      b.addEventListener('click', function(){ state.detail = b.getAttribute('data-detail'); syncSeg(detailSeg, 'data-detail', state.detail); applyDetail(); recompute(); });
+    });
+
+    document.getElementById('dg-clear').addEventListener('click', function(){ selectInput(null); });
+
+    function syncSeg(seg, attr, val){ seg.querySelectorAll('button').forEach(function(b){ b.classList.toggle('on', b.getAttribute(attr) === val); }); }
+    function applyDetail(){ diagram.classList.toggle('detail', state.detail === 'full'); }
+
+    // ---- selection ----
+    function selectInput(id){
+      state.input = (state.input === id) ? null : id;
+      Object.keys(inputNodes).forEach(function(k){ inputNodes[k].classList.toggle('sel', k === state.input); });
+      document.getElementById('dg-clear').style.display = state.input ? '' : 'none';
+      recompute();
+    }
+
+    function phaseOut(node){ return state.phase !== 'All' && node.phase && node.phase !== state.phase; }
+
+    // ---- recompute dim/highlight + callout + links ----
+    function recompute(){
+      var sel = state.input ? SPEC.inputs.filter(function(x){ return x.id === state.input; })[0] : null;
+      var lin = sel ? lineageFor(sel) : null;
+      diagram.classList.toggle('has-sel', !!sel);
+
+      // inputs
+      SPEC.inputs.forEach(function(inp){
+        var n = inputNodes[inp.id];
+        n.classList.toggle('pdim', phaseOut(inp));
+        n.classList.toggle('hl', !!(lin && lin.inputs[inp.id]));
+      });
+      // bronze
+      bronzeNode.classList.toggle('hl', !!(lin && lin.bronze));
+      // std steps
+      SPEC.standardisation.forEach(function(s){
+        var n = document.getElementById('std-' + s.step);
+        n.classList.toggle('hl', !!(lin && lin.std[s.step]));
+        n.querySelectorAll('.dg-applies-tag').forEach(function(t){
+          t.classList.toggle('on', !!(sel && t.getAttribute('data-input') === sel.id));
+        });
+      });
+      // entities
+      SPEC.entities.forEach(function(e){
+        var n = entityNodes[e.name]; if(!n) return;
+        n.classList.toggle('pdim', phaseOut(e));
+        n.classList.toggle('hl', !!(lin && lin.entities[e.name]));
+        // gold field highlight
+        n.querySelectorAll('.dg-fields li').forEach(function(li){
+          var fn = li.getAttribute('data-field');
+          li.classList.toggle('dg-field-hl', !!(lin && lin.goldFields[fn]));
+        });
+      });
+      // metrics
+      SPEC.metrics.forEach(function(m){ metricNodes[m.id].classList.toggle('mhl', !!(lin && lin.metricIds[m.id])); });
+
+      updateCallout(sel, lin);
+      requestAnimationFrame(function(){ drawLinks(sel, lin); });
+    }
+
+    // ---- callout ----
+    function updateCallout(sel, lin){
+      callout.innerHTML = '';
+      if(!sel){
+        callout.classList.add('empty');
+        callout.textContent = 'Click a source file on the left to trace its lineage — Source → Bronze → Standardisation → Silver → Golden — and see the gold fields and metrics it feeds.';
+        return;
+      }
+      callout.classList.remove('empty');
+      callout.appendChild(span('trace-from', 'Tracing  ' + sel.name));
+      callout.appendChild(arrow());
+      callout.appendChild(kv('grain', sel.grain));
+      callout.appendChild(arrow());
+      var feedNames = (sel.feeds || []).map(function(f){ var e = entityByFeed(f); return e ? e.name : f; }).join(' · ');
+      callout.appendChild(kv('silver', feedNames));
+      callout.appendChild(arrow());
+      callout.appendChild(kv('golden', (goldEntity() ? goldEntity().name : 'CompanySnapshot')));
+      var metricIds = Object.keys(lin.metricIds);
+      if(metricIds.length){
+        callout.appendChild(arrow());
+        var mwrap = span('kv', ''); mwrap.appendChild(document.createTextNode(' '));
+        metricIds.sort().forEach(function(mid){ var c = h('span','dg-mchip', mid); c.style.marginLeft = '4px'; mwrap.appendChild(c); });
+        callout.appendChild(mwrap);
+      }
+      var idrule = h('code', null, sel.id_rule);
+      var krwrap = span('kv',''); krwrap.appendChild(document.createTextNode('id rule ')); krwrap.appendChild(idrule);
+      callout.appendChild(document.createElement('br'));
+      callout.appendChild(krwrap);
+    }
+    function span(cls, txt){ return h('span', cls, txt); }
+    function kv(label, val){ var s = h('span','kv'); s.innerHTML = label + ' <b>' + esc(val) + '</b>'; return s; }
+    function arrow(){ return h('span','arrow','→'); }
+
+    // ---- SVG lineage connectors ----
+    function center(el, side){
+      var d = diagram.getBoundingClientRect();
+      var r = el.getBoundingClientRect();
+      var x = side === 'right' ? (r.right - d.left) : (side === 'left' ? (r.left - d.left) : (r.left - d.left + r.width/2));
+      var y = r.top - d.top + r.height/2;
+      return { x: x, y: y };
+    }
+    function pathBetween(a, b){
+      var dx = Math.max(28, (b.x - a.x) * 0.5);
+      return 'M' + a.x + ',' + a.y + ' C' + (a.x + dx) + ',' + a.y + ' ' + (b.x - dx) + ',' + b.y + ' ' + b.x + ',' + b.y;
+    }
+    function addLink(a, b){
+      if(!a || !b) return;
+      var p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d', pathBetween(a, b));
+      p.setAttribute('fill','none');
+      p.setAttribute('stroke','#13361a');
+      p.setAttribute('stroke-width','2');
+      p.setAttribute('stroke-opacity','0.5');
+      p.setAttribute('marker-end','url(#dg-arrow)');
+      links.appendChild(p);
+    }
+    function clearLinks(){ links.querySelectorAll('path').forEach(function(p){ p.remove(); }); }
+    function drawLinks(sel, lin){
+      clearLinks();
+      links.setAttribute('width', diagram.scrollWidth);
+      links.setAttribute('height', diagram.scrollHeight);
+      links.setAttribute('viewBox', '0 0 ' + diagram.scrollWidth + ' ' + diagram.scrollHeight);
+      if(!sel || !lin) return;
+      var inNode = inputNodes[sel.id];
+      addLink(center(inNode,'right'), center(bronzeNode,'left'));
+      addLink(center(bronzeNode,'right'), center(laneBodies.standardisation,'left'));
+      var stdRight = center(laneBodies.standardisation,'right');
+      var silver = Object.keys(lin.entities).filter(function(name){ var e = entityNodes[name]; return e && !e.classList.contains('dg-gold'); });
+      var goldNode = entityNodes[goldEntity() ? goldEntity().name : 'CompanySnapshot'];
+      silver.forEach(function(name){
+        var en = entityNodes[name];
+        addLink(stdRight, center(en,'left'));
+        if(goldNode) addLink(center(en,'right'), center(goldNode,'left'));
+      });
+    }
+
+    // redraw connectors on resize / scroll if a selection is active
+    var rT;
+    window.addEventListener('resize', function(){ clearTimeout(rT); rT = setTimeout(function(){ if(state.input) recompute(); }, 120); });
+
+    // ---- initial paint ----
+    applyDetail();
+    recompute();
+  }
+</script>
+</body>
+</html>
