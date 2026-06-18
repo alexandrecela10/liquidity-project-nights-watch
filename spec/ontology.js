@@ -817,6 +817,7 @@ window.NW_SPEC = {
       "deteriorating": true,
       "prior_issues": 1,
       "data_freshness_days": 0,
+      "worst_serviced_coverage": 0.8,
       "loan": {
         "loan_id": "LN-SAHEL-1",
         "principal": 6000000,
@@ -852,6 +853,7 @@ window.NW_SPEC = {
       "deteriorating": true,
       "prior_issues": 2,
       "data_freshness_days": 1,
+      "worst_serviced_coverage": 0.74,
       "loan": {
         "loan_id": "LN-LAGOS-1",
         "principal": 3200000,
@@ -886,6 +888,7 @@ window.NW_SPEC = {
       "deteriorating": true,
       "prior_issues": 0,
       "data_freshness_days": 2,
+      "worst_serviced_coverage": 0.9,
       "loan": {
         "loan_id": "LN-DAR-1",
         "principal": 4500000,
@@ -920,6 +923,7 @@ window.NW_SPEC = {
       "deteriorating": true,
       "prior_issues": 0,
       "data_freshness_days": 1,
+      "worst_serviced_coverage": 0.95,
       "loan": {
         "loan_id": "LN-NAIROBI-1",
         "principal": 1800000,
@@ -953,6 +957,7 @@ window.NW_SPEC = {
       "deteriorating": false,
       "prior_issues": 0,
       "data_freshness_days": 2,
+      "worst_serviced_coverage": 1.05,
       "loan": {
         "loan_id": "LN-KAMPALA-1",
         "principal": 900000,
@@ -985,6 +990,7 @@ window.NW_SPEC = {
       "deteriorating": false,
       "prior_issues": 0,
       "data_freshness_days": 6,
+      "worst_serviced_coverage": 1.2,
       "loan": {
         "loan_id": "LN-ACCRA-1",
         "principal": 600000,
@@ -1017,6 +1023,7 @@ window.NW_SPEC = {
       "deteriorating": false,
       "prior_issues": 0,
       "data_freshness_days": 1,
+      "worst_serviced_coverage": 1.1,
       "loan": {
         "loan_id": "LN-KIGALI-1",
         "principal": 1200000,
@@ -1049,6 +1056,7 @@ window.NW_SPEC = {
       "deteriorating": false,
       "prior_issues": 0,
       "data_freshness_days": 0,
+      "worst_serviced_coverage": 1.4,
       "loan": {
         "loan_id": "LN-CASA-1",
         "principal": 2000000,
@@ -1175,5 +1183,114 @@ window.NW_SPEC = {
       "actor": "credit-team",
       "outcome": "pending"
     }
-  }
+  },
+  "signal_capabilities": [
+    {
+      "id": "M1",
+      "item": "Current transferable cash",
+      "source": "Company banking data",
+      "availability": "Now",
+      "phase": "Now",
+      "method": "Proxy: local-currency cash likely to be exchangeable.",
+      "confidence": "4/5",
+      "difficulty": "Low"
+    },
+    {
+      "id": "M2",
+      "item": "History of transferable cash",
+      "source": "Company banking data",
+      "availability": "Now",
+      "phase": "Now",
+      "method": "Collect all the snapshots.",
+      "confidence": "4/5",
+      "difficulty": "Low"
+    },
+    {
+      "id": "M3",
+      "item": "Proxy of transferable cash at T1",
+      "source": "Company banking data",
+      "availability": "Now",
+      "phase": "Now",
+      "method": "Project from historical cash trend (burn rate + runway).",
+      "confidence": "2.5/5",
+      "difficulty": "Medium"
+    },
+    {
+      "id": "M4",
+      "item": "Time of next repayment",
+      "source": "Loan structure (fallback: tomorrow)",
+      "availability": "If in CRM",
+      "phase": "Now",
+      "method": "Read from record.",
+      "confidence": "5/5",
+      "difficulty": "Low"
+    },
+    {
+      "id": "M5",
+      "item": "Coupon / cash to repay at T1",
+      "source": "Loan structure",
+      "availability": "If in CRM",
+      "phase": "Now",
+      "method": "Read from record; flag cash vs PIK (PIK = no cash due).",
+      "confidence": "5/5",
+      "difficulty": "Low"
+    },
+    {
+      "id": "M6",
+      "item": "Robust forecast of cash at T1",
+      "source": "Cashflow statements + revenue-lifecycle data",
+      "availability": "Later",
+      "phase": "Later",
+      "method": "Model inflows and outflows, not just run-down.",
+      "confidence": "4/5",
+      "difficulty": "High"
+    },
+    {
+      "id": "M7",
+      "item": "Rates + input-cost forecasts (e.g. energy)",
+      "source": "External sources",
+      "availability": "Later",
+      "phase": "Later",
+      "method": "Adjust floating-rate payments & margin pressure.",
+      "confidence": "3/5",
+      "difficulty": "Medium"
+    }
+  ],
+  "workflow": [
+    {
+      "step": "See",
+      "tag": "Triage",
+      "phase": "Now",
+      "what": "List of companies with higher warning level. Ranked by coverage ratio + size.",
+      "inputs": "Signal + loan principal (bank account size fallback)"
+    },
+    {
+      "step": "Understand",
+      "tag": "Why",
+      "phase": "Now",
+      "what": "The cash story: balance trend, transferable vs trapped, runway — plus whether the company has been at risk before.",
+      "inputs": "Signal inputs + labelled history"
+    },
+    {
+      "step": "Prioritise",
+      "tag": "Work order",
+      "phase": "Medium",
+      "what": "Order by money at stake × can-they-recover — so the biggest savable money is worked first (the action framework).",
+      "inputs": "Principal + recoverability read (Balance Sheet, CFS)"
+    },
+    {
+      "step": "Decide",
+      "tag": "What to do",
+      "phase": "Medium",
+      "what": "Loan context — seniority, security, cash vs PIK, covenants — which sets the action.",
+      "inputs": "Loan structure, Balance Sheet"
+    },
+    {
+      "step": "Act",
+      "tag": "& record",
+      "phase": "Now",
+      "what": "Capture the action and the outcome — the labelled history that trains the model.",
+      "inputs": "Action log"
+    }
+  ]
 };
