@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Project Night's Watch — Liquidity Credit early-warning</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .hero { padding: 56px 0 30px; }
+  .hero h1 { font-size: 40px; line-height: 1.05; max-width: 16ch; }
+  .hero .lede { font-size: 18px; color: var(--taupe); max-width: 60ch; margin-top: 16px; }
+  .hero .signal { margin-top: 22px; display:inline-block; background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius); padding: 14px 18px; box-shadow: var(--shadow); }
+  .hero .signal code { font-family: var(--mono); color: var(--ink-700); }
+  .grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 18px; margin-top: 30px; }
+  .tile { padding: 22px; text-decoration:none; color:var(--ink); display:flex; flex-direction:column; gap:10px; min-height: 196px; transition: transform .12s ease, box-shadow .12s ease; }
+  .tile:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+  .tile .k { font-size: 12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color: var(--taupe); }
+  .tile h3 { font-size: 21px; }
+  .tile p { color: var(--taupe); margin: 0; font-size: 14px; }
+  .tile .go { margin-top:auto; font-weight:600; color: var(--ink); }
+  .tile .go::after { content:' →'; }
+  .stat-row { display:flex; gap: 26px; flex-wrap:wrap; margin-top: 26px; }
+  .stat { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); }
+  .stat .n { font-size: 26px; font-weight:700; }
+  .stat .l { font-size: 12.5px; color: var(--taupe); }
+  .foot { color: var(--taupe); font-size: 12.5px; padding: 30px 0 50px; border-top:1px solid var(--sand-500); margin-top: 34px; }
+  @media (max-width: 880px){ .grid{grid-template-columns:1fr;} .hero h1{font-size:32px;} }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html" class="active">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+  </nav>
+</div>
+
+<div class="nw-wrap">
+  <section class="hero">
+    <h1>Catch a borrower's cash trouble before it becomes a missed payment.</h1>
+    <p class="lede">Night's Watch turns raw multi-currency bank balances into a single ranked view of which portfolio companies are at risk, why, and what to do — with every number traceable back to the raw file behind it.</p>
+    <div class="signal">
+      <code>coverage = expected transferable cash at next payment (T1) ÷ cash to repay at T1</code><br>
+      <span class="nw-muted">Below 1.0 = at risk.</span>
+    </div>
+    <div class="stat-row">
+      <div class="stat"><div class="n">$9.31M</div><div class="l">total cash, worked example</div></div>
+      <div class="stat"><div class="n">$796K</div><div class="l">actually transferable (hard ccy)</div></div>
+      <div class="stat"><div class="n">28%</div><div class="l">of cash in null-ID NBFI accounts</div></div>
+      <div class="stat"><div class="n">22</div><div class="l">currencies, 62 accounts</div></div>
+    </div>
+  </section>
+
+  <section class="grid">
+    <a class="tile nw-card" href="product.html">
+      <span class="k">The product</span>
+      <h3>Credit desk</h3>
+      <p>At-risk companies ranked worst-first: understand why, pull loan follow-up, get a P1–P4 action, log it.</p>
+      <span class="go">Open the desk</span>
+    </a>
+    <a class="tile nw-card" href="diagram.html">
+      <span class="k">Ontology</span>
+      <h3>Data architecture</h3>
+      <p>Source → Bronze → Standardisation → Silver → Golden. Click any input to trace its lineage and grain.</p>
+      <span class="go">Explore the model</span>
+    </a>
+    <a class="tile nw-card" href="lifecycle.html">
+      <span class="k">End to end</span>
+      <h3>Lifecycle of a warning</h3>
+      <p>A new bank file → a High warning → a credit-team action → the updated database, step by step.</p>
+      <span class="go">Play it through</span>
+    </a>
+  </section>
+
+  <p class="foot">
+    Synthetic data only. One company mirrors the numeric distribution of a real bank export as the worked example.
+    Ontology &amp; schema: <a href="https://github.com/alexandrecela10/liquidity-project-nights-watch/blob/main/docs/ontology.md">docs/ontology.md</a> ·
+    <a href="https://github.com/alexandrecela10/liquidity-project-nights-watch/blob/main/docs/schema.sql">schema.sql</a>.
+  </p>
+</div>
+</body>
+</html>

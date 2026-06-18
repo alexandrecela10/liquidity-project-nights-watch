@@ -1,0 +1,441 @@
+{
+  "description": "Anonymized balance distribution from the provided real bank export (bank_balance_data.xlsx). Only currency/amount/FI-token/location are retained \u2014 there is no borrower identity in the source. Used to seed ONE synthetic company so the worked example reproduces the $9.31M-total / $796K-transferable gap. Synthetic account IDs and a synthetic company name are assigned at generation time.",
+  "snapshot_label": "real-sample point-in-time",
+  "n_accounts": 62,
+  "accounts": [
+    {
+      "currency": "XAF",
+      "lcy_value": 1640283066.0,
+      "usd_value_reported": 2941537.91,
+      "financial_institution": "FI-C95D26AC",
+      "account_location": "Cameroon"
+    },
+    {
+      "currency": "TZS",
+      "lcy_value": 3041758222.0,
+      "usd_value_reported": 1171685.27,
+      "financial_institution": "FI-A0366CB1",
+      "account_location": "Tanzania"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 525211005.0,
+      "usd_value_reported": 941866.75,
+      "financial_institution": "FI-BA002FD1",
+      "account_location": "Cameroon"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 1139734155.0,
+      "usd_value_reported": 838977.5,
+      "financial_institution": "FI-F465788D",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "EUR",
+      "lcy_value": 385950.63,
+      "usd_value_reported": 454337.54,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "TZS",
+      "lcy_value": 932988090.9,
+      "usd_value_reported": 359387.01,
+      "financial_institution": "FI-BB2D9F6C",
+      "account_location": "Tanzania"
+    },
+    {
+      "currency": "RWF",
+      "lcy_value": 510531020.0,
+      "usd_value_reported": 348182.16,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Rwanda"
+    },
+    {
+      "currency": "KES",
+      "lcy_value": 37900024.9,
+      "usd_value_reported": 293509.16,
+      "financial_institution": "FI-DF90483A",
+      "account_location": "Kenya"
+    },
+    {
+      "currency": "UGX",
+      "lcy_value": 1073916955.0,
+      "usd_value_reported": 287058.0,
+      "financial_institution": "FI-2023BB24",
+      "account_location": "Uganda"
+    },
+    {
+      "currency": "KES",
+      "lcy_value": 34682817.28,
+      "usd_value_reported": 268594.14,
+      "financial_institution": "FI-16BDF847",
+      "account_location": "Kenya"
+    },
+    {
+      "currency": "KES",
+      "lcy_value": 27198648.0,
+      "usd_value_reported": 210634.49,
+      "financial_institution": "FI-69A38133",
+      "account_location": "Kenya"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 224333303.2,
+      "usd_value_reported": 165135.52,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 120617.73,
+      "usd_value_reported": 120617.73,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "United Kingdom"
+    },
+    {
+      "currency": "UGX",
+      "lcy_value": 374814975.0,
+      "usd_value_reported": 100188.04,
+      "financial_institution": "FI-AF510A30",
+      "account_location": "Uganda"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 135578282.6,
+      "usd_value_reported": 99801.46,
+      "financial_institution": "FI-59D3F174",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "TZS",
+      "lcy_value": 252308624.0,
+      "usd_value_reported": 97189.28,
+      "financial_institution": "FI-69A38133",
+      "account_location": "Tanzania"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 96776.71846,
+      "usd_value_reported": 96776.72,
+      "financial_institution": "FI-FF40D992",
+      "account_location": "Pakistan"
+    },
+    {
+      "currency": "UGX",
+      "lcy_value": 349539170.0,
+      "usd_value_reported": 93431.82,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Uganda"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 57581.93,
+      "usd_value_reported": 78448.33,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "GHS",
+      "lcy_value": 669469.81,
+      "usd_value_reported": 59482.2,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Ghana"
+    },
+    {
+      "currency": "PHP",
+      "lcy_value": 1399124.31,
+      "usd_value_reported": 23185.42,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Phillipines"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 11715466.78,
+      "usd_value_reported": 21009.48,
+      "financial_institution": "FI-5F241A63",
+      "account_location": "Gabon"
+    },
+    {
+      "currency": "ZAR",
+      "lcy_value": 337137.72,
+      "usd_value_reported": 20744.65,
+      "financial_institution": "FI-419C017F",
+      "account_location": "South Africa"
+    },
+    {
+      "currency": "XOF",
+      "lcy_value": 11478598.81,
+      "usd_value_reported": 20584.35,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Senegal"
+    },
+    {
+      "currency": "INR",
+      "lcy_value": 1934981.1,
+      "usd_value_reported": 20560.8,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "India"
+    },
+    {
+      "currency": "PKR",
+      "lcy_value": 5643592.77,
+      "usd_value_reported": 20248.31,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Pakistan"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 14000.44,
+      "usd_value_reported": 19073.88,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "BDT",
+      "lcy_value": 2338320.83,
+      "usd_value_reported": 19051.13,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Bangladesh"
+    },
+    {
+      "currency": "EUR",
+      "lcy_value": 13901.0,
+      "usd_value_reported": 16364.13,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "GHS",
+      "lcy_value": 179072.69,
+      "usd_value_reported": 15910.56,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Ghana"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 8043079.72,
+      "usd_value_reported": 14423.74,
+      "financial_institution": "FI-5F241A63",
+      "account_location": "Congo"
+    },
+    {
+      "currency": "PKR",
+      "lcy_value": 3950141.38,
+      "usd_value_reported": 14172.48,
+      "financial_institution": "FI-884A5D7B",
+      "account_location": "Pakistan"
+    },
+    {
+      "currency": "XOF",
+      "lcy_value": 6254512.86,
+      "usd_value_reported": 11216.1,
+      "financial_institution": "FI-5F241A63",
+      "account_location": "Senegal"
+    },
+    {
+      "currency": "INR",
+      "lcy_value": 982903.76,
+      "usd_value_reported": 10444.18,
+      "financial_institution": "FI-02202D58",
+      "account_location": "India"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 8427.29,
+      "usd_value_reported": 8427.29,
+      "financial_institution": "FI-F5AFBEDF",
+      "account_location": null
+    },
+    {
+      "currency": "MAD",
+      "lcy_value": 63302.9,
+      "usd_value_reported": 6904.42,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Morocco"
+    },
+    {
+      "currency": "EGP",
+      "lcy_value": 319798.0,
+      "usd_value_reported": 6066.25,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Egypt"
+    },
+    {
+      "currency": "ETB",
+      "lcy_value": 798216.09,
+      "usd_value_reported": 5110.48,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Ethiopia"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 3109507.35,
+      "usd_value_reported": 2288.96,
+      "financial_institution": "FI-EA5144AA",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 1211068.0,
+      "usd_value_reported": 2171.82,
+      "financial_institution": "FI-C4723243",
+      "account_location": "Cameroon"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 1945815.1,
+      "usd_value_reported": 1432.35,
+      "financial_institution": "FI-1A693A6C",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 800.16,
+      "usd_value_reported": 1090.12,
+      "financial_institution": "FI-419C017F",
+      "account_location": "United Kingdom"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 482617.19,
+      "usd_value_reported": 865.48,
+      "financial_institution": "FI-5F241A63",
+      "account_location": "Cameroon"
+    },
+    {
+      "currency": "KES",
+      "lcy_value": 101611.0,
+      "usd_value_reported": 786.91,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Kenya"
+    },
+    {
+      "currency": "GHS",
+      "lcy_value": 7655.78,
+      "usd_value_reported": 680.21,
+      "financial_institution": "FI-A91EC028",
+      "account_location": "Ghana"
+    },
+    {
+      "currency": "EGP",
+      "lcy_value": 26030.07,
+      "usd_value_reported": 493.76,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Egypt"
+    },
+    {
+      "currency": "VND",
+      "lcy_value": 7668180.0,
+      "usd_value_reported": 291.45,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Vietnam"
+    },
+    {
+      "currency": "MXN",
+      "lcy_value": 4860.73,
+      "usd_value_reported": 282.59,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Mexico"
+    },
+    {
+      "currency": "PEN",
+      "lcy_value": 703.45,
+      "usd_value_reported": 203.02,
+      "financial_institution": "FI-BD4E8C63",
+      "account_location": "Peru"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 169.776655,
+      "usd_value_reported": 169.78,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 84999.89,
+      "usd_value_reported": 152.43,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Cameroon"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 77.51,
+      "usd_value_reported": 105.6,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "EUR",
+      "lcy_value": 79.575908,
+      "usd_value_reported": 93.68,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 58.264149,
+      "usd_value_reported": 79.38,
+      "financial_institution": "FI-2C7313E6",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "EUR",
+      "lcy_value": 52.685978,
+      "usd_value_reported": 62.02,
+      "financial_institution": "FI-66864FC9",
+      "account_location": "Czech Republic"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 54.82,
+      "usd_value_reported": 54.82,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "USD",
+      "lcy_value": 13.03,
+      "usd_value_reported": 13.03,
+      "financial_institution": "FI-960F20A3",
+      "account_location": "USA"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 11896.69,
+      "usd_value_reported": 8.76,
+      "financial_institution": "FI-419C017F",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "NGN",
+      "lcy_value": 11235.08,
+      "usd_value_reported": 8.27,
+      "financial_institution": "FI-294057C6",
+      "account_location": "Nigeria"
+    },
+    {
+      "currency": "RWF",
+      "lcy_value": 2582.0,
+      "usd_value_reported": 1.76,
+      "financial_institution": "FI-F158C54E",
+      "account_location": "Rwanda"
+    },
+    {
+      "currency": "GBP",
+      "lcy_value": 0.25,
+      "usd_value_reported": 0.34,
+      "financial_institution": "FI-EA354EF2",
+      "account_location": null
+    },
+    {
+      "currency": "XAF",
+      "lcy_value": 94.38,
+      "usd_value_reported": 0.17,
+      "financial_institution": "FI-DDC46326",
+      "account_location": "Cameroon"
+    }
+  ]
+}

@@ -1,0 +1,110 @@
+/* Project Night's Watch — shared brand theme.
+   Palette + type pulled from liquidity.com (2026 brand system). Used by every
+   interactive page so the architecture diagram, lifecycle mock and credit-team
+   product look like one product. */
+
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@300;400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+:root {
+  --ink: #072708;
+  --ink-700: #13361a;
+  --sand: #fdf5f0;
+  --sand-500: #f3e7df;
+  --sand-700: #c8b1a4;
+  --taupe: #6f5f56;
+  --yellow: #ffde43;
+  --white: #ffffff;
+  --brown: #291201;
+
+  --risk-high: #b3402e;
+  --risk-medium: #c98a1a;
+  --risk-low: #5e7d52;
+  --risk-none: #9f887c;
+
+  --font: 'IBM Plex Sans', Arial, sans-serif;
+  --mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius: 14px;
+  --radius-sm: 8px;
+  --shadow: 0 1px 2px rgba(7,39,8,.06), 0 8px 28px rgba(7,39,8,.08);
+  --shadow-lg: 0 12px 48px rgba(7,39,8,.16);
+  --border: 1px solid var(--sand-700);
+  --maxw: 1240px;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--sand);
+  color: var(--ink);
+  font-family: var(--font);
+  font-size: 15px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+a { color: var(--ink); }
+
+h1, h2, h3 { font-weight: 600; letter-spacing: -0.01em; margin: 0; }
+
+.nw-mono { font-family: var(--mono); }
+.nw-muted { color: var(--taupe); }
+
+/* ---- top bar shared across pages ---- */
+.nw-topbar {
+  display: flex; align-items: center; gap: 16px;
+  padding: 14px 22px;
+  background: var(--ink);
+  color: var(--sand);
+  position: sticky; top: 0; z-index: 50;
+}
+.nw-topbar .nw-logo { display:flex; align-items:center; gap:10px; font-weight:600; letter-spacing:-0.01em; }
+.nw-topbar .nw-logo .dot { width:10px; height:10px; border-radius:50%; background: var(--yellow); display:inline-block; }
+.nw-topbar .nw-tag { color: var(--sand-700); font-size: 13px; }
+.nw-nav { margin-left:auto; display:flex; gap:6px; }
+.nw-nav a {
+  color: var(--sand); text-decoration:none; font-size:13px; font-weight:500;
+  padding:7px 13px; border-radius: 999px; opacity:.78;
+}
+.nw-nav a:hover { opacity:1; background: rgba(253,245,240,.10); }
+.nw-nav a.active { opacity:1; background: var(--yellow); color: var(--ink); }
+
+/* ---- buttons ---- */
+.nw-btn {
+  font-family: var(--font); font-size: 13px; font-weight: 600;
+  padding: 9px 16px; border-radius: 999px; border: none; cursor: pointer;
+  background: var(--ink); color: var(--sand);
+}
+.nw-btn:hover { background: var(--ink-700); }
+.nw-btn.accent { background: var(--yellow); color: var(--ink); }
+.nw-btn.ghost { background: transparent; color: var(--ink); border: var(--border); }
+.nw-btn:disabled { opacity:.45; cursor: default; }
+
+/* ---- cards ---- */
+.nw-card { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow); border: 1px solid var(--sand-500); }
+
+/* ---- risk pills ---- */
+.nw-pill { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; }
+.nw-pill::before { content:''; width:7px; height:7px; border-radius:50%; background: currentColor; }
+.nw-risk-High   { color: var(--risk-high);   background: #f6e4e0; }
+.nw-risk-Medium { color: var(--risk-medium); background: #f6ecd9; }
+.nw-risk-Low    { color: var(--risk-low);    background: #e4ecdf; }
+.nw-risk-None   { color: var(--risk-none);   background: #efe8e3; }
+
+/* ---- layer chips (medallion) ---- */
+.nw-layer { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; padding:2px 8px; border-radius:6px; }
+.nw-layer-source          { background:#efe8e3; color:var(--taupe); }
+.nw-layer-bronze          { background:#e7d3c4; color:#7a4a25; }
+.nw-layer-standardisation { background:var(--yellow); color:var(--ink); }
+.nw-layer-silver          { background:#e3e7e4; color:#41514a; }
+.nw-layer-gold            { background:var(--ink); color:var(--yellow); }
+.nw-layer-app, .nw-layer-ref { background:var(--sand-500); color:var(--taupe); }
+
+/* phase tags */
+.nw-phase { font-size:10.5px; font-weight:600; padding:1px 7px; border-radius:999px; border:1px solid var(--sand-700); color:var(--taupe); }
+.nw-phase-Now    { border-color: var(--ink); color: var(--ink); }
+.nw-phase-Medium { border-color: var(--risk-medium); color: var(--risk-medium); }
+.nw-phase-Later  { border-color: var(--sand-700); color: var(--sand-700); }
+
+.nw-wrap { max-width: var(--maxw); margin: 0 auto; padding: 22px; }
