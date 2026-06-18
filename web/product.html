@@ -153,11 +153,73 @@
 
   .foot { color: var(--taupe); font-size: 11.5px; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--sand-500); }
 
+  /* ---- configurable high-risk threshold ---- */
+  .desk-controls { display:flex; align-items:center; gap:12px 18px; flex-wrap:wrap; margin: 0 0 16px; }
+  .thr { display:inline-flex; align-items:center; gap:10px; background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 8px 12px; box-shadow: var(--shadow); }
+  .thr .lbl { font-size: 11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color: var(--taupe); }
+  .thr input { font-family: var(--mono); font-size: 14px; font-weight:600; color: var(--ink); width: 68px; text-align:center; border:1px solid var(--sand-700); border-radius: var(--radius-sm); padding: 5px 8px; }
+  .thr input:focus { outline: 2px solid var(--yellow); outline-offset:0; border-color: var(--ink); }
+  .thr .thr-reset { font-size: 11.5px; padding: 5px 11px; }
+  .thr .thr-hint { font-size: 11.5px; color: var(--taupe); }
+  .thr .thr-hint b { color: var(--risk-high); font-family: var(--mono); }
+
+  /* ---- worst-serviced (historical floor) column ---- */
+  .wsc { display:inline-flex; flex-direction:column; align-items:flex-end; font-family: var(--mono); font-weight:600; color: var(--ink-700); line-height:1.15; }
+  .wsc.uncharted { color: var(--risk-high); }
+  .wsc .tag { font-family: var(--font); font-size: 9.5px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
+  .wsc.uncharted .tag { color: var(--risk-high); }
+  .wsc.safe .tag { color: var(--taupe); font-weight:500; }
+
+  /* ---- capability showcase + phase tabs (mirrors the architecture page) ---- */
+  .cap-card { margin-top: 16px; }
+  .cap-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; padding: 15px 16px 12px; border-bottom: 1px solid var(--sand-500); }
+  .cap-head .cap-lede { color: var(--taupe); font-size: 12px; margin-top: 4px; max-width: 70ch; }
+  .cap-head .cap-lede b { color: var(--ink-700); }
+  .dg-ctl-group { display:flex; align-items:center; gap:8px; }
+  .dg-ctl-group .lbl { font-size: 11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color: var(--taupe); }
+  .dg-seg { display:inline-flex; background: var(--white); border:1px solid var(--sand-500); border-radius:999px; padding:3px; box-shadow: var(--shadow); }
+  .dg-seg button { font-family: var(--font); font-size: 12.5px; font-weight:600; color: var(--taupe); background:transparent; border:none; cursor:pointer; padding:6px 13px; border-radius:999px; transition: background .15s ease, color .15s ease; }
+  .dg-seg button:hover { color: var(--ink); }
+  .dg-seg button.on { background: var(--ink); color: var(--sand); }
+  .cap-grid { display:grid; grid-template-columns: 1.4fr 1fr; }
+  .cap-col { padding: 14px 16px; }
+  .cap-col + .cap-col { border-left: 1px solid var(--sand-500); }
+  .cap-part { font-size: 11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color: var(--taupe); margin-bottom: 10px; }
+  table.cap-tbl { width:100%; border-collapse:collapse; font-size: 12px; }
+  table.cap-tbl th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color: var(--taupe); padding: 6px 8px; border-bottom:1px solid var(--sand-700); white-space:nowrap; }
+  table.cap-tbl td { padding: 8px 8px; border-bottom:1px solid var(--sand-500); vertical-align:top; }
+  table.cap-tbl tr:last-child td { border-bottom:none; }
+  table.cap-tbl tr { transition: opacity .15s ease; }
+  table.cap-tbl .item { font-weight:600; color: var(--ink); }
+  table.cap-tbl .meth { color: var(--taupe); font-size: 11px; margin-top:2px; line-height:1.35; }
+  table.cap-tbl .src { color: var(--ink-700); font-size:11.5px; }
+  table.cap-tbl .conf { font-family: var(--mono); font-size:11px; white-space:nowrap; }
+  table.cap-tbl .avail { display:block; font-size:10px; color: var(--taupe); font-style:italic; margin-top:2px; }
+  .diff { font-size:10.5px; font-weight:600; padding:1px 8px; border-radius:999px; white-space:nowrap; }
+  .diff-Low { background:#e4ecdf; color: var(--risk-low); }
+  .diff-Medium { background:#f6ecd9; color: var(--risk-medium); }
+  .diff-High { background:#f6e4e0; color: var(--risk-high); }
+  .cap-flow { list-style:none; margin:0; padding:0; }
+  .cap-flow li { position:relative; padding: 0 0 15px 22px; transition: opacity .15s ease; }
+  .cap-flow li:before { content:''; position:absolute; left:5px; top:4px; width:9px; height:9px; border-radius:50%; background: var(--ink); }
+  .cap-flow li:after { content:''; position:absolute; left:9px; top:15px; bottom:0; width:1.5px; background: var(--sand-500); }
+  .cap-flow li:last-child { padding-bottom:0; }
+  .cap-flow li:last-child:after { display:none; }
+  .cap-flow .fw-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
+  .cap-flow .fw-step { font-weight:700; font-size:13.5px; }
+  .cap-flow .fw-tag { font-size:10.5px; color: var(--taupe); font-family: var(--mono); }
+  .cap-flow .fw-what { font-size:11.5px; color: var(--ink-700); margin-top:3px; line-height:1.4; }
+  .cap-flow .fw-in { font-size:10.5px; color: var(--taupe); margin-top:3px; }
+  .cap-flow .fw-in b { color: var(--ink-700); font-weight:600; }
+  .pdim { opacity:.26; }
+
   @media (max-width: 1080px){
     .desk { grid-template-columns: 1fr; }
     .insp { position: static; }
     .kpis { grid-template-columns: repeat(2,1fr); }
     .insp-body, .tbl-scroll { max-height: none; }
+    .cap-grid { grid-template-columns: 1fr; }
+    .cap-col + .cap-col { border-left:none; border-top:1px solid var(--sand-500); }
   }
 </style>
 </head>
@@ -184,6 +246,15 @@
 
   <div class="kpis" id="kpis"></div>
 
+  <div class="desk-controls">
+    <div class="thr">
+      <span class="lbl">High-risk threshold</span>
+      <input id="thrInput" type="number" step="0.05" min="0.5" max="5" value="1.20" aria-label="High-risk coverage threshold">
+      <span class="thr-hint" id="thrHint"></span>
+      <button class="nw-btn ghost thr-reset" id="thrReset" type="button">Reset</button>
+    </div>
+  </div>
+
   <div class="desk">
     <!-- SEE: ranked list -->
     <section class="nw-card list-card">
@@ -199,6 +270,7 @@
               <th class="l">Company</th>
               <th class="l">Risk</th>
               <th>Coverage</th>
+              <th title="Worst coverage at which this company still serviced a payment — its historical floor. Current below this = uncharted territory.">Worst serviced</th>
               <th>Principal at risk</th>
               <th>Transferable / total</th>
               <th>Trend</th>
@@ -236,6 +308,30 @@
     <ul class="log-list" id="logList"></ul>
   </section>
 
+  <!-- CAPABILITY SHOWCASE: signal sourcing + workflow, phased Now / Medium / Later -->
+  <section class="nw-card cap-card" id="capCard">
+    <div class="cap-head">
+      <div>
+        <span class="panel-title">Signal &amp; workflow — what powers the desk</span>
+        <p class="cap-lede">How each number is sourced, and how the desk turns it into action. Filter by horizon to see how the signal and the credit team's fast access deepen <b>Now → Medium → Later</b>.</p>
+      </div>
+      <div class="dg-ctl-group">
+        <span class="lbl">Phase</span>
+        <div class="dg-seg" id="capPhase"></div>
+      </div>
+    </div>
+    <div class="cap-grid">
+      <div class="cap-col">
+        <div class="cap-part">Part 1 · The signal — how we get each piece of the metric</div>
+        <table class="cap-tbl"><thead><tr><th>Metric item</th><th>Source</th><th>Conf.</th><th>Difficulty</th><th>Phase</th></tr></thead><tbody id="sigBody"></tbody></table>
+      </div>
+      <div class="cap-col">
+        <div class="cap-part">Part 2 · The workflow — what the credit team needs to act</div>
+        <ol class="cap-flow" id="flowList"></ol>
+      </div>
+    </div>
+  </section>
+
   <p class="foot" id="foot"></p>
 </div>
 
@@ -248,6 +344,9 @@
   loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
 
   var LOG_KEY = 'nw_action_log_v1';
+  var THRESH_KEY = 'nw_cov_threshold_v1';
+  var DEFAULT_THRESH = 1.2;
+  var THRESH = DEFAULT_THRESH;
   var SEVERITY = { High:0, Medium:1, Low:2, None:3 };
   var OUTCOMES = ['pending','contacted','in progress','bridge / FX arranged','escalated','resolved','monitoring'];
   var selectedId = null;
@@ -278,12 +377,15 @@
     PORTFOLIO = SPEC.portfolio.slice();
     FRAMEWORK = SPEC.actions_framework;
     RANKED = PORTFOLIO.slice().sort(rank);
+    THRESH = readThresh();
 
     renderSignal();
     renderKpis();
     renderTable();
     bindLog();
     renderLog();
+    bindThreshold();
+    renderCapabilities();
 
     // default selection = worst-first (#1) so the desk opens on what's at risk
     select(RANKED[0].company_id);
@@ -295,20 +397,20 @@
   function renderSignal(){
     document.getElementById('signalChip').innerHTML =
       '<code>coverage = transferable cash at next payment (T1) ÷ cash due at T1</code><br>' +
-      'Below <b>1.00</b> = at risk. Money is USD; nothing is invented — every figure comes from the spec.';
+      'Below <b>1.00</b> can\'t fully cover the payment; the <b>'+THRESH.toFixed(2)+'</b> high-risk line (adjustable, below) flags thin margins early. Every figure comes from the spec.';
   }
 
   function renderKpis(){
-    var atRisk = PORTFOLIO.filter(function(c){ return c.coverage < 1.0; }).length;
+    var atRisk = PORTFOLIO.filter(function(c){ return c.coverage < THRESH; }).length;
     var high   = PORTFOLIO.filter(function(c){ return c.label === 'High'; }).length;
     var par    = PORTFOLIO.reduce(function(s,c){ return s + c.principal_at_risk; }, 0);
     var worst  = Math.min.apply(null, PORTFOLIO.map(function(c){ return c.coverage; }));
     var stale  = PORTFOLIO.filter(function(c){ return isStale(c.data_freshness_days); }).length;
     var kpis = [
-      { n: atRisk + ' / ' + PORTFOLIO.length, l: 'companies below 1.0 coverage', alert: atRisk>0 },
+      { n: atRisk + ' / ' + PORTFOLIO.length, l: 'companies below ' + THRESH.toFixed(2) + ' coverage', alert: atRisk>0 },
       { n: String(high), l: 'High-severity alerts', alert: high>0 },
       { n: usdM(par), l: 'total principal at risk', alert: par>0 },
-      { n: worst.toFixed(2), l: 'worst coverage' + (stale? ' · '+stale+' stale feed':''), alert: worst<1.0 }
+      { n: worst.toFixed(2), l: 'worst coverage' + (stale? ' · '+stale+' stale feed':''), alert: worst<THRESH }
     ];
     document.getElementById('kpis').innerHTML = kpis.map(function(k){
       return '<div class="kpi"><div class="n'+(k.alert?' alert':'')+'">'+k.n+'</div><div class="l">'+k.l+'</div></div>';
@@ -316,7 +418,7 @@
   }
 
   function covMeta(cov){
-    var bad = cov < 1.0;
+    var bad = cov < THRESH;
     var fillPct = Math.max(4, Math.min(cov/2, 1) * 100);  // 1.0 sits at the 50% mark
     var color = bad ? 'var(--risk-high)' : 'var(--risk-low)';
     return { bad: bad, fillPct: fillPct, color: color };
@@ -327,6 +429,8 @@
       var cm = covMeta(c.coverage);
       var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd / c.total_cash_usd * 100) : 0;
       var stale = isStale(c.data_freshness_days);
+      var ws = c.worst_serviced_coverage;
+      var uncharted = (typeof ws === 'number') && c.coverage < ws;
       return '' +
       '<tr data-id="'+c.company_id+'">' +
         '<td class="l"><span class="rk">'+(i+1)+'</span></td>' +
@@ -338,6 +442,9 @@
             '<span class="covbar"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></span>' +
           '</span>' +
         '</td>' +
+        '<td>' + (typeof ws === 'number'
+            ? '<span class="wsc '+(uncharted?'uncharted':'safe')+'" title="'+(uncharted?'current coverage is below the worst level it has ever still serviced — uncharted territory':'has serviced payments down to this coverage before')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ uncharted':'held')+'</span></span>'
+            : '<span class="nw-muted">—</span>') + '</td>' +
         '<td><span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span></td>' +
         '<td>' +
           '<span class="split-mini">' +
@@ -383,6 +490,8 @@
     var tpPct = 100 - trPct;
     var shortfall = c.coverage < 1.0 ? Math.round(loan.cash_to_repay_t1 * (1 - c.coverage)) : 0;
     var isPik = (loan.cash_vs_pik || '').toLowerCase() === 'pik';
+    var ws = c.worst_serviced_coverage;
+    var uncharted = (typeof ws === 'number') && c.coverage < ws;
 
     document.getElementById('cName').textContent = c.name;
     document.getElementById('cPill').innerHTML = '<span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span>';
@@ -395,10 +504,12 @@
     /* 1. WHY — coverage */
     html += '<div class="sec">';
     html += '<span class="panel-title">Why it\'s flagged</span>';
-    html += '<div class="cov-big"><span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span><span class="vs">coverage · needs ≥ 1.00</span></div>';
+    html += '<div class="cov-big"><span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span><span class="vs">coverage · high-risk below '+THRESH.toFixed(2)+'</span></div>';
     html += '<div class="cov-track"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></div>';
     if (c.coverage < 1.0){
       html += '<div class="cov-note">Projected transferable cash at T1 covers only <b>'+pct(c.coverage)+'</b> of the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+'. <span class="flag">≈ '+usd(shortfall)+' short</span></div>';
+    } else if (c.coverage < THRESH){
+      html += '<div class="cov-note">Covers the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+', but coverage <b>'+c.coverage.toFixed(2)+'</b> sits below the <b>'+THRESH.toFixed(2)+'</b> high-risk line — thin margin. <span class="flag">below threshold</span></div>';
     } else {
       html += '<div class="cov-note">Projected transferable cash at T1 covers the '+usd(loan.cash_to_repay_t1>0?loan.cash_to_repay_t1:0)+ (loan.cash_to_repay_t1>0?' due on '+fmtDate(loan.next_payment_date):' (no cash due — PIK)')+'.</div>';
     }
@@ -421,6 +532,7 @@
     html += fact('Trend', c.deteriorating ? '↓ deteriorating' : '→ stable', 'coverage direction', c.deteriorating?'var(--risk-high)':'var(--ink)');
     html += fact('Prior issues', String(c.prior_issues), 'labelled past misses', c.prior_issues>0?'var(--risk-medium)':'var(--ink)');
     html += fact('Data freshness', freshLabel(c.data_freshness_days), stale?'stale — verify before acting':'feed is current', stale?'var(--risk-high)':'var(--ink)');
+    html += fact('Worst serviced', (typeof ws === 'number' ? ws.toFixed(2) : '—'), uncharted?'below its own floor — uncharted':'lowest coverage it still paid at', uncharted?'var(--risk-high)':'var(--ink)');
     html += '</div></div>';
 
     /* 3. FOLLOW-UP — loan structure */
@@ -468,6 +580,84 @@
     return '<div class="fact"><div class="k">'+k+'</div>' +
            '<div class="v"'+(color?' style="color:'+color+'"':'')+'>'+(raw? v : v)+'</div>' +
            (sub? '<div class="k" style="margin-top:1px;">'+esc(sub)+'</div>' : '') + '</div>';
+  }
+
+  /* ---- high-risk coverage threshold (configurable, persisted) ---- */
+  function readThresh(){
+    try { var v = parseFloat(localStorage.getItem(THRESH_KEY)); return (isFinite(v) && v>0) ? v : DEFAULT_THRESH; }
+    catch(e){ return DEFAULT_THRESH; }
+  }
+  function writeThresh(v){ try { localStorage.setItem(THRESH_KEY, String(v)); } catch(e){} }
+  function applyThreshold(v, persist){
+    v = Math.round(v*100)/100;
+    if (!isFinite(v) || v <= 0) v = DEFAULT_THRESH;
+    THRESH = v;
+    if (persist) writeThresh(v);
+    var input = document.getElementById('thrInput');
+    if (input && document.activeElement !== input) input.value = THRESH.toFixed(2);
+    renderSignal();
+    renderKpis();
+    renderTable();
+    if (selectedId) select(selectedId);
+    renderThreshHint();
+  }
+  function renderThreshHint(){
+    var n = PORTFOLIO.filter(function(c){ return c.coverage < THRESH; }).length;
+    document.getElementById('thrHint').innerHTML = '<b>'+n+'</b> of '+PORTFOLIO.length+' flagged · default 1.20';
+  }
+  function bindThreshold(){
+    var input = document.getElementById('thrInput');
+    input.value = THRESH.toFixed(2);
+    input.addEventListener('input', function(){ var v = parseFloat(input.value); if (isFinite(v) && v>0) applyThreshold(v, true); });
+    input.addEventListener('change', function(){ var v = parseFloat(input.value); applyThreshold(isFinite(v)&&v>0 ? v : DEFAULT_THRESH, true); });
+    document.getElementById('thrReset').addEventListener('click', function(){ applyThreshold(DEFAULT_THRESH, true); document.getElementById('thrInput').value = DEFAULT_THRESH.toFixed(2); });
+    renderThreshHint();
+  }
+
+  /* ---- capability showcase: signal sourcing + workflow, phased Now/Medium/Later ---- */
+  var capPhaseState = 'All';
+  function renderCapabilities(){
+    var caps = SPEC.signal_capabilities || [];
+    var flow = SPEC.workflow || [];
+    document.getElementById('sigBody').innerHTML = caps.map(function(m){
+      return '<tr data-phase="'+esc(m.phase)+'">' +
+        '<td><span class="item">'+esc(m.item)+'</span><div class="meth">'+esc(m.method)+'</div>' +
+          (m.availability && m.availability!==m.phase ? '<span class="avail">available '+esc(m.availability)+'</span>' : '') + '</td>' +
+        '<td class="src">'+esc(m.source)+'</td>' +
+        '<td class="conf">'+esc(m.confidence)+'</td>' +
+        '<td><span class="diff diff-'+esc(m.difficulty)+'">'+esc(m.difficulty)+'</span></td>' +
+        '<td><span class="nw-phase nw-phase-'+esc(m.phase)+'">'+esc(m.phase)+'</span></td>' +
+      '</tr>';
+    }).join('');
+    document.getElementById('flowList').innerHTML = flow.map(function(s){
+      return '<li data-phase="'+esc(s.phase)+'">' +
+        '<div class="fw-top"><span class="fw-step">'+esc(s.step)+'</span><span class="fw-tag">'+esc(s.tag)+'</span><span class="nw-phase nw-phase-'+esc(s.phase)+'">'+esc(s.phase)+'</span></div>' +
+        '<div class="fw-what">'+esc(s.what)+'</div>' +
+        '<div class="fw-in">needs <b>'+esc(s.inputs)+'</b></div>' +
+      '</li>';
+    }).join('');
+    var phases = ['All','Now','Medium','Later'];
+    var seg = document.getElementById('capPhase');
+    seg.innerHTML = '';
+    phases.forEach(function(p){
+      var b = document.createElement('button');
+      b.textContent = p; b.setAttribute('data-phase', p);
+      if (p === capPhaseState) b.className = 'on';
+      b.addEventListener('click', function(){ capPhaseState = p; syncCapSeg(); applyCapPhase(); });
+      seg.appendChild(b);
+    });
+    applyCapPhase();
+  }
+  function syncCapSeg(){
+    Array.prototype.forEach.call(document.querySelectorAll('#capPhase button'), function(b){
+      b.classList.toggle('on', b.getAttribute('data-phase') === capPhaseState);
+    });
+  }
+  function applyCapPhase(){
+    Array.prototype.forEach.call(document.querySelectorAll('#sigBody tr, #flowList li'), function(el){
+      var out = capPhaseState !== 'All' && el.getAttribute('data-phase') !== capPhaseState;
+      el.classList.toggle('pdim', out);
+    });
   }
 
   /* ---- action log (localStorage) ---- */
