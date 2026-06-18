@@ -1,0 +1,531 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit desk — Project Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* ---- page-local styles (kept inside this file per the build contract) ---- */
+  .desk-wrap { max-width: 1340px; margin: 0 auto; padding: 18px 22px 40px; }
+
+  .desk-head { display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; margin: 6px 0 16px; }
+  .desk-head h1 { font-size: 25px; }
+  .desk-head .lede { color: var(--taupe); font-size: 13.5px; margin-top: 4px; max-width: 64ch; }
+  .signal-chip { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 9px 13px; box-shadow: var(--shadow); font-size: 12px; color: var(--taupe); }
+  .signal-chip code { font-family: var(--mono); color: var(--ink-700); }
+  .signal-chip b { color: var(--risk-high); }
+
+  .kpis { display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .kpi { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 12px 15px; box-shadow: var(--shadow); }
+  .kpi .n { font-size: 23px; font-weight: 700; font-family: var(--mono); letter-spacing:-.02em; }
+  .kpi .n.alert { color: var(--risk-high); }
+  .kpi .l { font-size: 11.5px; color: var(--taupe); margin-top: 2px; }
+
+  /* layout: ranked list (left) + inspector (right) */
+  .desk { display:grid; grid-template-columns: minmax(0, 1.42fr) minmax(380px, .92fr); gap: 16px; align-items: start; }
+
+  .panel-title { font-size: 12px; font-weight: 700; letter-spacing:.06em; text-transform: uppercase; color: var(--taupe); }
+  .card-pad { padding: 14px 16px; }
+
+  /* ---- ranked table ---- */
+  .list-card { overflow: hidden; }
+  .list-head { display:flex; align-items:baseline; justify-content:space-between; padding: 14px 16px 10px; border-bottom: 1px solid var(--sand-500); }
+  .list-head .hint { font-size: 11.5px; color: var(--taupe); }
+  .tbl-scroll { max-height: calc(100vh - 250px); overflow:auto; }
+  table.rank { width:100%; border-collapse: collapse; font-size: 12.5px; }
+  table.rank thead th { position: sticky; top:0; z-index:2; background: var(--sand-500); color: var(--taupe);
+    font-size: 10.5px; font-weight: 600; text-transform: uppercase; letter-spacing:.04em; text-align: right;
+    padding: 8px 10px; white-space: nowrap; border-bottom:1px solid var(--sand-700); }
+  table.rank thead th.l { text-align:left; }
+  table.rank tbody td { padding: 9px 10px; border-bottom: 1px solid var(--sand-500); text-align: right; vertical-align: middle; white-space: nowrap; }
+  table.rank tbody td.l { text-align:left; }
+  table.rank tbody tr { cursor: pointer; }
+  table.rank tbody tr:hover { background: var(--sand); }
+  table.rank tbody tr.sel { background: #fbf3d6; box-shadow: inset 3px 0 0 var(--yellow); }
+  table.rank tbody tr.sel:hover { background: #faeec6; }
+  .rk { color: var(--sand-700); font-family: var(--mono); font-size: 11px; }
+  .co-name { font-weight: 600; }
+  .co-juris { color: var(--taupe); font-size: 11px; }
+  .num { font-family: var(--mono); }
+  .cov { font-family: var(--mono); font-weight: 600; }
+  .cov.bad { color: var(--risk-high); }
+  .cov.ok  { color: var(--risk-low); }
+  .covwrap { display:inline-flex; align-items:center; gap:7px; justify-content:flex-end; }
+  .covbar { width: 42px; height: 5px; border-radius: 3px; background: var(--sand-500); position: relative; overflow:hidden; flex: 0 0 auto; }
+  .covbar > i { position:absolute; left:0; top:0; bottom:0; border-radius:3px; display:block; }
+  .covbar > u { position:absolute; top:-2px; bottom:-2px; left:50%; width:1.5px; background: var(--ink); opacity:.55; }
+  .split-mini { display:inline-flex; flex-direction:column; gap:3px; align-items:flex-end; }
+  .split-mini .bar { width: 78px; height: 6px; border-radius: 3px; background: var(--sand-700); overflow:hidden; display:flex; }
+  .split-mini .bar > span { background: var(--ink-700); display:block; height:100%; }
+  .split-mini .txt { font-family: var(--mono); font-size: 10.5px; color: var(--taupe); }
+  .arrow.det { color: var(--risk-high); font-weight: 700; }
+  .arrow.stable { color: var(--taupe); }
+  .pi { display:inline-block; min-width: 18px; padding: 1px 6px; border-radius: 999px; font-size: 11px; font-weight:600; font-family: var(--mono); }
+  .pi.zero { color: var(--taupe); background: transparent; }
+  .pi.has  { color: var(--risk-medium); background: #f6ecd9; }
+  .fresh { font-size: 11px; font-family: var(--mono); }
+  .fresh.ok { color: var(--risk-low); }
+  .fresh.stale { color: var(--risk-high); font-weight: 600; }
+
+  /* ---- inspector ---- */
+  .insp { position: sticky; top: 74px; }
+  .insp-head { padding: 15px 16px; border-bottom: 1px solid var(--sand-500); }
+  .insp-head .top { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .insp-head h2 { font-size: 19px; }
+  .insp-head .sub { color: var(--taupe); font-size: 12px; margin-top: 2px; display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .insp-body { padding: 4px 16px 16px; max-height: calc(100vh - 220px); overflow:auto; }
+  .sec { padding: 14px 0; border-bottom: 1px dashed var(--sand-500); }
+  .sec:last-child { border-bottom: none; }
+  .sec > .panel-title { display:block; margin-bottom: 10px; }
+
+  .cov-big { display:flex; align-items:flex-end; gap:10px; }
+  .cov-big .v { font-size: 34px; font-weight: 700; font-family: var(--mono); line-height: 1; letter-spacing:-.02em; }
+  .cov-big .v.bad { color: var(--risk-high); }
+  .cov-big .v.ok  { color: var(--risk-low); }
+  .cov-big .vs { font-size: 12px; color: var(--taupe); padding-bottom: 3px; }
+  .cov-track { margin-top: 10px; height: 9px; border-radius: 5px; background: var(--sand-500); position: relative; overflow: hidden; }
+  .cov-track > i { position:absolute; left:0; top:0; bottom:0; border-radius:5px; }
+  .cov-track > u { position:absolute; top:-3px; bottom:-3px; left:50%; width:2px; background: var(--ink); }
+  .cov-note { font-size: 12px; margin-top: 8px; color: var(--ink-700); }
+  .flag { display:inline-block; background:#f6e4e0; color: var(--risk-high); font-size: 11.5px; font-weight:600; padding: 3px 9px; border-radius: 999px; }
+
+  .split-bar { height: 22px; border-radius: 6px; overflow:hidden; display:flex; background: var(--sand-700); border:1px solid var(--sand-700); }
+  .split-bar > .tr { background: var(--ink-700); }
+  .split-bar > .tp { background: repeating-linear-gradient(45deg, #d8c4b6, #d8c4b6 5px, #ceb6a7 5px, #ceb6a7 10px); }
+  .split-legend { display:flex; gap:16px; margin-top: 9px; flex-wrap:wrap; }
+  .split-legend .it { font-size: 11.5px; }
+  .split-legend .sw { display:inline-block; width:10px; height:10px; border-radius:3px; vertical-align:-1px; margin-right:6px; }
+  .split-legend .v { font-family: var(--mono); font-weight:600; }
+  .honest { font-size: 11.5px; color: var(--taupe); margin-top: 9px; line-height:1.45; }
+  .honest b { color: var(--ink-700); }
+
+  .facts { display:grid; grid-template-columns: 1fr 1fr; gap: 10px 18px; }
+  .fact { font-size: 12.5px; }
+  .fact .k { color: var(--taupe); font-size: 11px; }
+  .fact .v { font-weight: 600; font-family: var(--mono); }
+  .badge { display:inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 6px; letter-spacing:.02em; }
+  .badge.cash { background:#e4ecdf; color: var(--risk-low); }
+  .badge.pik  { background:#efe8e3; color: var(--taupe); }
+
+  /* P-action */
+  .rec { background: var(--sand); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 13px 14px; }
+  .rec .rec-top { display:flex; align-items:center; gap:10px; }
+  .nw-p { display:inline-flex; align-items:center; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 999px; letter-spacing:.02em; }
+  .nw-p-P1 { background:#f6e4e0; color: var(--risk-high); }
+  .nw-p-P2 { background:#f6ecd9; color: var(--risk-medium); }
+  .nw-p-P3 { background:#e4ecdf; color: var(--risk-low); }
+  .nw-p-P4 { background:#efe8e3; color: var(--risk-none); }
+  .rec h3 { font-size: 14.5px; }
+  .rec .why { font-size: 12.5px; color: var(--ink-700); margin: 8px 0 4px; }
+  .rec ol { margin: 6px 0 0; padding-left: 18px; }
+  .rec ol li { font-size: 12.5px; margin: 4px 0; }
+  .quad { font-size: 11.5px; color: var(--taupe); margin-top: 10px; border-top: 1px dashed var(--sand-700); padding-top: 9px; }
+  .quad b { color: var(--ink-700); }
+
+  /* form */
+  .form-row { display:flex; gap: 10px; margin-bottom: 10px; }
+  .field { flex:1; display:flex; flex-direction:column; gap: 4px; }
+  .field label { font-size: 11px; font-weight: 600; color: var(--taupe); text-transform: uppercase; letter-spacing:.04em; }
+  .field select, .field textarea, .field input {
+    font-family: var(--font); font-size: 13px; color: var(--ink); background: var(--white);
+    border: 1px solid var(--sand-700); border-radius: var(--radius-sm); padding: 8px 10px; width:100%; }
+  .field textarea { resize: vertical; min-height: 58px; }
+  .field select:focus, .field textarea:focus, .field input:focus { outline: 2px solid var(--yellow); outline-offset: 0; border-color: var(--ink); }
+  .form-actions { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-top: 2px; }
+  .demo-note { font-size: 11px; color: var(--taupe); }
+  .demo-note .dot { display:inline-block; width:6px; height:6px; border-radius:50%; background: var(--yellow); margin-right:5px; vertical-align: 1px; }
+
+  /* action log */
+  .log-card { margin-top: 16px; }
+  .log-head { display:flex; align-items:center; justify-content:space-between; padding: 14px 16px; border-bottom: 1px solid var(--sand-500); }
+  .log-list { list-style:none; margin:0; padding: 6px 0; max-height: 360px; overflow:auto; }
+  .log-list li { padding: 11px 16px; border-bottom: 1px solid var(--sand-500); display:grid; grid-template-columns: 150px 1fr auto; gap: 14px; align-items: baseline; }
+  .log-list li:last-child { border-bottom: none; }
+  .log-list li.fresh-row { animation: pop 1.4s ease; }
+  @keyframes pop { 0% { background: #fbf3d6; } 100% { background: transparent; } }
+  .log-when { font-size: 11px; color: var(--taupe); font-family: var(--mono); }
+  .log-co { font-weight: 600; font-size: 12.5px; }
+  .log-main .note { font-size: 12.5px; color: var(--ink-700); margin-top: 3px; word-break: break-word; }
+  .log-meta { display:flex; gap: 8px; align-items:center; }
+  .out-chip { font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 999px; background: var(--sand-500); color: var(--taupe); text-transform: capitalize; }
+  .log-empty { padding: 20px 16px; color: var(--taupe); font-size: 13px; }
+
+  .foot { color: var(--taupe); font-size: 11.5px; margin-top: 22px; padding-top: 14px; border-top: 1px solid var(--sand-500); }
+
+  @media (max-width: 1080px){
+    .desk { grid-template-columns: 1fr; }
+    .insp { position: static; }
+    .kpis { grid-template-columns: repeat(2,1fr); }
+    .insp-body, .tbl-scroll { max-height: none; }
+  }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html" class="active">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+  </nav>
+</div>
+
+<div class="desk-wrap">
+  <div class="desk-head">
+    <div>
+      <h1>Credit desk</h1>
+      <p class="lede">Portfolio ranked worst-first by early-warning severity, then money at risk. Pick a company to see why it's flagged, pull the loan follow-up, get the recommended action — and log what you did.</p>
+    </div>
+    <div class="signal-chip" id="signalChip"></div>
+  </div>
+
+  <div class="kpis" id="kpis"></div>
+
+  <div class="desk">
+    <!-- SEE: ranked list -->
+    <section class="nw-card list-card">
+      <div class="list-head">
+        <span class="panel-title">Portfolio — ranked worst-first</span>
+        <span class="hint" id="listHint"></span>
+      </div>
+      <div class="tbl-scroll">
+        <table class="rank">
+          <thead>
+            <tr>
+              <th class="l">#</th>
+              <th class="l">Company</th>
+              <th class="l">Risk</th>
+              <th>Coverage</th>
+              <th>Principal at risk</th>
+              <th>Transferable / total</th>
+              <th>Trend</th>
+              <th>Prior</th>
+              <th>Feed</th>
+            </tr>
+          </thead>
+          <tbody id="rankBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- UNDERSTAND + FOLLOW-UP + RECOMMENDED + ACT -->
+    <section class="nw-card insp">
+      <div class="insp-head">
+        <div class="top">
+          <h2 id="cName">—</h2>
+          <span id="cPill"></span>
+        </div>
+        <div class="sub" id="cSub"></div>
+      </div>
+      <div class="insp-body" id="inspBody"></div>
+    </section>
+  </div>
+
+  <!-- ACT & RECORD: action log -->
+  <section class="nw-card log-card" id="logCard">
+    <div class="log-head">
+      <div>
+        <span class="panel-title">Action log</span>
+        <span class="demo-note" style="margin-left:10px;"><span class="dot"></span>demo — stored locally in your browser (localStorage); survives reload, nothing leaves this page</span>
+      </div>
+      <button class="nw-btn ghost" id="clearLog" type="button">Clear log</button>
+    </div>
+    <ul class="log-list" id="logList"></ul>
+  </section>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+  /* ---- resilient spec loader (per spec/INTEGRATION.md) ---- */
+  function loadSpec(srcs, done){ if(!srcs.length) return done(new Error('no spec'));
+    var s=document.createElement('script'); s.src=srcs[0];
+    s.onload=done; s.onerror=function(){loadSpec(srcs.slice(1),done);};
+    document.head.appendChild(s); }
+  loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
+
+  var LOG_KEY = 'nw_action_log_v1';
+  var SEVERITY = { High:0, Medium:1, Low:2, None:3 };
+  var OUTCOMES = ['pending','contacted','in progress','bridge / FX arranged','escalated','resolved','monitoring'];
+  var selectedId = null;
+  var SPEC, PORTFOLIO, FRAMEWORK, RANKED;
+
+  /* ---- formatting helpers ---- */
+  function usd(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
+  function usdM(n){ return '$' + (n/1e6).toFixed(2) + 'M'; }
+  function pct(n){ return Math.round(n*100) + '%'; }
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function fmtDate(iso){ var d=new Date(iso+'T00:00:00');
+    return isNaN(d) ? iso : d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  function fmtWhen(iso){ var d=new Date(iso);
+    return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' +
+           d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
+  function freshLabel(days){ return days===0 ? 'today' : days+'d ago'; }
+  function isStale(days){ return days > 3; }
+
+  function rank(a,b){
+    if (SEVERITY[a.label] !== SEVERITY[b.label]) return SEVERITY[a.label] - SEVERITY[b.label];
+    if (b.principal_at_risk !== a.principal_at_risk) return b.principal_at_risk - a.principal_at_risk;
+    return a.coverage - b.coverage;
+  }
+
+  function init(){
+    SPEC = window.NW_SPEC;
+    PORTFOLIO = SPEC.portfolio.slice();
+    FRAMEWORK = SPEC.actions_framework;
+    RANKED = PORTFOLIO.slice().sort(rank);
+
+    renderSignal();
+    renderKpis();
+    renderTable();
+    bindLog();
+    renderLog();
+
+    // default selection = worst-first (#1) so the desk opens on what's at risk
+    select(RANKED[0].company_id);
+
+    document.getElementById('foot').textContent =
+      SPEC.meta.note + ' · ' + SPEC.meta.product + ' (' + SPEC.meta.version + ').';
+  }
+
+  function renderSignal(){
+    document.getElementById('signalChip').innerHTML =
+      '<code>coverage = transferable cash at next payment (T1) ÷ cash due at T1</code><br>' +
+      'Below <b>1.00</b> = at risk. Money is USD; nothing is invented — every figure comes from the spec.';
+  }
+
+  function renderKpis(){
+    var atRisk = PORTFOLIO.filter(function(c){ return c.coverage < 1.0; }).length;
+    var high   = PORTFOLIO.filter(function(c){ return c.label === 'High'; }).length;
+    var par    = PORTFOLIO.reduce(function(s,c){ return s + c.principal_at_risk; }, 0);
+    var worst  = Math.min.apply(null, PORTFOLIO.map(function(c){ return c.coverage; }));
+    var stale  = PORTFOLIO.filter(function(c){ return isStale(c.data_freshness_days); }).length;
+    var kpis = [
+      { n: atRisk + ' / ' + PORTFOLIO.length, l: 'companies below 1.0 coverage', alert: atRisk>0 },
+      { n: String(high), l: 'High-severity alerts', alert: high>0 },
+      { n: usdM(par), l: 'total principal at risk', alert: par>0 },
+      { n: worst.toFixed(2), l: 'worst coverage' + (stale? ' · '+stale+' stale feed':''), alert: worst<1.0 }
+    ];
+    document.getElementById('kpis').innerHTML = kpis.map(function(k){
+      return '<div class="kpi"><div class="n'+(k.alert?' alert':'')+'">'+k.n+'</div><div class="l">'+k.l+'</div></div>';
+    }).join('');
+  }
+
+  function covMeta(cov){
+    var bad = cov < 1.0;
+    var fillPct = Math.max(4, Math.min(cov/2, 1) * 100);  // 1.0 sits at the 50% mark
+    var color = bad ? 'var(--risk-high)' : 'var(--risk-low)';
+    return { bad: bad, fillPct: fillPct, color: color };
+  }
+
+  function renderTable(){
+    var rows = RANKED.map(function(c, i){
+      var cm = covMeta(c.coverage);
+      var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd / c.total_cash_usd * 100) : 0;
+      var stale = isStale(c.data_freshness_days);
+      return '' +
+      '<tr data-id="'+c.company_id+'">' +
+        '<td class="l"><span class="rk">'+(i+1)+'</span></td>' +
+        '<td class="l"><div class="co-name">'+esc(c.name)+'</div><div class="co-juris">'+esc(c.jurisdiction)+'</div></td>' +
+        '<td class="l"><span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span></td>' +
+        '<td>' +
+          '<span class="covwrap">' +
+            '<span class="cov '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span>' +
+            '<span class="covbar"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></span>' +
+          '</span>' +
+        '</td>' +
+        '<td><span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span></td>' +
+        '<td>' +
+          '<span class="split-mini">' +
+            '<span class="bar" title="transferable vs trapped"><span style="width:'+trPct.toFixed(1)+'%"></span></span>' +
+            '<span class="txt">'+usdM(c.transferable_cash_usd)+' / '+usdM(c.total_cash_usd)+'</span>' +
+          '</span>' +
+        '</td>' +
+        '<td>' + (c.deteriorating
+            ? '<span class="arrow det" title="coverage trend worsening">↓ worsening</span>'
+            : '<span class="arrow stable" title="coverage stable">→ stable</span>') + '</td>' +
+        '<td><span class="pi '+(c.prior_issues>0?'has':'zero')+'" title="prior labelled misses">'+c.prior_issues+'</span></td>' +
+        '<td><span class="fresh '+(stale?'stale':'ok')+'" title="data freshness — a stale feed is itself a risk flag">'+
+            (stale?'⚠ ':'')+freshLabel(c.data_freshness_days)+'</span></td>' +
+      '</tr>';
+    }).join('');
+    var body = document.getElementById('rankBody');
+    body.innerHTML = rows;
+    Array.prototype.forEach.call(body.querySelectorAll('tr'), function(tr){
+      tr.addEventListener('click', function(){ select(tr.getAttribute('data-id')); });
+    });
+    document.getElementById('listHint').textContent = RANKED.length + ' companies · click a row to inspect';
+  }
+
+  function byId(id){ return PORTFOLIO.filter(function(c){ return c.company_id===id; })[0]; }
+  function frameworkFor(p){ return FRAMEWORK.filter(function(q){ return q.priority===p; })[0]; }
+
+  function select(id){
+    selectedId = id;
+    var c = byId(id);
+    Array.prototype.forEach.call(document.querySelectorAll('#rankBody tr'), function(tr){
+      tr.classList.toggle('sel', tr.getAttribute('data-id')===id);
+    });
+    renderInspector(c);
+  }
+
+  function renderInspector(c){
+    var cm = covMeta(c.coverage);
+    var loan = c.loan;
+    var act = c.action;
+    var quad = frameworkFor(act.priority);
+    var stale = isStale(c.data_freshness_days);
+    var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd/c.total_cash_usd*100) : 0;
+    var tpPct = 100 - trPct;
+    var shortfall = c.coverage < 1.0 ? Math.round(loan.cash_to_repay_t1 * (1 - c.coverage)) : 0;
+    var isPik = (loan.cash_vs_pik || '').toLowerCase() === 'pik';
+
+    document.getElementById('cName').textContent = c.name;
+    document.getElementById('cPill').innerHTML = '<span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span>';
+    document.getElementById('cSub').innerHTML =
+      '<span>'+esc(c.jurisdiction)+'</span><span>·</span><span class="nw-mono">'+esc(loan.loan_id)+'</span>' +
+      '<span>·</span><span class="fresh '+(stale?'stale':'ok')+'">'+(stale?'⚠ stale feed — ':'feed ')+freshLabel(c.data_freshness_days)+'</span>';
+
+    var html = '';
+
+    /* 1. WHY — coverage */
+    html += '<div class="sec">';
+    html += '<span class="panel-title">Why it\'s flagged</span>';
+    html += '<div class="cov-big"><span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span><span class="vs">coverage · needs ≥ 1.00</span></div>';
+    html += '<div class="cov-track"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></div>';
+    if (c.coverage < 1.0){
+      html += '<div class="cov-note">Projected transferable cash at T1 covers only <b>'+pct(c.coverage)+'</b> of the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+'. <span class="flag">≈ '+usd(shortfall)+' short</span></div>';
+    } else {
+      html += '<div class="cov-note">Projected transferable cash at T1 covers the '+usd(loan.cash_to_repay_t1>0?loan.cash_to_repay_t1:0)+ (loan.cash_to_repay_t1>0?' due on '+fmtDate(loan.next_payment_date):' (no cash due — PIK)')+'.</div>';
+    }
+    html += '</div>';
+
+    /* 1b. transferable vs trapped */
+    html += '<div class="sec">';
+    html += '<span class="panel-title">Transferable vs trapped cash</span>';
+    html += '<div class="split-bar"><div class="tr" style="width:'+trPct.toFixed(2)+'%"></div><div class="tp" style="width:'+tpPct.toFixed(2)+'%"></div></div>';
+    html += '<div class="split-legend">' +
+              '<span class="it"><span class="sw" style="background:var(--ink-700)"></span>Transferable <span class="v">'+usd(c.transferable_cash_usd)+'</span> <span class="nw-muted">('+usdM(c.transferable_cash_usd)+')</span></span>' +
+              '<span class="it"><span class="sw" style="background:#cdb5a6"></span>Trapped <span class="v">'+usd(c.trapped_cash_usd)+'</span> <span class="nw-muted">('+usdM(c.trapped_cash_usd)+')</span></span>' +
+            '</div>';
+    html += '<div class="honest">Total cash <b>'+usd(c.total_cash_usd)+'</b> ('+usdM(c.total_cash_usd)+'), but only <b>'+usd(c.transferable_cash_usd)+'</b> is hard-currency cash usable to service this loan. The trapped '+usd(c.trapped_cash_usd)+' is restricted / non-convertible and is <b>never</b> counted as available.</div>';
+    html += '</div>';
+
+    /* 1c. runway / trend / prior */
+    html += '<div class="sec"><span class="panel-title">Context</span><div class="facts">';
+    html += fact('Runway', c.runway_days + ' days', 'transferable cash at current burn');
+    html += fact('Trend', c.deteriorating ? '↓ deteriorating' : '→ stable', 'coverage direction', c.deteriorating?'var(--risk-high)':'var(--ink)');
+    html += fact('Prior issues', String(c.prior_issues), 'labelled past misses', c.prior_issues>0?'var(--risk-medium)':'var(--ink)');
+    html += fact('Data freshness', freshLabel(c.data_freshness_days), stale?'stale — verify before acting':'feed is current', stale?'var(--risk-high)':'var(--ink)');
+    html += '</div></div>';
+
+    /* 3. FOLLOW-UP — loan structure */
+    html += '<div class="sec"><span class="panel-title">Loan follow-up</span><div class="facts">';
+    html += fact('Seniority', esc(loan.seniority));
+    html += fact('Principal', usd(loan.principal));
+    html += fact('Coupon', pct(loan.coupon_rate));
+    html += fact('Type', isPik ? '<span class="badge pik">PIK</span> no cash due' : '<span class="badge cash">CASH</span> coupon', null, null, true);
+    html += fact('Next payment', fmtDate(loan.next_payment_date));
+    html += fact('Cash to repay (T1)', isPik && loan.cash_to_repay_t1===0 ? '$0 · PIK' : usd(loan.cash_to_repay_t1), isPik && loan.cash_to_repay_t1===0 ? 'paid in kind — no cash leaves the borrower' : null);
+    html += '</div></div>';
+
+    /* 4. RECOMMENDED ACTION */
+    html += '<div class="sec"><span class="panel-title">Recommended action</span>';
+    html += '<div class="rec">';
+    html += '<div class="rec-top"><span class="nw-p nw-p-'+act.priority+'">'+act.priority+'</span><h3>'+esc(act.title)+'</h3></div>';
+    html += '<div class="why">'+esc(act.why)+'</div>';
+    html += '<ol>'+act.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ol>';
+    if (quad) html += '<div class="quad"><b>'+quad.priority+' · '+esc(quad.name)+'</b> — '+esc(quad.when)+'. '+esc(quad.posture)+'</div>';
+    html += '</div></div>';
+
+    /* 5. ACT & RECORD */
+    html += '<div class="sec"><span class="panel-title">Act &amp; record</span>';
+    html += '<div class="form-row">';
+    html += '<div class="field"><label for="fPriority">Priority</label><select id="fPriority">' +
+              FRAMEWORK.map(function(q){ return '<option value="'+q.priority+'"'+(q.priority===act.priority?' selected':'')+'>'+q.priority+' · '+esc(q.name)+'</option>'; }).join('') +
+            '</select></div>';
+    html += '<div class="field"><label for="fOutcome">Outcome</label><select id="fOutcome">' +
+              OUTCOMES.map(function(o){ return '<option value="'+esc(o)+'">'+esc(o)+'</option>'; }).join('') +
+            '</select></div>';
+    html += '</div>';
+    html += '<div class="field" style="margin-bottom:10px;"><label for="fNote">Note</label><textarea id="fNote" placeholder="What did you do? e.g. Called treasurer; arranging FX bridge to fund the coupon before T1."></textarea></div>';
+    html += '<div class="form-actions">';
+    html += '<span class="demo-note"><span class="dot"></span>logged against '+esc(c.name)+' ('+esc(loan.loan_id)+')</span>';
+    html += '<button class="nw-btn accent" id="logBtn" type="button">Log action</button>';
+    html += '</div></div>';
+
+    var body = document.getElementById('inspBody');
+    body.innerHTML = html;
+    body.scrollTop = 0;
+    document.getElementById('logBtn').addEventListener('click', function(){ logAction(c); });
+  }
+
+  function fact(k, v, sub, color, raw){
+    return '<div class="fact"><div class="k">'+k+'</div>' +
+           '<div class="v"'+(color?' style="color:'+color+'"':'')+'>'+(raw? v : v)+'</div>' +
+           (sub? '<div class="k" style="margin-top:1px;">'+esc(sub)+'</div>' : '') + '</div>';
+  }
+
+  /* ---- action log (localStorage) ---- */
+  function readLog(){
+    try { return JSON.parse(localStorage.getItem(LOG_KEY) || '[]'); }
+    catch(e){ return []; }
+  }
+  function writeLog(arr){ try { localStorage.setItem(LOG_KEY, JSON.stringify(arr)); } catch(e){} }
+
+  function logAction(c){
+    var priority = document.getElementById('fPriority').value;
+    var outcome  = document.getElementById('fOutcome').value;
+    var note     = document.getElementById('fNote').value.trim();
+    var entry = {
+      ts: new Date().toISOString(),
+      company_id: c.company_id,
+      company_name: c.name,
+      loan_id: c.loan.loan_id,
+      priority: priority,
+      outcome: outcome,
+      note: note,
+      actor: 'credit-team'
+    };
+    var arr = readLog();
+    arr.push(entry);
+    writeLog(arr);
+    renderLog(entry.ts);
+    document.getElementById('fNote').value = '';
+    var card = document.getElementById('logCard');
+    card.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  }
+
+  function renderLog(freshTs){
+    var arr = readLog().slice().sort(function(a,b){ return b.ts.localeCompare(a.ts); });
+    var ul = document.getElementById('logList');
+    if (!arr.length){
+      ul.innerHTML = '<li class="log-empty">No actions logged yet — select a company and record what you did. Entries persist locally and survive reload.</li>';
+      return;
+    }
+    ul.innerHTML = arr.map(function(e){
+      return '<li'+(freshTs && e.ts===freshTs ? ' class="fresh-row"':'')+'>' +
+        '<div class="log-when">'+fmtWhen(e.ts)+'<br><span class="nw-muted">by '+esc(e.actor||'credit-team')+'</span></div>' +
+        '<div class="log-main"><span class="log-co">'+esc(e.company_name)+'</span> <span class="nw-muted nw-mono" style="font-size:11px;">'+esc(e.loan_id||'')+'</span>' +
+          (e.note ? '<div class="note">'+esc(e.note)+'</div>' : '<div class="note nw-muted">(no note)</div>') + '</div>' +
+        '<div class="log-meta"><span class="nw-p nw-p-'+esc(e.priority)+'">'+esc(e.priority)+'</span><span class="out-chip">'+esc(e.outcome)+'</span></div>' +
+      '</li>';
+    }).join('');
+  }
+
+  function bindLog(){
+    document.getElementById('clearLog').addEventListener('click', function(){
+      if (!readLog().length){ return; }
+      if (confirm('Clear the entire action log? This removes the locally-stored demo entries.')){
+        writeLog([]);
+        renderLog();
+      }
+    });
+  }
+</script>
+</body>
+</html>

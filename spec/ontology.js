@@ -816,6 +816,7 @@ window.NW_SPEC = {
       "runway_days": 38,
       "deteriorating": true,
       "prior_issues": 1,
+      "data_freshness_days": 0,
       "loan": {
         "loan_id": "LN-SAHEL-1",
         "principal": 6000000,
@@ -850,6 +851,7 @@ window.NW_SPEC = {
       "runway_days": 52,
       "deteriorating": true,
       "prior_issues": 2,
+      "data_freshness_days": 1,
       "loan": {
         "loan_id": "LN-LAGOS-1",
         "principal": 3200000,
@@ -883,6 +885,7 @@ window.NW_SPEC = {
       "runway_days": 70,
       "deteriorating": true,
       "prior_issues": 0,
+      "data_freshness_days": 2,
       "loan": {
         "loan_id": "LN-DAR-1",
         "principal": 4500000,
@@ -916,6 +919,7 @@ window.NW_SPEC = {
       "runway_days": 61,
       "deteriorating": true,
       "prior_issues": 0,
+      "data_freshness_days": 1,
       "loan": {
         "loan_id": "LN-NAIROBI-1",
         "principal": 1800000,
@@ -948,6 +952,7 @@ window.NW_SPEC = {
       "runway_days": 95,
       "deteriorating": false,
       "prior_issues": 0,
+      "data_freshness_days": 2,
       "loan": {
         "loan_id": "LN-KAMPALA-1",
         "principal": 900000,
@@ -979,6 +984,7 @@ window.NW_SPEC = {
       "runway_days": 140,
       "deteriorating": false,
       "prior_issues": 0,
+      "data_freshness_days": 6,
       "loan": {
         "loan_id": "LN-ACCRA-1",
         "principal": 600000,
@@ -1010,6 +1016,7 @@ window.NW_SPEC = {
       "runway_days": 210,
       "deteriorating": false,
       "prior_issues": 0,
+      "data_freshness_days": 1,
       "loan": {
         "loan_id": "LN-KIGALI-1",
         "principal": 1200000,
@@ -1041,6 +1048,7 @@ window.NW_SPEC = {
       "runway_days": 320,
       "deteriorating": false,
       "prior_issues": 0,
+      "data_freshness_days": 0,
       "loan": {
         "loan_id": "LN-CASA-1",
         "principal": 2000000,
