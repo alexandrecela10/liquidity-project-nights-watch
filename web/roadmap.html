@@ -152,6 +152,12 @@
 
   function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
     return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  // optional deep-link: roadmap.html?h=Now (or #Medium) preselects a horizon
+  function phaseFromURL(){
+    var m = (location.search.match(/[?&]h=([^&]+)/) || [])[1] || location.hash.replace('#','');
+    m = decodeURIComponent(m || '');
+    return (['All','Now','Medium','Later'].indexOf(m) >= 0) ? m : 'All';
+  }
   function idx(p){ return PHASES.indexOf(p); }
   // cumulative: a horizon-row is "reached" by the selected phase (All reaches everything)
   function reached(rowPhase){ return PHASE === 'All' || idx(rowPhase) <= idx(PHASE); }
@@ -159,6 +165,7 @@
 
   function init(){
     SPEC = window.NW_SPEC;
+    PHASE = phaseFromURL();
     UNLOCKS = SPEC.data_unlocks || {};
     WORKFLOW = SPEC.workflow || [];
     SIGNALS = SPEC.signal_capabilities || [];
