@@ -16,7 +16,7 @@
   .signal-chip code { font-family: var(--mono); color: var(--ink-700); }
   .signal-chip b { color: var(--risk-high); }
 
-  .kpis { display:grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .kpis { display:grid; grid-template-columns: repeat(auto-fit, minmax(184px, 1fr)); gap: 12px; margin-bottom: 16px; }
   .kpi { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 12px 15px; box-shadow: var(--shadow); }
   .kpi .n { font-size: 23px; font-weight: 700; font-family: var(--mono); letter-spacing:-.02em; }
   .kpi .n.alert { color: var(--risk-high); }
@@ -170,56 +170,49 @@
   .wsc.uncharted .tag { color: var(--risk-high); }
   .wsc.safe .tag { color: var(--taupe); font-weight:500; }
 
-  /* ---- capability showcase + phase tabs (mirrors the architecture page) ---- */
-  .cap-card { margin-top: 16px; }
-  .cap-head { display:flex; align-items:flex-end; justify-content:space-between; gap:16px; flex-wrap:wrap; padding: 15px 16px 12px; border-bottom: 1px solid var(--sand-500); }
-  .cap-head .cap-lede { color: var(--taupe); font-size: 12px; margin-top: 4px; max-width: 70ch; }
-  .cap-head .cap-lede b { color: var(--ink-700); }
+  /* ---- data-horizon control (drives the whole desk) ---- */
   .dg-ctl-group { display:flex; align-items:center; gap:8px; }
   .dg-ctl-group .lbl { font-size: 11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color: var(--taupe); }
   .dg-seg { display:inline-flex; background: var(--white); border:1px solid var(--sand-500); border-radius:999px; padding:3px; box-shadow: var(--shadow); }
   .dg-seg button { font-family: var(--font); font-size: 12.5px; font-weight:600; color: var(--taupe); background:transparent; border:none; cursor:pointer; padding:6px 13px; border-radius:999px; transition: background .15s ease, color .15s ease; }
   .dg-seg button:hover { color: var(--ink); }
   .dg-seg button.on { background: var(--ink); color: var(--sand); }
-  .cap-grid { display:grid; grid-template-columns: 1.4fr 1fr; }
-  .cap-col { padding: 14px 16px; }
-  .cap-col + .cap-col { border-left: 1px solid var(--sand-500); }
-  .cap-part { font-size: 11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color: var(--taupe); margin-bottom: 10px; }
-  table.cap-tbl { width:100%; border-collapse:collapse; font-size: 12px; }
-  table.cap-tbl th { text-align:left; font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color: var(--taupe); padding: 6px 8px; border-bottom:1px solid var(--sand-700); white-space:nowrap; }
-  table.cap-tbl td { padding: 8px 8px; border-bottom:1px solid var(--sand-500); vertical-align:top; }
-  table.cap-tbl tr:last-child td { border-bottom:none; }
-  table.cap-tbl tr { transition: opacity .15s ease; }
-  table.cap-tbl .item { font-weight:600; color: var(--ink); }
-  table.cap-tbl .meth { color: var(--taupe); font-size: 11px; margin-top:2px; line-height:1.35; }
-  table.cap-tbl .src { color: var(--ink-700); font-size:11.5px; }
-  table.cap-tbl .conf { font-family: var(--mono); font-size:11px; white-space:nowrap; }
-  table.cap-tbl .avail { display:block; font-size:10px; color: var(--taupe); font-style:italic; margin-top:2px; }
-  .diff { font-size:10.5px; font-weight:600; padding:1px 8px; border-radius:999px; white-space:nowrap; }
-  .diff-Low { background:#e4ecdf; color: var(--risk-low); }
-  .diff-Medium { background:#f6ecd9; color: var(--risk-medium); }
-  .diff-High { background:#f6e4e0; color: var(--risk-high); }
-  .cap-flow { list-style:none; margin:0; padding:0; }
-  .cap-flow li { position:relative; padding: 0 0 15px 22px; transition: opacity .15s ease; }
-  .cap-flow li:before { content:''; position:absolute; left:5px; top:4px; width:9px; height:9px; border-radius:50%; background: var(--ink); }
-  .cap-flow li:after { content:''; position:absolute; left:9px; top:15px; bottom:0; width:1.5px; background: var(--sand-500); }
-  .cap-flow li:last-child { padding-bottom:0; }
-  .cap-flow li:last-child:after { display:none; }
-  .cap-flow .fw-top { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
-  .cap-flow .fw-step { font-weight:700; font-size:13.5px; }
-  .cap-flow .fw-tag { font-size:10.5px; color: var(--taupe); font-family: var(--mono); }
-  .cap-flow .fw-what { font-size:11.5px; color: var(--ink-700); margin-top:3px; line-height:1.4; }
-  .cap-flow .fw-in { font-size:10.5px; color: var(--taupe); margin-top:3px; }
-  .cap-flow .fw-in b { color: var(--ink-700); font-weight:600; }
-  .pdim { opacity:.26; }
+  .hz { display:inline-flex; align-items:center; gap:10px; background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 7px 12px; box-shadow: var(--shadow); }
+  .hz .hz-note { font-size:11.5px; color: var(--taupe); max-width: 52ch; }
+  .hz .hz-note b { color: var(--ink-700); }
+
+  /* "new at this horizon" affordance, shared by KPIs and detail sections */
+  .nw-new { font-size:8.5px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#8a6d00; background: var(--yellow); border-radius:4px; padding:1px 6px; vertical-align:1px; }
+  .kpi.unlocked { border-color: var(--yellow); box-shadow: inset 0 0 0 1px var(--yellow); }
+  .kpi .k-top { display:flex; align-items:center; gap:6px; }
+
+  /* recoverability (Medium unlock) — table pill + savable amount */
+  .recov { display:inline-flex; align-items:center; gap:7px; justify-content:flex-end; }
+  .recov .pill { font-size:10.5px; font-weight:700; padding:1px 8px; border-radius:999px; }
+  .recov-Strong { background:#e4ecdf; color: var(--risk-low); }
+  .recov-Partial { background:#f6ecd9; color: var(--risk-medium); }
+  .recov-Weak { background:#f6e4e0; color: var(--risk-high); }
+  .recov .sv { font-family: var(--mono); font-size:10.5px; color: var(--taupe); }
+
+  /* forecast (Later unlock) — modelled coverage at T1 */
+  .fc { display:inline-flex; flex-direction:column; align-items:flex-end; font-family: var(--mono); font-weight:600; line-height:1.15; }
+  .fc .tag { font-family: var(--font); font-size:9.5px; font-weight:600; text-transform:uppercase; letter-spacing:.02em; }
+  .fc.breached, .fc.pre-breach { color: var(--risk-high); }
+  .fc.clear { color: var(--risk-low); }
+  .fc.pre-breach .tag { color: var(--risk-medium); }
+
+  /* phase-unlocked sections inside the inspector */
+  .sec.phase { background: var(--sand); border:1px solid var(--sand-500); border-left:3px solid var(--yellow); border-radius: var(--radius-sm); padding: 11px 13px; }
+  .sec.phase .panel-title { color: var(--ink-700); }
+  .sec.phase .ph-read { font-size:12px; color: var(--ink-700); line-height:1.45; margin-top:7px; }
+  .sec.phase .ph-do { font-size:11.5px; color: var(--ink); margin-top:9px; }
+  .sec.phase .ph-do b { color: var(--ink-700); }
 
   @media (max-width: 1080px){
     .desk { grid-template-columns: 1fr; }
     .insp { position: static; }
-    .kpis { grid-template-columns: repeat(2,1fr); }
+    .kpis { grid-template-columns: repeat(2,1fr) !important; }
     .insp-body, .tbl-scroll { max-height: none; }
-    .cap-grid { grid-template-columns: 1fr; }
-    .cap-col + .cap-col { border-left:none; border-top:1px solid var(--sand-500); }
   }
 </style>
 </head>
@@ -232,6 +225,7 @@
     <a href="product.html" class="active">Credit desk</a>
     <a href="diagram.html">Data architecture</a>
     <a href="lifecycle.html">Lifecycle</a>
+    <a href="roadmap.html">Data roadmap</a>
   </nav>
 </div>
 
@@ -239,7 +233,7 @@
   <div class="desk-head">
     <div>
       <h1>Credit desk</h1>
-      <p class="lede">Portfolio ranked worst-first by early-warning severity, then money at risk. Pick a company to see why it's flagged, pull the loan follow-up, get the recommended action — and log what you did.</p>
+      <p class="lede">Portfolio ranked worst-first by early-warning severity, then money at risk. Pick a company to see why it's flagged, pull the loan follow-up, get the recommended action — and log what you did. Step the <b>data horizon</b> (Now → Medium → Later) to watch the desk gain new metrics, new actions and deeper analysis as more data unlocks.</p>
     </div>
     <div class="signal-chip" id="signalChip"></div>
   </div>
@@ -247,6 +241,15 @@
   <div class="kpis" id="kpis"></div>
 
   <div class="desk-controls">
+    <div class="dg-ctl-group">
+      <span class="lbl">Data horizon</span>
+      <div class="dg-seg" id="phaseSeg" role="tablist" aria-label="Data horizon">
+        <button type="button" data-phase="Now" role="tab">Now</button>
+        <button type="button" data-phase="Medium" role="tab">Medium</button>
+        <button type="button" data-phase="Later" role="tab">Later</button>
+      </div>
+      <span class="hz"><span class="hz-note" id="phaseNote"></span></span>
+    </div>
     <div class="thr">
       <span class="lbl">High-risk threshold</span>
       <input id="thrInput" type="number" step="0.05" min="0.5" max="5" value="1.20" aria-label="High-risk coverage threshold">
@@ -264,20 +267,7 @@
       </div>
       <div class="tbl-scroll">
         <table class="rank">
-          <thead>
-            <tr>
-              <th class="l">#</th>
-              <th class="l">Company</th>
-              <th class="l">Risk</th>
-              <th>Coverage</th>
-              <th title="Worst coverage at which this company still serviced a payment — its historical floor. Current below this = uncharted territory.">Worst serviced</th>
-              <th>Principal at risk</th>
-              <th>Transferable / total</th>
-              <th>Trend</th>
-              <th>Prior</th>
-              <th>Feed</th>
-            </tr>
-          </thead>
+          <thead id="rankHead"></thead>
           <tbody id="rankBody"></tbody>
         </table>
       </div>
@@ -308,30 +298,6 @@
     <ul class="log-list" id="logList"></ul>
   </section>
 
-  <!-- CAPABILITY SHOWCASE: signal sourcing + workflow, phased Now / Medium / Later -->
-  <section class="nw-card cap-card" id="capCard">
-    <div class="cap-head">
-      <div>
-        <span class="panel-title">Signal &amp; workflow — what powers the desk</span>
-        <p class="cap-lede">How each number is sourced, and how the desk turns it into action. Filter by horizon to see how the signal and the credit team's fast access deepen <b>Now → Medium → Later</b>.</p>
-      </div>
-      <div class="dg-ctl-group">
-        <span class="lbl">Phase</span>
-        <div class="dg-seg" id="capPhase"></div>
-      </div>
-    </div>
-    <div class="cap-grid">
-      <div class="cap-col">
-        <div class="cap-part">Part 1 · The signal — how we get each piece of the metric</div>
-        <table class="cap-tbl"><thead><tr><th>Metric item</th><th>Source</th><th>Conf.</th><th>Difficulty</th><th>Phase</th></tr></thead><tbody id="sigBody"></tbody></table>
-      </div>
-      <div class="cap-col">
-        <div class="cap-part">Part 2 · The workflow — what the credit team needs to act</div>
-        <ol class="cap-flow" id="flowList"></ol>
-      </div>
-    </div>
-  </section>
-
   <p class="foot" id="foot"></p>
 </div>
 
@@ -349,8 +315,14 @@
   var THRESH = DEFAULT_THRESH;
   var SEVERITY = { High:0, Medium:1, Low:2, None:3 };
   var OUTCOMES = ['pending','contacted','in progress','bridge / FX arranged','escalated','resolved','monitoring'];
+  var PHASES = ['Now','Medium','Later'];
+  var DESK_PHASE = 'Now';
   var selectedId = null;
-  var SPEC, PORTFOLIO, FRAMEWORK, RANKED;
+  var SPEC, PORTFOLIO, FRAMEWORK, RANKED, UNLOCKS;
+
+  function phaseIdx(p){ var i = PHASES.indexOf(p); return i<0 ? 0 : i; }
+  function phaseReached(p){ return phaseIdx(DESK_PHASE) >= phaseIdx(p); }   // cumulative
+  function unlockedHere(p){ return DESK_PHASE === p; }                       // newly unlocked at the current horizon
 
   /* ---- formatting helpers ---- */
   function usd(n){ return '$' + Math.round(n).toLocaleString('en-US'); }
@@ -377,21 +349,57 @@
     PORTFOLIO = SPEC.portfolio.slice();
     FRAMEWORK = SPEC.actions_framework;
     RANKED = PORTFOLIO.slice().sort(rank);
+    UNLOCKS = SPEC.data_unlocks || {};
     THRESH = readThresh();
 
+    bindPhase();
     renderSignal();
-    renderKpis();
-    renderTable();
+    paintPhase();          // KPIs + table + horizon note for the active phase
     bindLog();
     renderLog();
     bindThreshold();
-    renderCapabilities();
 
     // default selection = worst-first (#1) so the desk opens on what's at risk
     select(RANKED[0].company_id);
 
     document.getElementById('foot').textContent =
       SPEC.meta.note + ' · ' + SPEC.meta.product + ' (' + SPEC.meta.version + ').';
+  }
+
+  /* ---- data horizon: Now/Medium/Later drives the whole desk ---- */
+  function bindPhase(){
+    var seg = document.getElementById('phaseSeg');
+    Array.prototype.forEach.call(seg.querySelectorAll('button'), function(b){
+      b.addEventListener('click', function(){ setPhase(b.getAttribute('data-phase')); });
+    });
+    syncPhaseSeg();
+  }
+  function setPhase(p){
+    if (PHASES.indexOf(p) < 0 || p === DESK_PHASE) return;
+    DESK_PHASE = p;
+    syncPhaseSeg();
+    paintPhase();
+    if (selectedId) select(selectedId);
+  }
+  function syncPhaseSeg(){
+    Array.prototype.forEach.call(document.querySelectorAll('#phaseSeg button'), function(b){
+      var on = b.getAttribute('data-phase') === DESK_PHASE;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+  }
+  function paintPhase(){
+    renderPhaseNote();
+    renderKpis();
+    renderTable();
+  }
+  function renderPhaseNote(){
+    var u = UNLOCKS[DESK_PHASE];
+    var el = document.getElementById('phaseNote');
+    if (!u){ el.textContent = ''; return; }
+    var sets = (u.datasets||[]).join(' · ');
+    el.innerHTML = '<b>' + esc(u.title) + '</b> — ' + esc(u.summary) +
+      (sets ? ' <span style="opacity:.8">(' + esc(sets) + ')</span>' : '');
   }
 
   function renderSignal(){
@@ -406,16 +414,35 @@
     var par    = PORTFOLIO.reduce(function(s,c){ return s + c.principal_at_risk; }, 0);
     var worst  = Math.min.apply(null, PORTFOLIO.map(function(c){ return c.coverage; }));
     var stale  = PORTFOLIO.filter(function(c){ return isStale(c.data_freshness_days); }).length;
+
+    // Now — banking + loan data
     var kpis = [
       { n: atRisk + ' / ' + PORTFOLIO.length, l: 'companies below ' + THRESH.toFixed(2) + ' coverage', alert: atRisk>0 },
       { n: String(high), l: 'High-severity alerts', alert: high>0 },
       { n: usdM(par), l: 'total principal at risk', alert: par>0 },
       { n: worst.toFixed(2), l: 'worst coverage' + (stale? ' · '+stale+' stale feed':''), alert: worst<THRESH }
     ];
+
+    // Medium — financial statements unlock recoverability → savable money
+    if (phaseReached('Medium')){
+      var savable = PORTFOLIO.reduce(function(s,c){ return s + (c.recoverability? c.recoverability.savable_usd : 0); }, 0);
+      kpis.push({ n: usdM(savable), l: 'recoverable of money at risk', alert: false, sub: 'balance sheet + cashflow', is_new: unlockedHere('Medium') });
+    }
+    // Later — forecasting + external signals unlock forward cash-at-T1
+    if (phaseReached('Later')){
+      var fcShort = PORTFOLIO.filter(function(c){ return c.forecast && c.forecast.coverage_t1 < 1.0; }).length;
+      var extra = Math.max(0, fcShort - atRiskBelow1());
+      kpis.push({ n: fcShort + ' / ' + PORTFOLIO.length, l: 'forecast short at T1' + (extra>0 ? ' · +'+extra+' vs spot' : ''), alert: fcShort>0, sub: 'modelled — incl. rates & input cost', is_new: unlockedHere('Later') });
+    }
+
     document.getElementById('kpis').innerHTML = kpis.map(function(k){
-      return '<div class="kpi"><div class="n'+(k.alert?' alert':'')+'">'+k.n+'</div><div class="l">'+k.l+'</div></div>';
+      return '<div class="kpi'+(k.is_new?' unlocked':'')+'">' +
+               '<div class="k-top"><div class="n'+(k.alert?' alert':'')+'">'+k.n+'</div>'+(k.is_new?'<span class="nw-new">new</span>':'')+'</div>' +
+               '<div class="l">'+k.l+(k.sub?' <span class="nw-muted">· '+esc(k.sub)+'</span>':'')+'</div>' +
+             '</div>';
     }).join('');
   }
+  function atRiskBelow1(){ return PORTFOLIO.filter(function(c){ return c.coverage < 1.0; }).length; }
 
   function covMeta(cov){
     var bad = cov < THRESH;
@@ -424,7 +451,37 @@
     return { bad: bad, fillPct: fillPct, color: color };
   }
 
+  function fcCellHtml(c){
+    var f = c.forecast; if(!f) return '<span class="nw-muted">—</span>';
+    var tag = f.status==='breached' ? '↓ short' : (f.status==='pre-breach' ? '↓ '+f.lead_days+'d lead' : '→ holds');
+    return '<span class="fc '+f.status+'" title="'+esc(f.read)+'">'+f.coverage_t1.toFixed(2)+'<span class="tag">'+tag+'</span></span>';
+  }
+  function recovCellHtml(c){
+    var r = c.recoverability; if(!r) return '<span class="nw-muted">—</span>';
+    return '<span class="recov" title="'+esc(r.read)+'"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span>'+
+           (r.savable_usd>0?'<span class="sv">'+usdM(r.savable_usd)+'</span>':'')+'</span>';
+  }
+
   function renderTable(){
+    var showRecov = phaseReached('Medium');
+    var showFc = phaseReached('Later');
+
+    document.getElementById('rankHead').innerHTML =
+      '<tr>' +
+        '<th class="l">#</th>' +
+        '<th class="l">Company</th>' +
+        '<th class="l">Risk</th>' +
+        '<th>Coverage</th>' +
+        (showFc ? '<th title="Modelled transferable cash at T1 ÷ cash due — forward-looking, includes rates &amp; input costs.">Forecast @ T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</th>' : '') +
+        '<th title="Worst coverage at which this company still serviced a payment — its historical floor. Current below this = uncharted territory.">Worst serviced</th>' +
+        '<th>Principal at risk</th>' +
+        (showRecov ? '<th title="Can they actually repay? Read from balance sheet + cashflow.">Recoverability'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</th>' : '') +
+        '<th>Transferable / total</th>' +
+        '<th>Trend</th>' +
+        '<th>Prior</th>' +
+        '<th>Feed</th>' +
+      '</tr>';
+
     var rows = RANKED.map(function(c, i){
       var cm = covMeta(c.coverage);
       var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd / c.total_cash_usd * 100) : 0;
@@ -442,10 +499,12 @@
             '<span class="covbar"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></span>' +
           '</span>' +
         '</td>' +
+        (showFc ? '<td>'+fcCellHtml(c)+'</td>' : '') +
         '<td>' + (typeof ws === 'number'
             ? '<span class="wsc '+(uncharted?'uncharted':'safe')+'" title="'+(uncharted?'current coverage is below the worst level it has ever still serviced — uncharted territory':'has serviced payments down to this coverage before')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ uncharted':'held')+'</span></span>'
             : '<span class="nw-muted">—</span>') + '</td>' +
         '<td><span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span></td>' +
+        (showRecov ? '<td>'+recovCellHtml(c)+'</td>' : '') +
         '<td>' +
           '<span class="split-mini">' +
             '<span class="bar" title="transferable vs trapped"><span style="width:'+trPct.toFixed(1)+'%"></span></span>' +
@@ -535,6 +594,36 @@
     html += fact('Worst serviced', (typeof ws === 'number' ? ws.toFixed(2) : '—'), uncharted?'below its own floor — uncharted':'lowest coverage it still paid at', uncharted?'var(--risk-high)':'var(--ink)');
     html += '</div></div>';
 
+    /* 2a. MEDIUM unlock — recoverability (balance sheet + cashflow) */
+    if (phaseReached('Medium') && c.recoverability){
+      var r = c.recoverability;
+      html += '<div class="sec phase">';
+      html += '<span class="panel-title">Recoverability — can they actually repay?'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</span>';
+      html += '<div class="facts" style="margin-top:8px;">';
+      html += fact('Recoverability', '<span class="recov"><span class="pill recov-'+r.label+'">'+esc(r.label)+'</span></span>', 'read from balance sheet + cashflow', null, true);
+      html += fact('Savable money', r.savable_usd>0?usd(r.savable_usd):'—', 'recoverable of the principal at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)');
+      html += '</div>';
+      html += '<div class="ph-read">'+esc(r.read)+'</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> classify the shortfall as timing vs structural, then prioritise P1–P4 by savable money.</div>';
+      html += '</div>';
+    }
+
+    /* 2b. LATER unlock — forecast & scenarios (cash at T1, rates + input costs) */
+    if (phaseReached('Later') && c.forecast){
+      var f = c.forecast;
+      var leadTxt = f.status==='pre-breach' ? '~'+f.lead_days+' days' : (f.status==='breached' ? 'already short' : 'clear');
+      html += '<div class="sec phase">';
+      html += '<span class="panel-title">Forecast &amp; scenarios — modelled cash at T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</span>';
+      html += '<div class="facts" style="margin-top:8px;">';
+      html += fact('Forecast @ T1', f.coverage_t1.toFixed(2), 'modelled coverage vs spot '+c.coverage.toFixed(2), f.coverage_t1<1.0?'var(--risk-high)':'var(--risk-low)');
+      html += fact('Lead time to breach', leadTxt, 'warning before a shortfall', f.status==='clear'?'var(--ink)':'var(--risk-medium)');
+      html += fact('Drivers', esc(f.drivers), 'what moves it next', null, true);
+      html += '</div>';
+      html += '<div class="ph-read">'+esc(f.read)+'</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> run a rate / input-cost scenario and size the bridge from the forecast gap.</div>';
+      html += '</div>';
+    }
+
     /* 3. FOLLOW-UP — loan structure */
     html += '<div class="sec"><span class="panel-title">Loan follow-up</span><div class="facts">';
     html += fact('Seniority', esc(loan.seniority));
@@ -612,52 +701,6 @@
     input.addEventListener('change', function(){ var v = parseFloat(input.value); applyThreshold(isFinite(v)&&v>0 ? v : DEFAULT_THRESH, true); });
     document.getElementById('thrReset').addEventListener('click', function(){ applyThreshold(DEFAULT_THRESH, true); document.getElementById('thrInput').value = DEFAULT_THRESH.toFixed(2); });
     renderThreshHint();
-  }
-
-  /* ---- capability showcase: signal sourcing + workflow, phased Now/Medium/Later ---- */
-  var capPhaseState = 'All';
-  function renderCapabilities(){
-    var caps = SPEC.signal_capabilities || [];
-    var flow = SPEC.workflow || [];
-    document.getElementById('sigBody').innerHTML = caps.map(function(m){
-      return '<tr data-phase="'+esc(m.phase)+'">' +
-        '<td><span class="item">'+esc(m.item)+'</span><div class="meth">'+esc(m.method)+'</div>' +
-          (m.availability && m.availability!==m.phase ? '<span class="avail">available '+esc(m.availability)+'</span>' : '') + '</td>' +
-        '<td class="src">'+esc(m.source)+'</td>' +
-        '<td class="conf">'+esc(m.confidence)+'</td>' +
-        '<td><span class="diff diff-'+esc(m.difficulty)+'">'+esc(m.difficulty)+'</span></td>' +
-        '<td><span class="nw-phase nw-phase-'+esc(m.phase)+'">'+esc(m.phase)+'</span></td>' +
-      '</tr>';
-    }).join('');
-    document.getElementById('flowList').innerHTML = flow.map(function(s){
-      return '<li data-phase="'+esc(s.phase)+'">' +
-        '<div class="fw-top"><span class="fw-step">'+esc(s.step)+'</span><span class="fw-tag">'+esc(s.tag)+'</span><span class="nw-phase nw-phase-'+esc(s.phase)+'">'+esc(s.phase)+'</span></div>' +
-        '<div class="fw-what">'+esc(s.what)+'</div>' +
-        '<div class="fw-in">needs <b>'+esc(s.inputs)+'</b></div>' +
-      '</li>';
-    }).join('');
-    var phases = ['All','Now','Medium','Later'];
-    var seg = document.getElementById('capPhase');
-    seg.innerHTML = '';
-    phases.forEach(function(p){
-      var b = document.createElement('button');
-      b.textContent = p; b.setAttribute('data-phase', p);
-      if (p === capPhaseState) b.className = 'on';
-      b.addEventListener('click', function(){ capPhaseState = p; syncCapSeg(); applyCapPhase(); });
-      seg.appendChild(b);
-    });
-    applyCapPhase();
-  }
-  function syncCapSeg(){
-    Array.prototype.forEach.call(document.querySelectorAll('#capPhase button'), function(b){
-      b.classList.toggle('on', b.getAttribute('data-phase') === capPhaseState);
-    });
-  }
-  function applyCapPhase(){
-    Array.prototype.forEach.call(document.querySelectorAll('#sigBody tr, #flowList li'), function(el){
-      var out = capPhaseState !== 'All' && el.getAttribute('data-phase') !== capPhaseState;
-      el.classList.toggle('pdim', out);
-    });
   }
 
   /* ---- action log (localStorage) ---- */

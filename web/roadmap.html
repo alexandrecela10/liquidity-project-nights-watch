@@ -1,0 +1,276 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Data roadmap — what unlocks Now / Medium / Later · Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .rm-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px 60px; }
+  .rm-head { padding: 30px 0 6px; display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap; }
+  .rm-head h1 { font-size: 30px; line-height:1.08; max-width: 22ch; }
+  .rm-head .lede { font-size: 15px; color: var(--taupe); max-width: 64ch; margin-top: 12px; }
+
+  /* horizon filter (segmented) */
+  .dg-ctl-group { display:flex; align-items:center; gap:10px; }
+  .dg-ctl-group .lbl { font-size:11px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--taupe); }
+  .dg-seg { display:inline-flex; background: var(--white); border:1px solid var(--sand-500); border-radius:999px; padding:3px; box-shadow: var(--shadow); }
+  .dg-seg button { font-family: var(--font); font-size:12.5px; font-weight:600; color: var(--taupe); background:transparent; border:none; cursor:pointer; padding:6px 14px; border-radius:999px; transition: background .15s ease, color .15s ease; }
+  .dg-seg button:hover { color: var(--ink); }
+  .dg-seg button.on { background: var(--ink); color: var(--sand); }
+
+  .sec-title { font-size: 12px; font-weight:600; letter-spacing:.05em; text-transform:uppercase; color:var(--taupe); margin: 30px 0 12px; }
+  .sec-title .n { color: var(--ink-700); }
+
+  /* data-unlock cards */
+  .unlock-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+  .u-card { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius); padding: 18px 18px 16px; box-shadow: var(--shadow); transition: opacity .15s ease, box-shadow .15s ease, border-color .15s ease; position:relative; }
+  .u-card .step { display:inline-flex; align-items:center; gap:7px; font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color: var(--taupe); }
+  .u-card .step .pin { width:8px; height:8px; border-radius:50%; background: var(--sand-700); display:inline-block; }
+  .u-card.h-Now .step .pin { background: var(--risk-low); }
+  .u-card.h-Medium .step .pin { background: var(--risk-medium); }
+  .u-card.h-Later .step .pin { background: var(--ink-700); }
+  .u-card h3 { font-size: 18px; margin-top: 8px; }
+  .u-card .sets { display:flex; flex-wrap:wrap; gap:6px; margin: 11px 0 10px; }
+  .u-card .set { font-size:11px; font-family: var(--mono); color: var(--ink-700); background: var(--sand); border:1px solid var(--sand-500); border-radius:999px; padding:3px 9px; }
+  .u-card .sum { font-size: 13px; color: var(--taupe); line-height:1.5; }
+  .u-card.on { border-color: var(--yellow); box-shadow: inset 0 0 0 1px var(--yellow), var(--shadow); }
+  .u-card.dim { opacity: .34; }
+
+  /* evolving workflow */
+  .wf-list { display:flex; flex-direction:column; gap:12px; }
+  .wf-step { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+  .wf-step .s-head { display:flex; align-items:center; gap:10px; padding: 12px 16px; border-bottom:1px solid var(--sand-500); }
+  .wf-step .s-name { font-size: 15px; font-weight:600; }
+  .wf-step .s-tag { font-size:10.5px; font-weight:600; text-transform:uppercase; letter-spacing:.04em; color: var(--taupe); background: var(--sand); border:1px solid var(--sand-500); border-radius:999px; padding:2px 9px; }
+  .ph-row { display:grid; grid-template-columns: 92px 1fr; gap: 14px; padding: 13px 16px; border-top:1px solid var(--sand-500); transition: opacity .15s ease; }
+  .ph-row:first-of-type { border-top:none; }
+  .ph-row.dim { opacity:.3; }
+  .ph-row .ph-key { display:flex; flex-direction:column; gap:4px; }
+  .ph-row .ph-key .h { font-size:12.5px; font-weight:700; }
+  .ph-row .ph-key .pin { width:8px; height:8px; border-radius:50%; display:inline-block; }
+  .ph-Now .h { color: var(--risk-low); } .ph-Now .pin { background: var(--risk-low); }
+  .ph-Medium .h { color: var(--risk-medium); } .ph-Medium .pin { background: var(--risk-medium); }
+  .ph-Later .h { color: var(--ink-700); } .ph-Later .pin { background: var(--ink-700); }
+  .ph-row .what { font-size: 13.5px; color: var(--ink); }
+  .ph-row .analysis { font-size: 12px; color: var(--taupe); margin-top:3px; }
+  .ph-row .chips { display:flex; flex-wrap:wrap; gap:6px; margin-top:9px; }
+  .chip { font-size:11px; border-radius:999px; padding:3px 9px; border:1px solid var(--sand-500); background: var(--sand); color: var(--ink-700); }
+  .chip.act { background: var(--ink); color: var(--sand); border-color: var(--ink); }
+  .chip .nu { font-size:8.5px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:#8a6d00; background: var(--yellow); border-radius:3px; padding:0 4px; margin-right:5px; vertical-align:1px; }
+  .blk-lbl { font-size:10px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:var(--sand-700); margin-top:11px; }
+
+  /* signal table */
+  .sig-wrap { background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius); box-shadow: var(--shadow); overflow:hidden; }
+  table.sig { width:100%; border-collapse: collapse; font-size: 13px; }
+  table.sig th, table.sig td { text-align:left; padding: 11px 14px; border-bottom:1px solid var(--sand-500); vertical-align: top; }
+  table.sig thead th { font-size:10.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color: var(--taupe); background: var(--sand); }
+  table.sig tbody tr:last-child td { border-bottom:none; }
+  table.sig .id { font-family: var(--mono); font-weight:600; color: var(--ink-700); }
+  table.sig .item { font-weight:600; }
+  table.sig .src { color: var(--taupe); }
+  table.sig .method { color: var(--taupe); font-size:12px; }
+  .hz-pill { font-size:10.5px; font-weight:700; border-radius:999px; padding:2px 9px; }
+  .hz-Now { background:#e4ecdf; color: var(--risk-low); }
+  .hz-Later { background:#ece7df; color: var(--ink-700); }
+  .conf { font-family: var(--mono); font-size:12px; }
+  .diff { font-size:11px; font-weight:600; border-radius:999px; padding:2px 8px; }
+  .diff-Low { background:#e4ecdf; color: var(--risk-low); }
+  .diff-Medium { background:#f6ecd9; color: var(--risk-medium); }
+  .diff-High { background:#f6e4e0; color: var(--risk-high); }
+  table.sig tr.dim { opacity:.28; }
+  .filter-note { font-size:12px; color: var(--taupe); margin: 10px 2px 0; min-height: 1em; }
+
+  .foot { color: var(--taupe); font-size: 12.5px; padding: 26px 0 0; border-top:1px solid var(--sand-500); margin-top: 34px; }
+
+  @media (max-width: 900px){ .unlock-grid{grid-template-columns:1fr;} .ph-row{grid-template-columns:1fr;} }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity · Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="roadmap.html" class="active">Data roadmap</a>
+  </nav>
+</div>
+
+<div class="rm-wrap">
+  <div class="rm-head">
+    <div>
+      <h1>Data roadmap — what unlocks Now / Medium / Later</h1>
+      <p class="lede">The credit desk is useful from day one on banking + loan data, and it gets sharper as more data lands. Here's where each signal comes from and how the See → Understand → Prioritise → Decide → Act workflow deepens at each horizon. Pick a horizon to focus the view.</p>
+    </div>
+    <div class="dg-ctl-group">
+      <span class="lbl">Horizon</span>
+      <div class="dg-seg" id="seg" role="tablist" aria-label="Data horizon">
+        <button type="button" data-phase="All" role="tab">All</button>
+        <button type="button" data-phase="Now" role="tab">Now</button>
+        <button type="button" data-phase="Medium" role="tab">Medium</button>
+        <button type="button" data-phase="Later" role="tab">Later</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sec-title">What each horizon unlocks</div>
+  <div class="unlock-grid" id="unlockGrid"></div>
+
+  <div class="sec-title">How the workflow deepens — <span class="n">See → Understand → Prioritise → Decide → Act</span></div>
+  <div class="wf-list" id="wfList"></div>
+
+  <div class="sec-title">Where each signal comes from</div>
+  <div class="sig-wrap">
+    <table class="sig">
+      <thead>
+        <tr>
+          <th>#</th><th>Signal</th><th>Source</th><th>How we derive it</th><th>Confidence</th><th>Effort</th><th>Horizon</th>
+        </tr>
+      </thead>
+      <tbody id="sigBody"></tbody>
+    </table>
+  </div>
+  <div class="filter-note" id="filterNote"></div>
+
+  <p class="foot" id="foot"></p>
+</div>
+
+<script>
+  /* ---- resilient spec loader (per spec/INTEGRATION.md) ---- */
+  function loadSpec(srcs, done){ if(!srcs.length) return done(new Error('no spec'));
+    var s=document.createElement('script'); s.src=srcs[0];
+    s.onload=done; s.onerror=function(){loadSpec(srcs.slice(1),done);};
+    document.head.appendChild(s); }
+  loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
+
+  var PHASES = ['Now','Medium','Later'];
+  var PHASE = 'All';
+  var SPEC, UNLOCKS, WORKFLOW, SIGNALS;
+
+  function esc(s){ return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]; }); }
+  function idx(p){ return PHASES.indexOf(p); }
+  // cumulative: a horizon-row is "reached" by the selected phase (All reaches everything)
+  function reached(rowPhase){ return PHASE === 'All' || idx(rowPhase) <= idx(PHASE); }
+  function isNewAt(rowPhase){ return PHASE !== 'All' && rowPhase === PHASE; }
+
+  function init(){
+    SPEC = window.NW_SPEC;
+    UNLOCKS = SPEC.data_unlocks || {};
+    WORKFLOW = SPEC.workflow || [];
+    SIGNALS = SPEC.signal_capabilities || [];
+
+    bindSeg();
+    renderUnlocks();
+    renderWorkflow();
+    renderSignals();
+    paint();
+
+    document.getElementById('foot').textContent =
+      SPEC.meta.note + ' · ' + SPEC.meta.product + ' (' + SPEC.meta.version + ').';
+  }
+
+  function bindSeg(){
+    Array.prototype.forEach.call(document.querySelectorAll('#seg button'), function(b){
+      b.addEventListener('click', function(){
+        PHASE = b.getAttribute('data-phase');
+        syncSeg(); paint();
+      });
+    });
+    syncSeg();
+  }
+  function syncSeg(){
+    Array.prototype.forEach.call(document.querySelectorAll('#seg button'), function(b){
+      var on = b.getAttribute('data-phase') === PHASE;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-selected', on ? 'true' : 'false');
+    });
+  }
+
+  function renderUnlocks(){
+    document.getElementById('unlockGrid').innerHTML = PHASES.map(function(p){
+      var u = UNLOCKS[p] || {};
+      var sets = (u.datasets||[]).map(function(d){ return '<span class="set">'+esc(d)+'</span>'; }).join('');
+      return '<div class="u-card h-'+p+'" data-phase="'+p+'">' +
+               '<span class="step"><span class="pin"></span>'+esc(p)+'</span>' +
+               '<h3>'+esc(u.title||'')+'</h3>' +
+               '<div class="sets">'+sets+'</div>' +
+               '<div class="sum">'+esc(u.summary||'')+'</div>' +
+             '</div>';
+    }).join('');
+  }
+
+  function chips(arr, isAction, rowPhase){
+    return (arr||[]).map(function(t){
+      return '<span class="chip'+(isAction?' act':'')+'">' +
+        (isNewAt(rowPhase) ? '<span class="nu">new</span>' : '') + esc(t) + '</span>';
+    }).join('');
+  }
+
+  function renderWorkflow(){
+    document.getElementById('wfList').innerHTML = WORKFLOW.map(function(s){
+      var rows = PHASES.map(function(p){
+        var ph = (s.phases && s.phases[p]) || {};
+        var metricChips = chips(ph.metrics, false, p);
+        var actionChips = chips(ph.actions, true, p);
+        return '<div class="ph-row ph-'+p+'" data-phase="'+p+'">' +
+                 '<div class="ph-key"><span class="pin"></span><span class="h">'+esc(p)+'</span></div>' +
+                 '<div>' +
+                   '<div class="what">'+esc(ph.what||'')+'</div>' +
+                   '<div class="analysis">'+esc(ph.analysis||'')+'</div>' +
+                   '<div class="blk-lbl">Metrics</div><div class="chips">'+metricChips+'</div>' +
+                   '<div class="blk-lbl">Actions</div><div class="chips">'+actionChips+'</div>' +
+                 '</div>' +
+               '</div>';
+      }).join('');
+      return '<div class="wf-step">' +
+               '<div class="s-head"><span class="s-name">'+esc(s.step)+'</span><span class="s-tag">'+esc(s.tag)+'</span></div>' +
+               rows +
+             '</div>';
+    }).join('');
+  }
+
+  function renderSignals(){
+    document.getElementById('sigBody').innerHTML = SIGNALS.map(function(m){
+      var ph = m.phase || 'Now';
+      return '<tr data-phase="'+ph+'">' +
+               '<td class="id">'+esc(m.id)+'</td>' +
+               '<td class="item">'+esc(m.item)+'</td>' +
+               '<td class="src">'+esc(m.source)+'</td>' +
+               '<td class="method">'+esc(m.method)+'</td>' +
+               '<td class="conf">'+esc(m.confidence)+'</td>' +
+               '<td><span class="diff diff-'+esc(m.difficulty)+'">'+esc(m.difficulty)+'</span></td>' +
+               '<td><span class="hz-pill hz-'+ph+'">'+esc(ph)+'</span></td>' +
+             '</tr>';
+    }).join('');
+  }
+
+  function paint(){
+    // data-unlock cards: highlight reached, dim later; All = neutral bright
+    Array.prototype.forEach.call(document.querySelectorAll('#unlockGrid .u-card'), function(el){
+      var p = el.getAttribute('data-phase');
+      el.classList.toggle('on', PHASE === p);
+      el.classList.toggle('dim', !reached(p));
+    });
+    // workflow rows: dim phases not yet reached
+    Array.prototype.forEach.call(document.querySelectorAll('#wfList .ph-row'), function(el){
+      el.classList.toggle('dim', !reached(el.getAttribute('data-phase')));
+    });
+    // signal table: dim rows whose horizon isn't reached yet
+    var anyDim = false, anyBright = false;
+    Array.prototype.forEach.call(document.querySelectorAll('#sigBody tr'), function(el){
+      var on = reached(el.getAttribute('data-phase'));
+      el.classList.toggle('dim', !on);
+      if (on) anyBright = true; else anyDim = true;
+    });
+    var note = document.getElementById('filterNote');
+    if (PHASE === 'All'){ note.textContent = 'Showing every horizon. Pick Now / Medium / Later to focus.'; }
+    else if (PHASE === 'Medium'){ note.textContent = 'Medium adds no new raw feed — it unlocks analysis (recoverability) on top of the Now signals.'; }
+    else { note.textContent = 'Showing the signals available by ' + PHASE + ' (cumulative); later-horizon signals are dimmed.'; }
+  }
+</script>
+</body>
+</html>
