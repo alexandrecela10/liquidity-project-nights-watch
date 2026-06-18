@@ -15,7 +15,14 @@ Synthetic data only. One company (**Sahel AgriCorp**) mirrors the numeric distri
 | **Lifecycle mock** | `web/lifecycle.html` | A new bank file → a High warning → a credit-team action → the updated database, step by step. |
 | **Credit-team product** | `web/product.html` | At-risk companies ranked worst-first; understand why; loan follow-up; P1–P4 action; log it. |
 
-Live site (GitHub Pages): see the repo's **Pages** URL once deployed. Landing page = `web/index.html`.
+### Live site (GitHub Pages)
+Enable once in **Settings → Pages → Build and deployment → Deploy from a branch → Branch: `devin/nights-watch-spec` (or rename it to `main`), folder: `/ (root)` → Save**. The root [`index.html`](index.html) redirects to the landing page, so the site is served at:
+
+```
+https://alexandrecela10.github.io/liquidity-project-nights-watch/
+```
+
+(`.nojekyll` is included so the static files are served as-is.)
 
 ## Single source of truth
 All four outputs read from one spec, [`spec/ontology.json`](spec/ontology.json) — the data model, the synthetic portfolio, the lifecycle scenario, and the brand. The interactive pages load it via the generated `spec/ontology.js`:
