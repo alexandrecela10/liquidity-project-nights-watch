@@ -46,8 +46,12 @@
   table.rank tbody tr.sel { background: #fbf3d6; box-shadow: inset 3px 0 0 var(--yellow); }
   table.rank tbody tr.sel:hover { background: #faeec6; }
   .rk { color: var(--sand-700); font-family: var(--mono); font-size: 11px; }
-  .co-name { font-weight: 600; }
+  .co-name { font-weight: 600; display:flex; align-items:center; gap:6px; }
   .co-juris { color: var(--taupe); font-size: 11px; }
+  .co-name .drill { font-weight:600; font-size:11px; color:var(--taupe); letter-spacing:.01em;
+    opacity:0; transform: translateX(-3px); transition: opacity .12s ease, transform .12s ease; margin-left:auto; padding-left:10px; }
+  table.rank tbody tr:hover .co-name .drill, table.rank tbody tr.sel .co-name .drill { opacity:.85; transform:none; }
+  table.rank tbody tr.sel .co-name .drill { color: var(--ink); }
   .num { font-family: var(--mono); }
   .cov { font-family: var(--mono); font-weight: 600; }
   .cov.bad { color: var(--risk-high); }
@@ -105,6 +109,18 @@
   .fact { font-size: 12.5px; }
   .fact .k { color: var(--taupe); font-size: 11px; }
   .fact .v { font-weight: 600; font-family: var(--mono); }
+
+  /* loan drill-down section */
+  .loan-sec { background: var(--white); border:1px solid var(--sand-500); border-left: 3px solid var(--ink-700);
+    border-radius: var(--radius-sm); padding: 13px 14px; margin: 4px 0; }
+  .loan-sec .loan-tag { font-size: 10.5px; font-weight: 600; color: var(--taupe); background: var(--sand);
+    border:1px solid var(--sand-500); border-radius: 999px; padding: 1px 8px; margin-left: 6px; }
+  .loan-lead { font-size: 12.5px; color: var(--ink-700); line-height: 1.5; margin: 4px 0 12px; }
+  .loan-kpis { display:grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-bottom: 13px; }
+  .lkpi { background: var(--sand); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 8px 10px; }
+  .lk-k { font-size: 10.5px; color: var(--taupe); margin-bottom: 3px; line-height:1.25; }
+  .lk-v { font-size: 18px; font-weight: 700; font-family: var(--mono); line-height: 1.05; letter-spacing:-.01em; }
+  .lk-s { font-size: 10px; color: var(--sand-700); margin-top: 3px; line-height:1.3; }
   .badge { display:inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 7px; border-radius: 6px; letter-spacing:.02em; }
   .badge.cash { background:#e4ecdf; color: var(--risk-low); }
   .badge.pik  { background:#efe8e3; color: var(--taupe); }
@@ -265,6 +281,13 @@
   .filt-toggle { font-family: var(--font); font-size: 16px; line-height:1; color: var(--taupe); background: transparent; border: 1px solid var(--sand-500); border-radius: var(--radius-sm); width: 26px; height: 26px; cursor: pointer; }
   .filt-toggle:hover { color: var(--ink); border-color: var(--sand-700); }
   .filt-body { padding: 4px 14px 14px; max-height: calc(100vh - 250px); overflow:auto; }
+  .fsearch { position:relative; margin: 8px 0 4px; }
+  .fsearch svg { position:absolute; left:9px; top:50%; transform:translateY(-50%); width:15px; height:15px;
+    fill:none; stroke: var(--sand-700); stroke-width:1.7; stroke-linecap:round; pointer-events:none; }
+  .fsearch input { width:100%; box-sizing:border-box; font-family: inherit; font-size:12.5px; color: var(--ink);
+    background: var(--white); border:1px solid var(--sand-700); border-radius: var(--radius-sm); padding:8px 10px 8px 30px; }
+  .fsearch input::placeholder { color: var(--sand-700); }
+  .fsearch input:focus { outline: 2px solid var(--yellow); outline-offset:0; border-color: var(--ink); }
   .fgroup { padding: 12px 0 11px; border-bottom: 1px dashed var(--sand-500); }
   .fgroup:last-of-type { border-bottom: none; }
   .fg-onto { font-size: 9px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color: var(--sand-700); }
@@ -472,7 +495,7 @@
 
   /* filter state + pending deep-link selection (set from the URL) */
   var FILTERS, PENDING_SELECT = null;
-  function defaultFilters(){ return { countries:[], severities:[], seniorities:[], coupons:[], pMin:null, pMax:null, covMin:null, covMax:null, atRiskOnly:false, worseningOnly:false, priorOnly:false }; }
+  function defaultFilters(){ return { q:'', countries:[], severities:[], seniorities:[], coupons:[], pMin:null, pMax:null, covMin:null, covMax:null, atRiskOnly:false, worseningOnly:false, priorOnly:false }; }
 
   var ICON = {
     user:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="6.4" r="3.1"/><path d="M2.6 16.7c0-3 2.4-4.9 5.4-4.9 1 0 1.9.22 2.6.6"/><path d="M15.4 12.3v4.4M13.2 14.5h4.4"/></svg>',
@@ -498,7 +521,9 @@
     ".headline.bad{border-left-color:var(--high)}" +
     "table.kv{width:100%;border-collapse:collapse;font-size:13px}" +
     "table.kv th{text-align:left;font-weight:500;color:var(--taupe);padding:6px 12px 6px 0;width:240px;vertical-align:top}" +
+    "table.kv th[title]{cursor:help;text-decoration:underline dotted var(--sand7);text-underline-offset:3px}" +
     "table.kv td{padding:6px 0;border-bottom:1px solid var(--sand5)}" +
+    ".hint-note{font-size:11px;color:var(--taupe);margin:0 0 6px;font-style:italic}" +
     ".pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}" +
     ".pill-High{background:#f6e4e0;color:var(--high)}.pill-Medium{background:#f6ecd9;color:var(--med)}.pill-Low{background:#e4ecdf;color:var(--low)}.pill-None{background:#efe8e3;color:var(--none)}" +
     ".pill-pri{background:var(--ink);color:var(--yellow)}" +
@@ -523,6 +548,26 @@
     return d.toLocaleDateString('en-US',{month:'short',day:'numeric'}) + ' · ' +
            d.toLocaleTimeString('en-US',{hour:'2-digit',minute:'2-digit'}); }
   function freshLabel(days){ return days===0 ? 'today' : days+'d ago'; }
+  function daysUntil(iso){ if(!iso) return null; var d=new Date(iso+'T00:00:00'); if(isNaN(d)) return null;
+    var now=new Date(); now.setHours(0,0,0,0); return Math.round((d-now)/86400000); }
+  function dueInLabel(iso){ var n=daysUntil(iso); if(n==null) return '';
+    return n<0 ? Math.abs(n)+'d overdue' : (n===0 ? 'due today' : 'in '+n+(n===1?' day':' days')); }
+
+  /* loan-level executive analytics, derived from the loan + golden signal (one loan per company) */
+  function loanAnalytics(c){
+    var loan = c.loan || {};
+    var isPik = (loan.cash_vs_pik || '').toLowerCase() === 'pik';
+    var cashDue = loan.cash_to_repay_t1 || 0;
+    var cov = c.coverage;
+    var transToT1 = cashDue>0 ? Math.round(cashDue * Math.min(cov,1)) : 0;
+    var gap = cashDue>0 && cov<1 ? Math.round(cashDue * (1 - cov)) : 0;   // shortfall (>0) at T1
+    var annualCoupon = (!isPik && loan.principal && loan.coupon_rate) ? Math.round(loan.principal * loan.coupon_rate) : 0;
+    var par = c.principal_at_risk || 0;
+    var parPct = (loan.principal>0) ? (par/loan.principal) : 0;
+    var rec = recovOf(c);
+    return { loan:loan, isPik:isPik, cashDue:cashDue, cov:cov, transToT1:transToT1, gap:gap,
+      annualCoupon:annualCoupon, par:par, parPct:parPct, rec:rec, dueDays:daysUntil(loan.next_payment_date) };
+  }
   function isStale(days){ return days > 3; }
 
   function rank(a,b){
@@ -567,6 +612,10 @@
 
   function passesFilters(c){
     var f = FILTERS;
+    if (f.q){
+      var q = f.q.trim().toLowerCase();
+      if (q && (c.name+' '+c.jurisdiction+' '+(c.loan&&c.loan.loan_id||'')).toLowerCase().indexOf(q) < 0) return false;
+    }
     if (!inSet(f.countries, c.jurisdiction)) return false;
     if (!inSet(f.severities, c.label)) return false;
     if (!inSet(f.seniorities, c.loan.seniority)) return false;
@@ -625,6 +674,11 @@
     var couponLabel = { cash:'Cash-pay', pik:'PIK' };
 
     var html = '';
+    // Search (company name / loan id)
+    html += '<div class="fsearch">' +
+      '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="9" cy="9" r="5.4"/><path d="m13.2 13.2 3.4 3.4"/></svg>' +
+      '<input type="search" id="fSearch" data-fk="q" placeholder="Find a company\u2026" value="'+esc(f.q||'')+'" aria-label="Search companies" autocomplete="off">' +
+    '</div>';
     // Company
     html += fgroup('Company', 'Country / jurisdiction', '<div class="fchecks">' +
       orderedKeys(byCountry).map(function(k){ return checkRow('countries', k, k, byCountry[k], f.countries.indexOf(k)>=0); }).join('') + '</div>');
@@ -665,7 +719,8 @@
       var el = e.target;
       var fk = el.getAttribute && el.getAttribute('data-fk');
       if (!fk) return;
-      if (el.type === 'checkbox'){
+      if (fk === 'q'){ FILTERS.q = el.value || ''; }
+      else if (el.type === 'checkbox'){
         if (fk === 'atRiskOnly' || fk === 'worseningOnly' || fk === 'priorOnly'){ FILTERS[fk] = el.checked; }
         else { var arr = FILTERS[fk], v = el.value, i = arr.indexOf(v); if (el.checked){ if (i<0) arr.push(v); } else if (i>=0) arr.splice(i,1); }
       } else {
@@ -674,7 +729,7 @@
       onFiltersChanged();
     }
     body.addEventListener('change', handle);
-    body.addEventListener('input', function(e){ if (e.target && e.target.type === 'number') handle(e); });
+    body.addEventListener('input', function(e){ if (e.target && (e.target.type === 'number' || e.target.getAttribute('data-fk') === 'q')) handle(e); });
     body.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('#filtClear')) clearFilters(); });
   }
 
@@ -692,6 +747,7 @@
 
   function activeFilterCount(){
     var f = FILTERS, n = 0;
+    if (f.q && f.q.trim()) n++;
     ['countries','severities','seniorities','coupons'].forEach(function(k){ n += f[k].length; });
     ['pMin','pMax','covMin','covMax'].forEach(function(k){ if (f[k] != null) n++; });
     ['atRiskOnly','worseningOnly','priorOnly'].forEach(function(k){ if (f[k]) n++; });
@@ -882,11 +938,11 @@
     toast('Downloaded executive summary \u00b7 <b>'+esc(c.name)+'</b>');
   }
   function execSummary(c){
-    var loan = c.loan, r = recovOf(c);
+    var loan = c.loan, r = recovOf(c), la = loanAnalytics(c);
     var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd/c.total_cash_usd*100) : 0;
     var owner = getAssignee(c.company_id), alerts = getAlerts(c.company_id), act = c.action;
     var gen = new Date().toISOString().slice(0,16).replace('T',' ');
-    function kv(k, v){ return '<tr><th>'+k+'</th><td>'+v+'</td></tr>'; }
+    function kv(k, v, t){ return '<tr><th'+(t?' title="'+esc(t)+'"':'')+'>'+k+'</th><td>'+v+'</td></tr>'; }
     var fcBlock = c.forecast ? (
       '<h2>Forecast @ T1 (Later horizon)</h2><table class="kv">' +
         kv('Base case coverage', c.forecast.coverage_t1.toFixed(2)) +
@@ -916,12 +972,19 @@
         kv('Savable money', r.savable>0?usd(r.savable):'&mdash;') +
         kv('Basis', esc(r.read || 'seniority / security + transferable-vs-trapped + prior-miss history')) +
       '</table>' + fcBlock +
-      '<h2>Loan follow-up</h2><table class="kv">' +
-        kv('Principal', usd(loan.principal)) +
-        kv('Seniority', esc(loan.seniority)) +
-        kv('Coupon', (loan.coupon_rate!=null?pct(loan.coupon_rate):'')+' &middot; '+(loan.cash_vs_pik==='pik'?'PIK':'cash-pay')) +
-        kv('Next payment', loan.next_payment_date?esc(fmtDate(loan.next_payment_date)):'&mdash;') +
-        kv('Cash to repay (T1)', usd(loan.cash_to_repay_t1)) +
+      '<h2>Loan &mdash; detail &amp; analytics</h2>' +
+      '<p class="hint-note">Hover any label for its definition &amp; formula.</p><table class="kv">' +
+        kv('Loan ID', esc(loan.loan_id)) +
+        kv('Principal', usd(loan.principal), 'Face value of the loan outstanding.') +
+        kv('Seniority &amp; security', esc(loan.seniority), 'Rank in the capital structure — drives recovery in a workout.') +
+        kv('Coupon', (loan.coupon_rate!=null?pct(loan.coupon_rate):'')+' &middot; '+(la.isPik?'PIK (accrues in kind)':'cash-pay'), 'Annual interest rate. PIK accrues to principal; cash-pay is paid in cash each period.') +
+        (la.annualCoupon>0 ? kv('Annual cash coupon', usd(la.annualCoupon), 'principal × coupon rate — cash interest per year.') : '') +
+        kv('Next payment', (loan.next_payment_date?esc(fmtDate(loan.next_payment_date)):'&mdash;')+(loan.next_payment_date?(' &middot; '+dueInLabel(loan.next_payment_date)):''), 'Date of the next scheduled payment (T1).') +
+        kv('Cash due at T1', (la.isPik&&la.cashDue===0)?'$0 &middot; PIK':usd(la.cashDue), 'Transferable cash needed to service the next payment.') +
+        kv('Coverage at T1', c.coverage.toFixed(2)+(c.coverage<1?' &mdash; underfunded':' &mdash; covered'), 'transferable cash at T1 ÷ cash due at T1.') +
+        (la.gap>0 ? kv('Shortfall at T1', usd(la.gap)+' ('+pct(1-Math.min(la.cov,1))+' of cash due)', 'cash due × (1 − coverage) — unfunded portion of the coupon.') : '') +
+        kv('Principal at risk', (la.par>0?usd(la.par)+' ('+pct(la.parPct)+' of principal)':'$0'), 'Principal exposed if the borrower cannot service or refinance.') +
+        kv('Recovery (savable)', (la.rec.savable>0?usd(la.rec.savable):'&mdash;')+' &middot; '+esc(la.rec.basis), 'Estimated recoverable of the principal at risk, given seniority / security.') +
       '</table>' +
       (act ? ('<h2>Recommended action <span class="pill pill-pri">'+esc(act.priority)+'</span></h2>' +
         '<p class="act-title">'+esc(act.title)+'</p><p class="act-why">'+esc(act.why)+'</p>' +
@@ -1199,7 +1262,7 @@
       return '' +
       '<tr data-id="'+c.company_id+'">' +
         '<td class="l"><span class="rk">'+(i+1)+'</span></td>' +
-        '<td class="l"><div class="co-name">'+esc(c.name)+chips+'</div><div class="co-juris">'+esc(c.jurisdiction)+'</div></td>' +
+        '<td class="l"><div class="co-name">'+esc(c.name)+chips+'<span class="drill" aria-hidden="true">drill in &rsaquo;</span></div><div class="co-juris">'+esc(c.jurisdiction)+'</div></td>' +
         '<td class="l"><span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span></td>' +
         '<td>' +
           '<span class="covwrap">' +
@@ -1247,7 +1310,7 @@
     });
     document.getElementById('listHint').textContent =
       (RANKED.length === PORTFOLIO.length ? RANKED.length + ' companies' : RANKED.length + ' of ' + PORTFOLIO.length + ' companies') +
-      ' · click a row to inspect';
+      ' · click any row to drill into the company + loan';
   }
 
   function byId(id){ return PORTFOLIO.filter(function(c){ return c.company_id===id; })[0]; }
@@ -1373,14 +1436,31 @@
       html += '</div>';
     }
 
-    /* 3. FOLLOW-UP — loan structure */
-    html += '<div class="sec"><span class="panel-title">Loan follow-up</span><div class="facts">';
-    html += fact('Seniority', tip('seniority-security', esc(loan.seniority)), null, null, true);
-    html += fact('Principal', usd(loan.principal));
-    html += fact('Coupon', tip('coupon-rate', pct(loan.coupon_rate)), null, null, true);
+    /* 3. LOAN — drill-down: structure + executive analytics */
+    var la = loanAnalytics(c);
+    html += '<div class="sec loan-sec" id="loanSec">';
+    html += '<span class="panel-title">Loan &mdash; detail &amp; analytics <span class="loan-tag nw-mono">'+esc(loan.loan_id)+'</span></span>';
+    var lead;
+    if (la.isPik && la.cashDue===0){
+      lead = 'A '+usdM(loan.principal)+' '+esc(loan.seniority)+' loan. Next payment is <b>PIK</b> — no cash leaves the borrower at T1, so coverage isn\u2019t tested this cycle.';
+    } else {
+      lead = 'A '+usdM(loan.principal)+' '+esc(loan.seniority)+' loan. <b>'+usd(la.cashDue)+'</b> cash due '+fmtDate(loan.next_payment_date)+' ('+dueInLabel(loan.next_payment_date)+'). Transferable cash covers <b>'+pct(Math.min(la.cov,1))+'</b>'+(la.gap>0?' &rarr; <span class="flag">&approx; '+usd(la.gap)+' short</span>.':' of it.');
+    }
+    html += '<div class="loan-lead">'+lead+'</div>';
+    html += '<div class="loan-kpis">';
+    html += loanKpi(tip('coverage-ratio','Coverage @ T1'), c.coverage.toFixed(2), cm.bad?'var(--risk-high)':'var(--risk-low)', 'transferable \u00f7 cash due');
+    html += loanKpi(tip('cash-due-t1','Cash due (T1)'), (la.isPik && la.cashDue===0)?'$0':usd(la.cashDue), null, (la.isPik && la.cashDue===0)?'PIK — nothing due':dueInLabel(loan.next_payment_date));
+    if (la.gap>0) html += loanKpi('Shortfall (T1)', usd(la.gap), 'var(--risk-high)', 'unfunded portion of the coupon');
+    else html += loanKpi('Funding (T1)', la.cashDue>0?'covered':'—', 'var(--risk-low)', la.cashDue>0?'cash due is met':'no cash due');
+    html += loanKpi('Next payment', la.dueDays!=null?(la.dueDays<0?'overdue':la.dueDays+'d'):'—', (la.dueDays!=null && la.dueDays<=7 && !(la.isPik&&la.cashDue===0))?'var(--risk-medium)':null, fmtDate(loan.next_payment_date));
+    html += '</div>';
+    html += '<div class="facts">';
+    html += fact('Seniority &amp; security', tip('seniority-security', esc(loan.seniority)), 'recovery rank in a workout', null, true);
+    html += fact('Coupon', tip('coupon-rate', pct(loan.coupon_rate)), la.isPik?'accrues in kind (PIK)':'paid in cash', null, true);
     html += fact('Type', tip('cash-vs-pik', isPik ? '<span class="badge pik">PIK</span> no cash due' : '<span class="badge cash">CASH</span> coupon'), null, null, true);
-    html += fact('Next payment', tip('next-payment', fmtDate(loan.next_payment_date)), null, null, true);
-    html += fact('Cash to repay (T1)', tip('cash-due-t1', isPik && loan.cash_to_repay_t1===0 ? '$0 · PIK' : usd(loan.cash_to_repay_t1)), isPik && loan.cash_to_repay_t1===0 ? 'paid in kind — no cash leaves the borrower' : null, null, true);
+    if (la.annualCoupon>0) html += fact('Annual cash coupon', usd(la.annualCoupon), 'principal \u00d7 coupon, per year');
+    html += fact('Principal at risk', tip('principal-at-risk', la.par>0?usd(la.par):'$0'), la.par>0?pct(la.parPct)+' of principal':'none at risk now', la.par>0?'var(--risk-high)':'var(--ink)', true);
+    html += fact('Recovery (savable)', tip(la.rec.basis==='financials-enhanced'?'savable-money-sharpened':'savable-money-first-pass', la.rec.savable>0?usd(la.rec.savable):'—'), la.rec.basis==='financials-enhanced'?'financials-enhanced':'first-pass read', la.rec.savable>0?'var(--ink)':'var(--taupe)', true);
     html += '</div></div>';
 
     /* 4. RECOMMENDED ACTION */
@@ -1414,6 +1494,11 @@
     document.getElementById('logBtn').addEventListener('click', function(){ logAction(c); });
   }
 
+  function loanKpi(label, value, color, sub){
+    return '<div class="lkpi"><div class="lk-k">'+label+'</div>' +
+      '<div class="lk-v"'+(color?' style="color:'+color+'"':'')+'>'+value+'</div>' +
+      (sub ? '<div class="lk-s">'+esc(sub)+'</div>' : '') + '</div>';
+  }
   function fact(k, v, sub, color, raw){
     return '<div class="fact"><div class="k">'+k+'</div>' +
            '<div class="v"'+(color?' style="color:'+color+'"':'')+'>'+(raw? v : v)+'</div>' +
