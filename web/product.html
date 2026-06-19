@@ -22,8 +22,9 @@
   .kpi .n.alert { color: var(--risk-high); }
   .kpi .l { font-size: 11.5px; color: var(--taupe); margin-top: 2px; }
 
-  /* layout: ranked list (left) + inspector (right) */
-  .desk { display:grid; grid-template-columns: minmax(0, 1.42fr) minmax(380px, .92fr); gap: 16px; align-items: start; }
+  /* layout: filters (left) + ranked list (middle) + inspector (right) */
+  .desk { display:grid; grid-template-columns: 232px minmax(0, 1.4fr) minmax(360px, .92fr); gap: 16px; align-items: start; transition: grid-template-columns .18s ease; }
+  .desk.filt-collapsed { grid-template-columns: 46px minmax(0, 1.5fr) minmax(360px, .92fr); }
 
   .panel-title { font-size: 12px; font-weight: 700; letter-spacing:.06em; text-transform: uppercase; color: var(--taupe); }
   .card-pad { padding: 14px 16px; }
@@ -256,11 +257,84 @@
   .rng-cap { font-size: 11.5px; color: var(--ink-700); margin-top: 30px; line-height:1.45; }
   .rng-cap b { color: var(--risk-high); }
 
-  @media (max-width: 1080px){
-    .desk { grid-template-columns: 1fr; }
-    .insp { position: static; }
+  /* ======== left filter panel (filters by ontology element) ======== */
+  .filters { position: sticky; top: 74px; align-self: start; overflow: hidden; }
+  .filt-head { display:flex; align-items:center; justify-content:space-between; padding: 12px 14px; border-bottom: 1px solid var(--sand-500); }
+  .filt-head .panel-title { display:inline-flex; align-items:center; gap:7px; }
+  .filt-count { font-family: var(--mono); font-size: 10px; font-weight:700; color: var(--ink); background: var(--yellow); border-radius: 999px; padding: 1px 7px; }
+  .filt-toggle { font-family: var(--font); font-size: 16px; line-height:1; color: var(--taupe); background: transparent; border: 1px solid var(--sand-500); border-radius: var(--radius-sm); width: 26px; height: 26px; cursor: pointer; }
+  .filt-toggle:hover { color: var(--ink); border-color: var(--sand-700); }
+  .filt-body { padding: 4px 14px 14px; max-height: calc(100vh - 250px); overflow:auto; }
+  .fgroup { padding: 12px 0 11px; border-bottom: 1px dashed var(--sand-500); }
+  .fgroup:last-of-type { border-bottom: none; }
+  .fg-onto { font-size: 9px; font-weight:700; text-transform:uppercase; letter-spacing:.07em; color: var(--sand-700); }
+  .fg-title { font-size: 12.5px; font-weight:700; color: var(--ink-700); margin: 1px 0 9px; }
+  .fchecks, .ftoggles { display:flex; flex-direction:column; gap:7px; }
+  .fcheck { display:flex; align-items:center; gap:8px; font-size:12px; color: var(--ink-700); cursor:pointer; user-select:none; }
+  .fcheck input { width:14px; height:14px; accent-color: var(--ink); cursor:pointer; margin:0; flex:0 0 auto; }
+  .fcheck .cnt { margin-left:auto; font-family: var(--mono); font-size:10.5px; color: var(--taupe); }
+  .fcheck:hover { color: var(--ink); }
+  .frange { display:flex; align-items:center; gap:7px; }
+  .frange input { width:100%; min-width:0; font-family: var(--mono); font-size:12px; color: var(--ink); background: var(--white); border:1px solid var(--sand-700); border-radius: var(--radius-sm); padding:6px 8px; }
+  .frange input:focus { outline: 2px solid var(--yellow); outline-offset:0; border-color: var(--ink); }
+  .frange .dash { color: var(--taupe); font-size: 12px; }
+  .frange-hint { font-size: 10px; color: var(--sand-700); margin-top: 6px; font-family: var(--mono); }
+  .filt-foot { display:flex; align-items:center; justify-content:space-between; gap:8px; padding-top: 13px; }
+  .filt-foot .sum { font-size: 11px; color: var(--taupe); }
+  .filt-foot .nw-btn { font-size: 12px; padding: 6px 11px; }
+
+  /* collapsed rail */
+  .desk.filt-collapsed .filt-head, .desk.filt-collapsed .filt-body { display:none; }
+  .filt-rail { display:none; }
+  .desk.filt-collapsed .filt-rail { display:flex; flex-direction:column; align-items:center; gap:12px; padding: 14px 0; }
+  .filt-rail .rail-btn { writing-mode: vertical-rl; transform: rotate(180deg); font-family: var(--font); font-size: 12px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color: var(--ink); background:transparent; border:none; cursor:pointer; padding: 6px 0; }
+  .filt-rail .rail-btn:hover { color: var(--risk-high); }
+  .filt-rail .rail-count { font-family: var(--mono); font-size:10px; font-weight:700; color: var(--ink); background: var(--yellow); border-radius:999px; padding:1px 6px; }
+
+  /* ======== quick actions (row level) ======== */
+  table.rank thead th.qa-h { width: 1%; text-align:center; }
+  td.qa { text-align:right; white-space:nowrap; padding-right: 8px; }
+  .qa-btns { display:inline-flex; gap:5px; opacity:.34; transition: opacity .12s ease; }
+  table.rank tbody tr:hover .qa-btns, table.rank tbody tr.sel .qa-btns, .qa-btns:focus-within { opacity:1; }
+  .qa-btn { display:inline-flex; align-items:center; justify-content:center; width:25px; height:25px; padding:0; color: var(--taupe); background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); cursor:pointer; }
+  .qa-btn:hover { color: var(--ink); border-color: var(--ink); background: var(--sand); }
+  .qa-btn.on { color: var(--ink); border-color: var(--yellow); background: #fbf3d6; }
+  .qa-btn svg, .icon-btn svg { fill:none; stroke: currentColor; stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+  .qa-btn svg { width:14px; height:14px; display:block; }
+
+  /* assignee + alert chips on the row */
+  .row-chip { display:inline-flex; align-items:center; gap:4px; font-size:9px; font-weight:700; margin-left:6px; padding:1px 6px; border-radius:999px; vertical-align:1px; letter-spacing:.02em; }
+  .row-chip.assignee { background: var(--sand-500); color: var(--ink-700); }
+  .row-chip.alert { background:#f6e4e0; color: var(--risk-high); }
+  .row-chip svg { width:10px; height:10px; fill:none; stroke: currentColor; stroke-width:1.7; stroke-linecap:round; stroke-linejoin:round; }
+
+  /* ======== shared floating menu (assign / alert) ======== */
+  #qmenu { position: fixed; z-index: 95; min-width: 196px; max-width: 280px; background: var(--white); border:1px solid var(--sand-700); border-radius: var(--radius-sm); box-shadow: var(--shadow-lg); padding: 6px; display:none; }
+  #qmenu.on { display:block; }
+  #qmenu .qm-h { font-size: 9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color: var(--taupe); padding: 5px 8px 5px; line-height:1.3; }
+  #qmenu button.qm-item { display:flex; align-items:center; gap:8px; width:100%; text-align:left; font-family: var(--font); font-size: 12.5px; color: var(--ink); background:transparent; border:none; border-radius: 6px; padding: 7px 8px; cursor:pointer; }
+  #qmenu button.qm-item:hover { background: var(--sand); }
+  #qmenu button.qm-item .ck { margin-left:auto; color: var(--risk-low); font-weight:700; }
+
+  /* ======== table-level + inspector action buttons ======== */
+  .tbl-actions, .insp-actions { display:inline-flex; gap:7px; }
+  .icon-btn { display:inline-flex; align-items:center; gap:6px; font-family: var(--font); font-size: 11.5px; font-weight:600; color: var(--ink); background: var(--white); border:1px solid var(--sand-500); border-radius: var(--radius-sm); padding: 5px 10px; cursor:pointer; white-space:nowrap; }
+  .icon-btn:hover { border-color: var(--ink); background: var(--sand); }
+  .icon-btn svg { width:13px; height:13px; }
+  .insp-head .top .right { display:flex; align-items:center; gap:10px; flex-wrap:wrap; justify-content:flex-end; }
+
+  /* ======== toast ======== */
+  #toast { position: fixed; left:50%; bottom: 26px; transform: translateX(-50%) translateY(14px); z-index: 120;
+    background: var(--ink); color: var(--sand); font-size: 12.5px; font-weight:500; padding: 10px 16px; border-radius: 999px;
+    box-shadow: var(--shadow-lg); opacity:0; pointer-events:none; transition: opacity .18s ease, transform .18s ease; max-width: 80vw; text-align:center; }
+  #toast.on { opacity:1; transform: translateX(-50%) translateY(0); }
+  #toast b { color: var(--yellow); }
+
+  @media (max-width: 1180px){
+    .desk, .desk.filt-collapsed { grid-template-columns: 1fr; }
+    .insp, .filters { position: static; }
     .kpis { grid-template-columns: repeat(2,1fr) !important; }
-    .insp-body, .tbl-scroll { max-height: none; }
+    .insp-body, .tbl-scroll, .filt-body { max-height: none; }
   }
 </style>
 </head>
@@ -307,12 +381,28 @@
     </div>
   </div>
 
-  <div class="desk">
+  <div class="desk" id="desk">
+    <!-- FILTER: collapsible panel, grouped by ontology element -->
+    <aside class="nw-card filters" id="filters">
+      <div class="filt-head">
+        <span class="panel-title">Filters <span class="filt-count" id="filtCount" hidden></span></span>
+        <button class="filt-toggle" id="filtToggle" type="button" title="Collapse filters" aria-label="Collapse filters">&#8249;</button>
+      </div>
+      <div class="filt-rail" id="filtRail">
+        <button class="rail-btn" id="filtExpand" type="button" title="Show filters">Filters</button>
+        <span class="rail-count" id="railCount" hidden></span>
+      </div>
+      <div class="filt-body" id="filtBody"></div>
+    </aside>
+
     <!-- SEE: ranked list -->
     <section class="nw-card list-card">
       <div class="list-head">
-        <span class="panel-title">Portfolio — ranked worst-first</span>
-        <span class="hint" id="listHint"></span>
+        <div><span class="panel-title">Portfolio — ranked worst-first</span> <span class="hint" id="listHint"></span></div>
+        <div class="tbl-actions">
+          <button class="icon-btn" id="exportCsv" type="button" title="Export the filtered table as CSV"></button>
+          <button class="icon-btn" id="shareTable" type="button" title="Copy a link to this filtered view"></button>
+        </div>
       </div>
       <div class="tbl-scroll">
         <table class="rank">
@@ -327,7 +417,13 @@
       <div class="insp-head">
         <div class="top">
           <h2 id="cName">—</h2>
-          <span id="cPill"></span>
+          <div class="right">
+            <span id="cPill"></span>
+            <span class="insp-actions">
+              <button class="icon-btn" id="shareCo" type="button" title="Copy a link to this company"></button>
+              <button class="icon-btn" id="dlSummary" type="button" title="Download an executive summary report"></button>
+            </span>
+          </div>
         </div>
         <div class="sub" id="cSub"></div>
       </div>
@@ -369,6 +465,48 @@
   var selectedId = null;
   var SPEC, PORTFOLIO, FRAMEWORK, RANKED, UNLOCKS, EV;
 
+  /* quick-actions: demo state (persisted locally) */
+  var ASSIGN_KEY = 'nw_assignments_v1', ALERT_KEY = 'nw_alerts_v1', COLLAPSE_KEY = 'nw_filters_collapsed_v1';
+  var TEAM = ['Amara Okonkwo', 'Lars Vinter', 'Priya Rao', 'Tom Becker', 'Sara Mensah'];
+  var ALERT_TYPES = ['Coverage breach (< threshold)', 'Payment due within 7 days', 'Feed goes stale (> 3 days)', 'FX still blocked at T1'];
+
+  /* filter state + pending deep-link selection (set from the URL) */
+  var FILTERS, PENDING_SELECT = null;
+  function defaultFilters(){ return { countries:[], severities:[], seniorities:[], coupons:[], pMin:null, pMax:null, covMin:null, covMax:null, atRiskOnly:false, worseningOnly:false, priorOnly:false }; }
+
+  var ICON = {
+    user:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="8" cy="6.4" r="3.1"/><path d="M2.6 16.7c0-3 2.4-4.9 5.4-4.9 1 0 1.9.22 2.6.6"/><path d="M15.4 12.3v4.4M13.2 14.5h4.4"/></svg>',
+    bell:'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.3c-2.6 0-4.2 1.9-4.2 4.4 0 3-1 4-1.7 4.8-.3.3-.1.8.3.8h11.2c.4 0 .6-.5.3-.8-.7-.8-1.7-1.8-1.7-4.8 0-2.5-1.6-4.4-4.2-4.4z"/><path d="M8.4 15.8a1.7 1.7 0 0 0 3.2 0"/></svg>',
+    download:'<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M10 3.2v9.1"/><path d="M6.3 8.7 10 12.4l3.7-3.7"/><path d="M3.7 16.3h12.6"/></svg>',
+    share:'<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="6" cy="10" r="2.1"/><circle cx="14.3" cy="5.6" r="2.1"/><circle cx="14.3" cy="14.4" r="2.1"/><path d="M7.9 9 12.4 6.6M7.9 11l4.5 2.4"/></svg>'
+  };
+
+  /* brand styles for the downloadable executive summary (self-contained doc) */
+  var SUMMARY_CSS =
+    ":root{--ink:#072708;--sand:#fdf5f0;--sand5:#f3e7df;--sand7:#c8b1a4;--taupe:#6f5f56;--yellow:#ffde43;--high:#b3402e;--med:#c98a1a;--low:#5e7d52;--none:#9f887c}" +
+    "*{box-sizing:border-box}" +
+    "body{font-family:'IBM Plex Sans',Arial,sans-serif;color:var(--ink);background:var(--sand);margin:0 auto;padding:40px 44px;max-width:820px;line-height:1.5}" +
+    ".rep-head{display:flex;align-items:center;justify-content:space-between;border-bottom:2px solid var(--ink);padding-bottom:12px;margin-bottom:22px}" +
+    ".brand{font-weight:700;font-size:16px;display:flex;align-items:center;gap:8px}" +
+    ".brand .dot{width:10px;height:10px;border-radius:50%;background:var(--yellow);display:inline-block}" +
+    ".brand-sub{font-weight:500;color:var(--taupe);font-size:13px}" +
+    ".gen{font-size:11px;color:var(--taupe);font-family:'IBM Plex Mono',ui-monospace,monospace}" +
+    "h1{font-size:24px;margin:0 0 4px;display:flex;align-items:center;gap:10px}" +
+    "h2{font-size:12px;text-transform:uppercase;letter-spacing:.06em;color:var(--taupe);margin:26px 0 8px;border-bottom:1px solid var(--sand7);padding-bottom:5px}" +
+    ".meta{font-size:12px;color:var(--taupe);margin-bottom:16px}" +
+    ".headline{font-size:15px;font-weight:600;padding:12px 16px;border-radius:10px;background:#fff;border-left:4px solid var(--low)}" +
+    ".headline.bad{border-left-color:var(--high)}" +
+    "table.kv{width:100%;border-collapse:collapse;font-size:13px}" +
+    "table.kv th{text-align:left;font-weight:500;color:var(--taupe);padding:6px 12px 6px 0;width:240px;vertical-align:top}" +
+    "table.kv td{padding:6px 0;border-bottom:1px solid var(--sand5)}" +
+    ".pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px}" +
+    ".pill-High{background:#f6e4e0;color:var(--high)}.pill-Medium{background:#f6ecd9;color:var(--med)}.pill-Low{background:#e4ecdf;color:var(--low)}.pill-None{background:#efe8e3;color:var(--none)}" +
+    ".pill-pri{background:var(--ink);color:var(--yellow)}" +
+    ".act-title{font-weight:600;margin:6px 0 2px}.act-why{color:var(--taupe);font-size:13px;margin:0 0 8px}" +
+    "ol,ul{margin:6px 0;padding-left:20px;font-size:13px}li{margin:3px 0}" +
+    ".rep-foot{margin-top:32px;border-top:1px solid var(--sand7);padding-top:12px;font-size:11px;color:var(--taupe)}" +
+    "@media print{body{background:#fff;padding:0 8px}.headline{background:#fff}}";
+
   function phaseIdx(p){ var i = PHASES.indexOf(p); return i<0 ? 0 : i; }
   function phaseReached(p){ return phaseIdx(DESK_PHASE) >= phaseIdx(p); }   // cumulative
   function unlockedHere(p){ return DESK_PHASE === p; }                       // newly unlocked at the current horizon
@@ -397,24 +535,400 @@
     SPEC = window.NW_SPEC;
     PORTFOLIO = SPEC.portfolio.slice();
     FRAMEWORK = SPEC.actions_framework;
-    RANKED = PORTFOLIO.slice().sort(rank);
     UNLOCKS = SPEC.data_unlocks || {};
     EV = SPEC.evidence || { metrics:{}, files:[] };
+    FILTERS = defaultFilters();
     THRESH = readThresh();
+    parseUrl();            // restore phase / threshold / filters / company from the URL
+    applyFilters();        // RANKED = PORTFOLIO filtered + ranked
 
-    mpInit();
+    mpInit(); qmInit(); toastInit();
     bindPhase();
     renderSignal();
+    renderFilters(); bindFilters(); bindFiltersChrome();
     paintPhase();          // KPIs + table + horizon note for the active phase
     bindLog();
     renderLog();
     bindThreshold();
+    bindTableActions(); bindInspActions();
+    updateFilterSummary();
 
-    // default selection = worst-first (#1) so the desk opens on what's at risk
-    select(RANKED[0].company_id);
+    // open on the requested company (deep link), else worst-first (#1)
+    var startId = (PENDING_SELECT && byId(PENDING_SELECT)) ? PENDING_SELECT
+                  : (RANKED[0] ? RANKED[0].company_id : (PORTFOLIO[0] && PORTFOLIO[0].company_id));
+    if (startId) select(startId);
 
     document.getElementById('foot').textContent =
       SPEC.meta.note + ' · ' + SPEC.meta.product + ' (' + SPEC.meta.version + ').';
+  }
+
+  /* ===================== FILTERS (by ontology element) ===================== */
+  function inSet(arr, v){ return !arr.length || arr.indexOf(v) >= 0; }
+
+  function passesFilters(c){
+    var f = FILTERS;
+    if (!inSet(f.countries, c.jurisdiction)) return false;
+    if (!inSet(f.severities, c.label)) return false;
+    if (!inSet(f.seniorities, c.loan.seniority)) return false;
+    if (!inSet(f.coupons, (c.loan.cash_vs_pik || '').toLowerCase())) return false;
+    var pM = c.loan.principal / 1e6;
+    if (f.pMin != null && pM < f.pMin) return false;
+    if (f.pMax != null && pM > f.pMax) return false;
+    if (f.covMin != null && c.coverage < f.covMin) return false;
+    if (f.covMax != null && c.coverage > f.covMax) return false;
+    if (f.atRiskOnly && !(c.principal_at_risk > 0)) return false;
+    if (f.worseningOnly && !c.deteriorating) return false;
+    if (f.priorOnly && !(c.prior_issues > 0)) return false;
+    return true;
+  }
+
+  function applyFilters(){ RANKED = PORTFOLIO.filter(passesFilters).sort(rank); }
+
+  function onFiltersChanged(){
+    applyFilters();
+    renderTable();
+    if (RANKED.length){
+      if (RANKED.some(function(c){ return c.company_id === selectedId; })) highlightRow(selectedId);
+      else select(RANKED[0].company_id);
+    }
+    updateFilterSummary();
+  }
+
+  function clearFilters(){ FILTERS = defaultFilters(); renderFilters(); onFiltersChanged(); }
+
+  function countBy(getter){
+    var m = {};
+    PORTFOLIO.forEach(function(c){ var k = getter(c); m[k] = (m[k] || 0) + 1; });
+    return m;
+  }
+  function orderedKeys(map, order){
+    if (order) return order.filter(function(k){ return map[k] != null; });
+    return Object.keys(map).sort();
+  }
+  function checkRow(fk, value, label, count, checked){
+    return '<label class="fcheck"><input type="checkbox" data-fk="'+fk+'" value="'+esc(value)+'"'+(checked?' checked':'')+'>' +
+      '<span>'+esc(label)+'</span><span class="cnt">'+count+'</span></label>';
+  }
+  function toggleRow(fk, label, checked){
+    return '<label class="fcheck"><input type="checkbox" data-fk="'+fk+'"'+(checked?' checked':'')+'><span>'+esc(label)+'</span></label>';
+  }
+  function fgroup(onto, title, inner){
+    return '<div class="fgroup"><div class="fg-onto">'+esc(onto)+'</div><div class="fg-title">'+esc(title)+'</div>'+inner+'</div>';
+  }
+
+  function renderFilters(){
+    var f = FILTERS;
+    var byCountry = countBy(function(c){ return c.jurisdiction; });
+    var bySev     = countBy(function(c){ return c.label; });
+    var bySen     = countBy(function(c){ return c.loan.seniority; });
+    var byCoupon  = countBy(function(c){ return (c.loan.cash_vs_pik || '').toLowerCase(); });
+    var couponLabel = { cash:'Cash-pay', pik:'PIK' };
+
+    var html = '';
+    // Company
+    html += fgroup('Company', 'Country / jurisdiction', '<div class="fchecks">' +
+      orderedKeys(byCountry).map(function(k){ return checkRow('countries', k, k, byCountry[k], f.countries.indexOf(k)>=0); }).join('') + '</div>');
+    html += fgroup('Company', 'Risk severity', '<div class="fchecks">' +
+      orderedKeys(bySev, ['High','Medium','Low','None']).map(function(k){ return checkRow('severities', k, k, bySev[k], f.severities.indexOf(k)>=0); }).join('') + '</div>');
+    // Loan
+    html += fgroup('Loan', 'Principal size',
+      '<div class="frange">' +
+        '<input type="number" inputmode="decimal" step="0.1" min="0" data-fk="pMin" placeholder="min" value="'+(f.pMin!=null?f.pMin:'')+'" aria-label="Min principal ($M)">' +
+        '<span class="dash">&ndash;</span>' +
+        '<input type="number" inputmode="decimal" step="0.1" min="0" data-fk="pMax" placeholder="max" value="'+(f.pMax!=null?f.pMax:'')+'" aria-label="Max principal ($M)">' +
+      '</div><div class="frange-hint">principal $M &middot; range 0.6&ndash;6.0</div>');
+    html += fgroup('Loan', 'Seniority', '<div class="fchecks">' +
+      orderedKeys(bySen).map(function(k){ return checkRow('seniorities', k, k, bySen[k], f.seniorities.indexOf(k)>=0); }).join('') + '</div>');
+    html += fgroup('Loan', 'Coupon', '<div class="fchecks">' +
+      orderedKeys(byCoupon).map(function(k){ return checkRow('coupons', k, couponLabel[k]||k, byCoupon[k], f.coupons.indexOf(k)>=0); }).join('') + '</div>');
+    // Signal (golden metrics)
+    html += fgroup('Signal', 'Coverage ratio',
+      '<div class="frange">' +
+        '<input type="number" inputmode="decimal" step="0.05" min="0" data-fk="covMin" placeholder="min" value="'+(f.covMin!=null?f.covMin:'')+'" aria-label="Min coverage">' +
+        '<span class="dash">&ndash;</span>' +
+        '<input type="number" inputmode="decimal" step="0.05" min="0" data-fk="covMax" placeholder="max" value="'+(f.covMax!=null?f.covMax:'')+'" aria-label="Max coverage">' +
+      '</div><div class="frange-hint">coverage ratio &middot; 1.00 = exactly covered</div>');
+    html += fgroup('Signal', 'Quick flags', '<div class="ftoggles">' +
+        toggleRow('atRiskOnly', 'Only money at risk', f.atRiskOnly) +
+        toggleRow('worseningOnly', 'Only worsening trend', f.worseningOnly) +
+        toggleRow('priorOnly', 'Only with prior misses', f.priorOnly) +
+      '</div>');
+    html += '<div class="filt-foot"><button class="nw-btn ghost" id="filtClear" type="button">Clear all</button><span class="sum" id="filtSummary"></span></div>';
+
+    document.getElementById('filtBody').innerHTML = html;
+    updateFilterSummary();
+  }
+
+  function bindFilters(){
+    var body = document.getElementById('filtBody');
+    function handle(e){
+      var el = e.target;
+      var fk = el.getAttribute && el.getAttribute('data-fk');
+      if (!fk) return;
+      if (el.type === 'checkbox'){
+        if (fk === 'atRiskOnly' || fk === 'worseningOnly' || fk === 'priorOnly'){ FILTERS[fk] = el.checked; }
+        else { var arr = FILTERS[fk], v = el.value, i = arr.indexOf(v); if (el.checked){ if (i<0) arr.push(v); } else if (i>=0) arr.splice(i,1); }
+      } else {
+        var num = parseFloat(el.value); FILTERS[fk] = isFinite(num) ? num : null;
+      }
+      onFiltersChanged();
+    }
+    body.addEventListener('change', handle);
+    body.addEventListener('input', function(e){ if (e.target && e.target.type === 'number') handle(e); });
+    body.addEventListener('click', function(e){ if (e.target.closest && e.target.closest('#filtClear')) clearFilters(); });
+  }
+
+  function bindFiltersChrome(){
+    var desk = document.getElementById('desk'), collapsed = false;
+    try { collapsed = localStorage.getItem(COLLAPSE_KEY) === '1'; } catch(e){}
+    desk.classList.toggle('filt-collapsed', collapsed);
+    document.getElementById('filtToggle').addEventListener('click', function(){
+      desk.classList.add('filt-collapsed'); try { localStorage.setItem(COLLAPSE_KEY, '1'); } catch(e){}
+    });
+    document.getElementById('filtExpand').addEventListener('click', function(){
+      desk.classList.remove('filt-collapsed'); try { localStorage.setItem(COLLAPSE_KEY, '0'); } catch(e){}
+    });
+  }
+
+  function activeFilterCount(){
+    var f = FILTERS, n = 0;
+    ['countries','severities','seniorities','coupons'].forEach(function(k){ n += f[k].length; });
+    ['pMin','pMax','covMin','covMax'].forEach(function(k){ if (f[k] != null) n++; });
+    ['atRiskOnly','worseningOnly','priorOnly'].forEach(function(k){ if (f[k]) n++; });
+    return n;
+  }
+  function updateFilterSummary(){
+    var n = activeFilterCount();
+    var badge = document.getElementById('filtCount'), rail = document.getElementById('railCount');
+    if (badge){ badge.textContent = n; badge.hidden = !n; }
+    if (rail){ rail.textContent = n; rail.hidden = !n; }
+    var sum = document.getElementById('filtSummary');
+    if (sum) sum.textContent = RANKED.length + ' of ' + PORTFOLIO.length + ' shown';
+  }
+
+  /* ===================== quick actions (row level) ===================== */
+  function getMap(k){ try { return JSON.parse(localStorage.getItem(k) || '{}'); } catch(e){ return {}; } }
+  function setMap(k, m){ try { localStorage.setItem(k, JSON.stringify(m)); } catch(e){} }
+  function getAssignee(id){ return getMap(ASSIGN_KEY)[id] || ''; }
+  function setAssignee(id, v){ var m = getMap(ASSIGN_KEY); if (v) m[id] = v; else delete m[id]; setMap(ASSIGN_KEY, m); }
+  function getAlerts(id){ var a = getMap(ALERT_KEY)[id]; return Array.isArray(a) ? a : []; }
+  function setAlerts(id, arr){ var m = getMap(ALERT_KEY); if (arr && arr.length) m[id] = arr; else delete m[id]; setMap(ALERT_KEY, m); }
+  function initials(name){ return name.split(/\s+/).map(function(w){ return w.charAt(0); }).join('').slice(0,2).toUpperCase(); }
+
+  function logEvent(c, outcome, note){
+    var entry = { ts:new Date().toISOString(), company_id:c.company_id, company_name:c.name,
+      loan_id:c.loan.loan_id, priority:'—', outcome:outcome, note:note||'', actor:'credit-team' };
+    var arr = readLog(); arr.push(entry); writeLog(arr); renderLog(entry.ts);
+  }
+
+  function openAssign(anchor, c){
+    var cur = getAssignee(c.company_id);
+    var items = TEAM.map(function(n){ return { label:n, value:n, active:(n===cur) }; });
+    items.push({ label:(cur ? 'Unassign' : 'Unassigned'), value:'', active:!cur });
+    qmenuOpen(anchor, 'Assign \u2014 ' + c.name, items, function(v){
+      setAssignee(c.company_id, v);
+      if (v) logEvent(c, 'assigned', 'Assigned to ' + v);
+      toast(v ? ('Assigned <b>'+esc(c.name)+'</b> to '+esc(v)) : ('Unassigned <b>'+esc(c.name)+'</b>'));
+      renderTable(); highlightRow(selectedId);
+      if (selectedId === c.company_id) renderInspector(c);
+    });
+  }
+  function openAlert(anchor, c){
+    var cur = getAlerts(c.company_id);
+    var items = ALERT_TYPES.map(function(t){ return { label:t, value:t, active:(cur.indexOf(t)>=0) }; });
+    qmenuOpen(anchor, 'Trigger alert \u2014 ' + c.name, items, function(v){
+      var arr = getAlerts(c.company_id), i = arr.indexOf(v);
+      if (i >= 0){ arr.splice(i,1); toast('Cleared alert \u00b7 <b>'+esc(c.name)+'</b>'); }
+      else { arr.push(v); logEvent(c, 'alert set', 'Alert: ' + v); toast('Alert set \u00b7 <b>'+esc(c.name)+'</b>'); }
+      setAlerts(c.company_id, arr);
+      renderTable(); highlightRow(selectedId);
+    });
+  }
+
+  /* shared floating menu (assign / alert) */
+  var QM = null;
+  function qmInit(){
+    if (QM) return;
+    QM = document.createElement('div'); QM.id = 'qmenu'; document.body.appendChild(QM);
+    document.addEventListener('click', function(e){
+      if (!QM.classList.contains('on')) return;
+      if (e.target.closest && (e.target.closest('#qmenu') || e.target.closest('.qa-btn'))) return;
+      qmClose();
+    });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape') qmClose(); });
+    window.addEventListener('scroll', qmClose, true);
+    window.addEventListener('resize', qmClose);
+  }
+  function qmClose(){ if (QM) QM.classList.remove('on'); }
+  function qmenuOpen(anchor, title, items, onPick){
+    QM.innerHTML = '<div class="qm-h">'+esc(title)+'</div>' + items.map(function(it, idx){
+      return '<button class="qm-item" type="button" data-i="'+idx+'">'+esc(it.label)+(it.active?'<span class="ck">\u2713</span>':'')+'</button>';
+    }).join('');
+    QM.classList.add('on');
+    Array.prototype.forEach.call(QM.querySelectorAll('.qm-item'), function(b){
+      b.addEventListener('click', function(e){ e.stopPropagation(); var it = items[parseInt(b.getAttribute('data-i'),10)]; qmClose(); onPick(it.value); });
+    });
+    qmPos(anchor);
+  }
+  function qmPos(anchor){
+    var r = anchor.getBoundingClientRect(), w = QM.offsetWidth, h = QM.offsetHeight;
+    var left = Math.min(r.right - w, window.innerWidth - w - 12); left = Math.max(12, left);
+    var top = r.bottom + 6; if (top + h > window.innerHeight - 12) top = r.top - h - 6; if (top < 12) top = 12;
+    QM.style.left = Math.round(left) + 'px'; QM.style.top = Math.round(top) + 'px';
+  }
+
+  /* toast */
+  var TOAST_T = null;
+  function toastInit(){ if (!document.getElementById('toast')){ var t = document.createElement('div'); t.id = 'toast'; document.body.appendChild(t); } }
+  function toast(html){
+    var t = document.getElementById('toast'); if (!t) return;
+    t.innerHTML = html; t.classList.add('on');
+    clearTimeout(TOAST_T); TOAST_T = setTimeout(function(){ t.classList.remove('on'); }, 2600);
+  }
+
+  /* ===================== table + inspector actions ===================== */
+  function bindTableActions(){
+    var ex = document.getElementById('exportCsv'), sh = document.getElementById('shareTable');
+    ex.innerHTML = ICON.download + 'Export CSV'; sh.innerHTML = ICON.share + 'Share';
+    ex.addEventListener('click', exportCsv); sh.addEventListener('click', shareTable);
+  }
+  function bindInspActions(){
+    var sc = document.getElementById('shareCo'), dl = document.getElementById('dlSummary');
+    sc.innerHTML = ICON.share + 'Share'; dl.innerHTML = ICON.download + 'Summary';
+    sc.addEventListener('click', shareCompany); dl.addEventListener('click', downloadSummary);
+  }
+
+  function recovOf(c){
+    if (phaseReached('Medium') && c.recoverability) return { label:c.recoverability.label, savable:c.recoverability.savable_usd||0, basis:'financials-enhanced', read:c.recoverability.read };
+    var fp = firstPassRecov(c); return { label:fp.label, savable:fp.savable||0, basis:'first-pass', read:fp.read };
+  }
+
+  function exportCsv(){
+    var later = phaseReached('Later');
+    var head = ['Rank','Company','Jurisdiction','Risk','Coverage'];
+    if (later) head.push('Forecast@T1','Worst@T1');
+    head.push('WorstServiced','PrincipalAtRisk','Recoverability','RecovBasis','SavableUSD','TransferableUSD','TotalUSD','TrappedUSD','RunwayDays','Trend','PriorIssues','FeedDays','Owner','Alerts');
+    var lines = [head];
+    RANKED.forEach(function(c, i){
+      var r = recovOf(c);
+      var row = [ i+1, c.name, c.jurisdiction, c.label, c.coverage.toFixed(2) ];
+      if (later) row.push(c.forecast?c.forecast.coverage_t1.toFixed(2):'', c.forecast?c.forecast.coverage_t1_worst.toFixed(2):'');
+      row.push(
+        (typeof c.worst_serviced_coverage==='number'?c.worst_serviced_coverage.toFixed(2):''),
+        c.principal_at_risk, r.label, r.basis, r.savable, c.transferable_cash_usd, c.total_cash_usd, c.trapped_cash_usd,
+        c.runway_days, c.deteriorating?'worsening':'stable', c.prior_issues, c.data_freshness_days,
+        getAssignee(c.company_id)||'', getAlerts(c.company_id).join(' | ')
+      );
+      lines.push(row);
+    });
+    var csv = lines.map(function(r){ return r.map(csvCell).join(','); }).join('\r\n');
+    download('nights-watch-portfolio-' + new Date().toISOString().slice(0,10) + '.csv', 'text/csv;charset=utf-8', csv);
+    toast('Exported <b>'+RANKED.length+'</b> ' + (RANKED.length===1?'company':'companies') + ' to CSV');
+  }
+  function csvCell(v){ v = String(v==null?'':v); return /[",\r\n]/.test(v) ? '"'+v.replace(/"/g,'""')+'"' : v; }
+  function download(name, mime, content){
+    var blob = new Blob([content], { type:mime }), url = URL.createObjectURL(blob);
+    var a = document.createElement('a'); a.href = url; a.download = name;
+    document.body.appendChild(a); a.click();
+    setTimeout(function(){ document.body.removeChild(a); URL.revokeObjectURL(url); }, 200);
+  }
+
+  function buildUrl(params){
+    var parts = [];
+    Object.keys(params).forEach(function(k){ var v = params[k]; if (v != null && v !== '') parts.push(k + '=' + encodeURIComponent(v)); });
+    return location.origin + location.pathname + (parts.length ? '?' + parts.join('&') : '');
+  }
+  function encodeFilters(){
+    var f = FILTERS, d = defaultFilters(), out = {};
+    Object.keys(f).forEach(function(k){ if (JSON.stringify(f[k]) !== JSON.stringify(d[k])) out[k] = f[k]; });
+    return Object.keys(out).length ? JSON.stringify(out) : '';
+  }
+  function copyText(text){
+    if (navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(text)['catch'](function(){ fallbackCopy(text); }); }
+    else fallbackCopy(text);
+  }
+  function fallbackCopy(text){
+    var ta = document.createElement('textarea'); ta.value = text;
+    ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+    try { document.execCommand('copy'); } catch(e){} document.body.removeChild(ta);
+  }
+  function shareTable(){
+    copyText(buildUrl({ h:DESK_PHASE, thr:THRESH.toFixed(2), flt:encodeFilters() }));
+    var n = activeFilterCount();
+    toast('Filtered-view link copied' + (n ? (' \u00b7 '+n+' filter'+(n>1?'s':'')) : ''));
+  }
+  function shareCompany(){
+    if (!selectedId) return;
+    var c = byId(selectedId);
+    copyText(buildUrl({ h:DESK_PHASE, company:selectedId }));
+    toast('Link to <b>'+esc(c.name)+'</b> copied');
+  }
+
+  function parseUrl(){
+    var q; try { q = new URLSearchParams(location.search); } catch(e){ return; }
+    var h = q.get('h'); if (h && PHASES.indexOf(h) >= 0) DESK_PHASE = h;
+    var thr = parseFloat(q.get('thr')); if (isFinite(thr) && thr > 0) THRESH = Math.round(thr*100)/100;
+    var flt = q.get('flt');
+    if (flt){ try { var o = JSON.parse(flt), d = defaultFilters(); Object.keys(d).forEach(function(k){ if (o[k] != null) d[k] = o[k]; }); FILTERS = d; } catch(e){} }
+    var co = q.get('company'); if (co) PENDING_SELECT = co;
+  }
+
+  /* ===================== executive summary report ===================== */
+  function slug(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+  function downloadSummary(){
+    if (!selectedId) return;
+    var c = byId(selectedId);
+    download('NightsWatch-' + slug(c.name) + '-summary.html', 'text/html;charset=utf-8', execSummary(c));
+    toast('Downloaded executive summary \u00b7 <b>'+esc(c.name)+'</b>');
+  }
+  function execSummary(c){
+    var loan = c.loan, r = recovOf(c);
+    var trPct = c.total_cash_usd>0 ? (c.transferable_cash_usd/c.total_cash_usd*100) : 0;
+    var owner = getAssignee(c.company_id), alerts = getAlerts(c.company_id), act = c.action;
+    var gen = new Date().toISOString().slice(0,16).replace('T',' ');
+    function kv(k, v){ return '<tr><th>'+k+'</th><td>'+v+'</td></tr>'; }
+    var fcBlock = c.forecast ? (
+      '<h2>Forecast @ T1 (Later horizon)</h2><table class="kv">' +
+        kv('Base case coverage', c.forecast.coverage_t1.toFixed(2)) +
+        kv('Worst case coverage', c.forecast.coverage_t1_worst.toFixed(2) + ' &mdash; FX stays blocked + rate / energy spike') +
+        kv('Best case coverage', c.forecast.coverage_t1_best.toFixed(2)) +
+        kv('Expected range', '<b>'+c.forecast.coverage_t1_worst.toFixed(2)+'&ndash;'+c.forecast.coverage_t1.toFixed(2)+'</b> &mdash; size the bridge against the worst case') +
+      '</table>') : '';
+    return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
+      '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+      '<title>Night\'s Watch \u2014 '+esc(c.name)+' \u2014 Executive summary</title>' +
+      '<style>'+SUMMARY_CSS+'</style></head><body>' +
+      '<header class="rep-head"><div class="brand"><span class="dot"></span> Night\'s Watch <span class="brand-sub">Credit desk</span></div>' +
+        '<div class="gen">Executive summary &middot; generated '+gen+' UTC</div></header>' +
+      '<h1>'+esc(c.name)+' <span class="pill pill-'+c.label+'">'+c.label+' risk</span></h1>' +
+      '<div class="meta">'+esc(c.jurisdiction)+' &middot; loan '+esc(loan.loan_id)+' &middot; '+esc(loan.seniority)+' &middot; '+(loan.cash_vs_pik==='pik'?'PIK':'cash-pay')+' &middot; feed '+esc(freshLabel(c.data_freshness_days))+(owner?(' &middot; owner '+esc(owner)):'')+'</div>' +
+      '<div class="headline '+(c.coverage<1?'bad':'ok')+'">Coverage '+c.coverage.toFixed(2)+' &mdash; '+(c.coverage<1?'transferable cash does <b>not</b> cover cash due at T1':'transferable cash covers cash due at T1')+'</div>' +
+      '<h2>Liquidity</h2><table class="kv">' +
+        kv('Total cash', usd(c.total_cash_usd)) +
+        kv('Transferable (hard-currency) cash', '<b>'+usd(c.transferable_cash_usd)+'</b> ('+trPct.toFixed(0)+'% of total)') +
+        kv('Trapped cash', usd(c.trapped_cash_usd)+' ('+(100-trPct).toFixed(0)+'% &mdash; FX-restricted)') +
+        kv('Cash due at T1', usd(loan.cash_to_repay_t1)) +
+        kv('Runway', c.runway_days+' days') +
+        kv('Principal at risk', c.principal_at_risk>0?usd(c.principal_at_risk):'$0') +
+      '</table>' +
+      '<h2>Recoverability ('+esc(r.basis)+')</h2><table class="kv">' +
+        kv('Read', esc(r.label)) +
+        kv('Savable money', r.savable>0?usd(r.savable):'&mdash;') +
+        kv('Basis', esc(r.read || 'seniority / security + transferable-vs-trapped + prior-miss history')) +
+      '</table>' + fcBlock +
+      '<h2>Loan follow-up</h2><table class="kv">' +
+        kv('Principal', usd(loan.principal)) +
+        kv('Seniority', esc(loan.seniority)) +
+        kv('Coupon', (loan.coupon_rate!=null?pct(loan.coupon_rate):'')+' &middot; '+(loan.cash_vs_pik==='pik'?'PIK':'cash-pay')) +
+        kv('Next payment', loan.next_payment_date?esc(fmtDate(loan.next_payment_date)):'&mdash;') +
+        kv('Cash to repay (T1)', usd(loan.cash_to_repay_t1)) +
+      '</table>' +
+      (act ? ('<h2>Recommended action <span class="pill pill-pri">'+esc(act.priority)+'</span></h2>' +
+        '<p class="act-title">'+esc(act.title)+'</p><p class="act-why">'+esc(act.why)+'</p>' +
+        ((act.steps&&act.steps.length)?('<ol>'+act.steps.map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol>'):'')) : '') +
+      (alerts.length ? ('<h2>Active alerts</h2><ul>'+alerts.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul>') : '') +
+      '<footer class="rep-foot">'+esc(SPEC.meta.note)+' &middot; '+esc(SPEC.meta.product)+' ('+esc(SPEC.meta.version)+') &middot; synthetic data, illustrative only.</footer>' +
+      '</body></html>';
   }
 
   /* ---- data horizon: Now/Medium/Later drives the whole desk ---- */
@@ -658,7 +1172,19 @@
         '<th>Trend</th>' +
         '<th>Prior</th>' +
         '<th>Feed</th>' +
+        '<th class="qa-h" title="Quick actions"></th>' +
       '</tr>';
+
+    if (!RANKED.length){
+      document.getElementById('rankBody').innerHTML =
+        '<tr><td colspan="14" style="text-align:center;padding:28px 16px;color:var(--taupe);">' +
+          'No companies match these filters. <button id="emptyClear" class="nw-btn ghost" type="button" style="margin-left:8px;font-size:12px;padding:5px 11px;">Clear all filters</button>' +
+        '</td></tr>';
+      var ec = document.getElementById('emptyClear');
+      if (ec) ec.addEventListener('click', clearFilters);
+      document.getElementById('listHint').textContent = '0 of ' + PORTFOLIO.length + ' companies';
+      return;
+    }
 
     var rows = RANKED.map(function(c, i){
       var cm = covMeta(c.coverage);
@@ -666,10 +1192,14 @@
       var stale = isStale(c.data_freshness_days);
       var ws = c.worst_serviced_coverage;
       var uncharted = (typeof ws === 'number') && c.coverage < ws;
+      var asg = getAssignee(c.company_id), alr = getAlerts(c.company_id);
+      var chips =
+        (asg ? '<span class="row-chip assignee" title="Assigned to '+esc(asg)+'">'+esc(initials(asg))+'</span>' : '') +
+        (alr.length ? '<span class="row-chip alert" title="'+esc(alr.join(' · '))+'">'+ICON.bell+alr.length+'</span>' : '');
       return '' +
       '<tr data-id="'+c.company_id+'">' +
         '<td class="l"><span class="rk">'+(i+1)+'</span></td>' +
-        '<td class="l"><div class="co-name">'+esc(c.name)+'</div><div class="co-juris">'+esc(c.jurisdiction)+'</div></td>' +
+        '<td class="l"><div class="co-name">'+esc(c.name)+chips+'</div><div class="co-juris">'+esc(c.jurisdiction)+'</div></td>' +
         '<td class="l"><span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span></td>' +
         '<td>' +
           '<span class="covwrap">' +
@@ -695,6 +1225,12 @@
         '<td>'+tipc('prior-issues','<span class="pi '+(c.prior_issues>0?'has':'zero')+'">'+c.prior_issues+'</span>')+'</td>' +
         '<td>'+tipc('data-freshness','<span class="fresh '+(stale?'stale':'ok')+'">'+
             (stale?'⚠ ':'')+freshLabel(c.data_freshness_days)+'</span>')+'</td>' +
+        '<td class="qa">'+
+          '<span class="qa-btns">'+
+            '<button class="qa-btn'+(asg?' on':'')+'" type="button" data-qa="assign" data-id="'+c.company_id+'" title="Assign'+(asg?' (currently '+esc(asg)+')':'')+'" aria-label="Assign '+esc(c.name)+'">'+ICON.user+'</button>'+
+            '<button class="qa-btn'+(alr.length?' on':'')+'" type="button" data-qa="alert" data-id="'+c.company_id+'" title="Trigger alert'+(alr.length?' ('+alr.length+' set)':'')+'" aria-label="Trigger alert for '+esc(c.name)+'">'+ICON.bell+'</button>'+
+          '</span>'+
+        '</td>' +
       '</tr>';
     }).join('');
     var body = document.getElementById('rankBody');
@@ -702,18 +1238,32 @@
     Array.prototype.forEach.call(body.querySelectorAll('tr'), function(tr){
       tr.addEventListener('click', function(){ select(tr.getAttribute('data-id')); });
     });
-    document.getElementById('listHint').textContent = RANKED.length + ' companies · click a row to inspect';
+    Array.prototype.forEach.call(body.querySelectorAll('.qa-btn'), function(b){
+      b.addEventListener('click', function(e){
+        e.stopPropagation();
+        var c = byId(b.getAttribute('data-id'));
+        if (b.getAttribute('data-qa') === 'assign') openAssign(b, c); else openAlert(b, c);
+      });
+    });
+    document.getElementById('listHint').textContent =
+      (RANKED.length === PORTFOLIO.length ? RANKED.length + ' companies' : RANKED.length + ' of ' + PORTFOLIO.length + ' companies') +
+      ' · click a row to inspect';
   }
 
   function byId(id){ return PORTFOLIO.filter(function(c){ return c.company_id===id; })[0]; }
   function frameworkFor(p){ return FRAMEWORK.filter(function(q){ return q.priority===p; })[0]; }
 
-  function select(id){
-    selectedId = id;
-    var c = byId(id);
+  function highlightRow(id){
     Array.prototype.forEach.call(document.querySelectorAll('#rankBody tr'), function(tr){
       tr.classList.toggle('sel', tr.getAttribute('data-id')===id);
     });
+  }
+
+  function select(id){
+    selectedId = id;
+    var c = byId(id);
+    if (!c) return;
+    highlightRow(id);
     renderInspector(c);
   }
 
@@ -732,9 +1282,11 @@
 
     document.getElementById('cName').textContent = c.name;
     document.getElementById('cPill').innerHTML = '<span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span>';
+    var asg = getAssignee(c.company_id);
     document.getElementById('cSub').innerHTML =
       '<span>'+esc(c.jurisdiction)+'</span><span>·</span><span class="nw-mono">'+esc(loan.loan_id)+'</span>' +
-      '<span>·</span><span class="fresh '+(stale?'stale':'ok')+'">'+(stale?'⚠ stale feed — ':'feed ')+freshLabel(c.data_freshness_days)+'</span>';
+      '<span>·</span><span class="fresh '+(stale?'stale':'ok')+'">'+(stale?'⚠ stale feed — ':'feed ')+freshLabel(c.data_freshness_days)+'</span>' +
+      (asg ? '<span>·</span><span>owner <b>'+esc(asg)+'</b></span>' : '');
 
     var html = '';
 
@@ -942,7 +1494,7 @@
         '<div class="log-when">'+fmtWhen(e.ts)+'<br><span class="nw-muted">by '+esc(e.actor||'credit-team')+'</span></div>' +
         '<div class="log-main"><span class="log-co">'+esc(e.company_name)+'</span> <span class="nw-muted nw-mono" style="font-size:11px;">'+esc(e.loan_id||'')+'</span>' +
           (e.note ? '<div class="note">'+esc(e.note)+'</div>' : '<div class="note nw-muted">(no note)</div>') + '</div>' +
-        '<div class="log-meta"><span class="nw-p nw-p-'+esc(e.priority)+'">'+esc(e.priority)+'</span><span class="out-chip">'+esc(e.outcome)+'</span></div>' +
+        '<div class="log-meta">'+(/^P[1-4]$/.test(e.priority||'') ? '<span class="nw-p nw-p-'+esc(e.priority)+'">'+esc(e.priority)+'</span>' : '')+'<span class="out-chip">'+esc(e.outcome)+'</span></div>' +
       '</li>';
     }).join('');
   }
