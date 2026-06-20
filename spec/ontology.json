@@ -320,22 +320,116 @@
   ],
 
   "lifecycle": {
-    "title": "A new bank file turns into a warning, an action, and an updated database",
-    "company_id": "C-SAHEL", "company_name": "Sahel AgriCorp",
-    "before": { "refresh_ts": "2026-07-01", "total_cash_usd": 9311675, "transferable_cash_usd": 795714, "trapped_cash_usd": 8515961, "cash_to_repay_t1": 700000, "coverage_ratio": 1.14, "ew_label": "Low", "deteriorating": false },
-    "new_file": { "file_name": "bank_export_2026-07-08.xlsx", "ingested_at": "2026-07-08T08:00:00Z", "change": "The EUR operating account at FI-EA354EF2 (~$471K, the largest transferable balance) now reads 0 — swept to an offshore parent / FX-blocked.", "raw_rows": 62 },
-    "after": { "refresh_ts": "2026-07-08", "total_cash_usd": 8840818, "transferable_cash_usd": 324857, "trapped_cash_usd": 8515961, "cash_to_repay_t1": 700000, "coverage_ratio": 0.46, "ew_label": "High", "deteriorating": true },
-    "steps": [
-      { "layer": "source", "title": "New file lands", "detail": "bank_export_2026-07-08.xlsx arrives (62 rows). The hourly feed shows the EUR operating account at $0.", "db_changes": ["+1 bronze.source_file", "+62 bronze.bank_balance_raw rows (immutable)"] },
-      { "layer": "standardisation", "title": "Standardise raw -> canonical", "detail": "Parse types; resolve account_key (NBFI rule); de-dup; re-derive USD from FX; tag convertibility; validate + freshness.", "db_changes": ["account_key synthesized for null-ID rows", "EUR row tagged convertibility=transferable, balance now $0", "rows with issues -> validation_quarantine"] },
-      { "layer": "silver", "title": "Update canonical entities", "detail": "silver.account refreshed for snapshot 2026-07-08; the EUR transferable balance drops $471K -> $0.", "db_changes": ["~62 silver.account rows upserted for the new snapshot"] },
-      { "layer": "gold", "title": "Recompute the golden model", "detail": "M1 transferable cash = $324,857 (was $795,714). cash_to_repay_t1 = $700,000. coverage = 0.46. Label flips Low -> High.", "db_changes": ["+1 gold.company_snapshot (coverage 0.46, label High)", "+N gold.metric_lineage rows linking each number to its bronze rows"] },
-      { "layer": "warning", "title": "Warning fires + digest", "detail": "Sahel AgriCorp moves to High (coverage < 1.0, principal at risk $6.0M). It enters the 8am digest as a changed-status company.", "db_changes": ["+1 app.digest entry (changed-status, ranked by principal at risk)"] },
-      { "layer": "action", "title": "Credit team acts & records", "detail": "Specialist opens the row, drills the $324,857 to the raw EUR row, and logs a P1 action: contact treasurer, arrange FX/bridge, confirm coupon source.", "db_changes": ["+1 app.action_log (P1, actor=credit-team, outcome pending)"] },
-      { "layer": "gold", "title": "Updated database state", "detail": "The portfolio now ranks Sahel AgriCorp #1 by principal at risk with an open P1 action attached. Every number still drills back to the 2026-07-08 raw file.", "db_changes": ["gold reflects the new High snapshot", "action_log shows the open P1", "lineage intact end-to-end"] }
-    ],
-    "warning": { "ew_label": "High", "coverage_ratio": 0.46, "principal_at_risk": 6000000, "reason": "Transferable cash fell 59% ($795,714 -> $324,857) after the EUR operating account dropped to $0; projected cash at T1 no longer covers the $700,000 due." },
-    "action": { "priority": "P1", "action_taken": "Contacted treasurer; arranging FX conversion / bridge to fund the $700K coupon; confirming funding source before 2026-07-15.", "actor": "credit-team", "outcome": "pending" }
+    "scenarios": [
+      {
+        "id": "bank_file",
+        "short_title": "Bank file \u2192 Coverage warning",
+        "title": "A new bank file turns into a warning, an action, and an updated database",
+        "company_id": "C-SAHEL", "company_name": "Sahel AgriCorp",
+        "subtitle": "Honest by construction: the only thing that changed in the new file is the EUR operating account dropping to $0 \u2014 every downstream number follows from that.",
+        "before": { "refresh_ts": "2026-07-01", "total_cash_usd": 9311675, "transferable_cash_usd": 795714, "trapped_cash_usd": 8515961, "cash_to_repay_t1": 700000, "coverage_ratio": 1.14, "ew_label": "Low", "deteriorating": false },
+        "new_file": { "file_name": "bank_export_2026-07-08.xlsx", "ingested_at": "2026-07-08T08:00:00Z", "source": "hourly bank feed (Excel)", "change": "The EUR operating account at FI-EA354EF2 (~$471K, the largest transferable balance) now reads 0 \u2014 swept to an offshore parent / FX-blocked.", "raw_rows": 62 },
+        "after": { "refresh_ts": "2026-07-08", "total_cash_usd": 8840818, "transferable_cash_usd": 324857, "trapped_cash_usd": 8515961, "cash_to_repay_t1": 700000, "coverage_ratio": 0.46, "ew_label": "High", "deteriorating": true },
+        "steps": [
+          { "layer": "source", "title": "New file lands", "detail": "bank_export_2026-07-08.xlsx arrives (62 rows). The hourly feed shows the EUR operating account at $0.", "db_changes": ["+1 bronze.source_file", "+62 bronze.bank_balance_raw rows (immutable)"] },
+          { "layer": "standardisation", "title": "Standardise raw \u2192 canonical", "detail": "Parse types; resolve account_key (NBFI rule); de-dup; re-derive USD from FX; tag convertibility; validate + freshness.", "db_changes": ["account_key synthesized for null-ID rows", "EUR row tagged convertibility=transferable, balance now $0", "rows with issues \u2192 validation_quarantine"] },
+          { "layer": "silver", "title": "Update canonical entities", "detail": "silver.account refreshed for snapshot 2026-07-08; the EUR transferable balance drops $471K \u2192 $0.", "db_changes": ["~62 silver.account rows upserted for the new snapshot"] },
+          { "layer": "gold", "title": "Recompute the golden model", "detail": "M1 transferable cash = $324,857 (was $795,714). cash_to_repay_t1 = $700,000. coverage = 0.46. Label flips Low \u2192 High.", "db_changes": ["+1 gold.company_snapshot (coverage 0.46, label High)", "+N gold.metric_lineage rows linking each number to its bronze rows"] },
+          { "layer": "warning", "title": "Warning fires + digest", "detail": "Sahel AgriCorp moves to High (coverage < 1.0, principal at risk $6.0M). It enters the 8am digest as a changed-status company.", "db_changes": ["+1 app.digest entry (changed-status, ranked by principal at risk)"] },
+          { "layer": "action", "title": "Credit team acts & records", "detail": "Specialist opens the row, drills the $324,857 to the raw EUR row, and logs a P1 action: contact treasurer, arrange FX/bridge, confirm coupon source.", "db_changes": ["+1 app.action_log (P1, actor=credit-team, outcome pending)"] },
+          { "layer": "gold", "title": "Updated database state", "detail": "The portfolio now ranks Sahel AgriCorp #1 by principal at risk with an open P1 action attached. Every number still drills back to the 2026-07-08 raw file.", "db_changes": ["gold reflects the new High snapshot", "action_log shows the open P1", "lineage intact end-to-end"] }
+        ],
+        "warning": { "pill_label": "High", "pill_class": "High", "title_text": "Warning fired", "reason": "Transferable cash fell 59% ($795,714 \u2192 $324,857) after the EUR operating account dropped to $0; projected cash at T1 no longer covers the $700,000 due.", "metrics": [{ "value": "0.46", "label": "coverage (signal)" }, { "value": "$6,000,000", "label": "principal at risk" }] },
+        "action": { "priority": "P1", "action_taken": "Contacted treasurer; arranging FX conversion / bridge to fund the $700K coupon; confirming funding source before 2026-07-15.", "actor": "credit-team", "outcome": "pending" },
+        "display": [
+          { "type": "money", "label": "Transferable cash (M1)", "before": 795714, "after": 324857, "delta": "\u25bc 59%" },
+          { "type": "bar", "label": "Coverage ratio \u2014 the signal", "before": 1.14, "after": 0.46, "threshold": 1.0, "max": 1.5 },
+          { "type": "pill", "label": "Early-warning label", "before": "Low", "after": "High" },
+          { "type": "money", "label": "Total cash", "before": 9311675, "after": 8840818 },
+          { "type": "money", "label": "Cash to repay (T1)", "before": 700000, "after": 700000, "delta": "unchanged", "neutral": true }
+        ]
+      },
+      {
+        "id": "balance_sheet",
+        "short_title": "Balance sheet \u2192 Recoverability",
+        "title": "Quarterly balance sheet data updates the recoverability estimate",
+        "company_id": "C-DAR", "company_name": "Dar Telecom",
+        "subtitle": "New data input: a quarterly balance sheet file reveals structural leverage \u2014 the recoverability assessment drops from Partial to Weak even though spot coverage hasn\u2019t changed.",
+        "before": { "refresh_ts": "2026-06-30", "coverage_ratio": 0.98, "ew_label": "Medium", "recoverability_label": "Partial", "recoverability_score": 0.60, "savable_usd": 1320000, "net_leverage": 2.80, "current_ratio": 1.10, "free_cash_after_commitments": 120000 },
+        "new_file": {
+          "file_name": "balance_sheet_2026-Q2.xlsx", "ingested_at": "2026-07-10T09:00:00Z", "source": "quarterly upload (finance team)",
+          "change": "Dar Telecom\u2019s Q2 balance sheet shows net leverage jumped to 4.2x (was 2.8x), current ratio fell to 0.65 (was 1.1), and free cash after commitments turned negative (\u2212$85K).",
+          "raw_rows": 8,
+          "raw_file_sample": {
+            "columns": ["company", "period", "total_debt_usd", "total_equity_usd", "net_leverage", "current_ratio", "quick_ratio", "cash_from_ops_usd", "debt_service_usd", "free_cash_usd"],
+            "rows": [
+              { "company": "Dar Telecom", "period": "2026-Q2", "total_debt_usd": 8400000, "total_equity_usd": 2000000, "net_leverage": 4.20, "current_ratio": 0.65, "quick_ratio": 0.40, "cash_from_ops_usd": 315000, "debt_service_usd": 400000, "free_cash_usd": -85000 }
+            ]
+          }
+        },
+        "after": { "refresh_ts": "2026-07-10", "coverage_ratio": 0.98, "ew_label": "Medium", "recoverability_label": "Weak", "recoverability_score": 0.30, "savable_usd": 660000, "net_leverage": 4.20, "current_ratio": 0.65, "free_cash_after_commitments": -85000 },
+        "steps": [
+          { "layer": "source", "title": "Balance sheet file lands", "detail": "balance_sheet_2026-Q2.xlsx arrives (8 rows, one per portfolio company). Quarterly upload via the finance team.", "db_changes": ["+1 bronze.source_file (balance_sheet)", "+8 bronze.balance_sheet_raw rows"] },
+          { "layer": "standardisation", "title": "Parse & validate financials", "detail": "Parse numeric types; compute net leverage = total_debt / total_equity; derive current and quick ratios; validate free_cash = cash_from_ops \u2212 debt_service.", "db_changes": ["ratios validated: net_leverage, current_ratio, quick_ratio", "free_cash cross-checked: $315K ops \u2212 $400K service = \u2212$85K", "rows with issues \u2192 validation_quarantine"] },
+          { "layer": "silver", "title": "Update canonical financials", "detail": "silver.financials refreshed for period 2026-Q2. Dar Telecom: net leverage 2.8x \u2192 4.2x, current ratio 1.1 \u2192 0.65, free cash $120K \u2192 \u2212$85K.", "db_changes": ["~8 silver.financials rows upserted for 2026-Q2"] },
+          { "layer": "gold", "title": "Recoverability model recomputes", "detail": "Enhanced recoverability incorporates the balance sheet: high leverage (4.2x) + negative free cash = structural distress signal. Recoverability drops Partial (0.60) \u2192 Weak (0.30). Savable USD halves: $1.32M \u2192 $660K.", "db_changes": ["+1 gold.company_snapshot (recoverability Weak, score 0.30)", "+N gold.metric_lineage rows linking recoverability to the balance sheet rows"] },
+          { "layer": "warning", "title": "Recoverability downgrade flagged", "detail": "Dar Telecom\u2019s recoverability drops from Partial to Weak. The portfolio view now shows a structural concern, not just a timing issue. It enters the digest as a changed-recoverability company.", "db_changes": ["+1 app.digest entry (recoverability downgrade, Dar Telecom)"] },
+          { "layer": "action", "title": "Credit team reviews & escalates", "detail": "Analyst drills to the Q2 balance sheet (net leverage 4.2x, negative free cash) and escalates: request 13-week cashflow, review covenants, prepare workout options.", "db_changes": ["+1 app.action_log (P2, actor=credit-team, outcome pending)"] },
+          { "layer": "gold", "title": "Updated database state", "detail": "Dar Telecom remains Medium by coverage (0.98) but now carries a Weak recoverability flag with an open P2 action. Balance sheet ratios trace back to the 2026-Q2 raw file.", "db_changes": ["gold reflects Weak recoverability for Dar Telecom", "action_log shows the open P2", "lineage intact: recoverability \u2192 balance_sheet_2026-Q2.xlsx"] }
+        ],
+        "warning": { "pill_label": "Weak", "pill_class": "High", "title_text": "Recoverability downgrade", "reason": "Q2 balance sheet shows net leverage jumped to 4.2x (was 2.8x), current ratio fell to 0.65, and free cash after commitments turned negative (\u2212$85K). This signals structural distress \u2014 recoverability drops from Partial to Weak.", "metrics": [{ "value": "0.30", "label": "recoverability score" }, { "value": "$660,000", "label": "savable USD" }] },
+        "action": { "priority": "P2", "action_taken": "Escalated: requesting 13-week cashflow; reviewing covenants; preparing workout options ahead of T1.", "actor": "credit-team", "outcome": "pending" },
+        "display": [
+          { "type": "ratio", "label": "Net leverage", "before": 2.80, "after": 4.20, "delta": "\u25b2 50%", "suffix": "x" },
+          { "type": "ratio", "label": "Current ratio", "before": 1.10, "after": 0.65, "delta": "\u25bc 41%" },
+          { "type": "money", "label": "Free cash after commitments", "before": 120000, "after": -85000, "delta": "turned negative" },
+          { "type": "bar", "label": "Recoverability score", "before": 0.60, "after": 0.30, "threshold": 0.50, "max": 1.0 },
+          { "type": "pill", "label": "Recoverability", "before": "Partial", "after": "Weak" },
+          { "type": "ratio", "label": "Coverage ratio (spot)", "before": 0.98, "after": 0.98, "delta": "unchanged", "neutral": true },
+          { "type": "money", "label": "Savable USD", "before": 1320000, "after": 660000, "delta": "\u25bc 50%" }
+        ]
+      },
+      {
+        "id": "subscriptions",
+        "short_title": "Salesforce \u2192 Coverage forecast",
+        "title": "Two new subscriptions from a Salesforce connection update the coverage estimate",
+        "company_id": "C-NAIROBI", "company_name": "Nairobi Logistics",
+        "subtitle": "New data input: two contracted subscriptions from a Salesforce CRM integration add $175K in projected inflows \u2014 the coverage forecast at T1 lifts from pre-breach to clear.",
+        "before": { "refresh_ts": "2026-07-08", "transferable_cash_usd": 420000, "cash_to_repay_t1": 400000, "projected_inflows_t1": 0, "projected_transferable_t1": 388000, "forecast_coverage_t1": 0.97, "forecast_status": "pre-breach", "coverage_ratio": 1.05, "ew_label": "Medium" },
+        "new_file": {
+          "file_name": "salesforce_subscriptions_sync", "ingested_at": "2026-07-11T14:30:00Z", "source": "Salesforce CRM integration (webhook)",
+          "change": "Two new subscription contracts for Nairobi Logistics (Kenya): KLM Corp ($95K, 12-month) and TransKenya Ltd ($80K, 6-month). Total contracted inflows: $175K.",
+          "raw_rows": 2,
+          "raw_file_sample": {
+            "columns": ["subscription_id", "company", "customer", "country", "value_usd", "term_mo", "start_date", "status"],
+            "rows": [
+              { "subscription_id": "SUB-NBO-0047", "company": "Nairobi Logistics", "customer": "KLM Corp", "country": "Kenya", "value_usd": 95000, "term_mo": 12, "start_date": "2026-07-15", "status": "contracted" },
+              { "subscription_id": "SUB-NBO-0048", "company": "Nairobi Logistics", "customer": "TransKenya Ltd", "country": "Kenya", "value_usd": 80000, "term_mo": 6, "start_date": "2026-08-01", "status": "contracted" }
+            ]
+          }
+        },
+        "after": { "refresh_ts": "2026-07-11", "transferable_cash_usd": 420000, "cash_to_repay_t1": 400000, "projected_inflows_t1": 175000, "projected_transferable_t1": 560000, "forecast_coverage_t1": 1.40, "forecast_status": "clear", "coverage_ratio": 1.05, "ew_label": "Medium" },
+        "steps": [
+          { "layer": "source", "title": "Salesforce webhook fires", "detail": "Salesforce CRM delivers 2 new subscription records for Nairobi Logistics (Kenya): SUB-NBO-0047 (KLM Corp, $95K/12mo) and SUB-NBO-0048 (TransKenya Ltd, $80K/6mo).", "db_changes": ["+1 bronze.source_file (Salesforce sync)", "+2 bronze.subscription_raw rows"] },
+          { "layer": "standardisation", "title": "Parse subscription terms", "detail": "Validate contract terms; compute monthly revenue ($7,917 + $13,333); map company to Nairobi Logistics (C-NAIROBI, Kenya); confirm both start dates fall before T1 (2026-07-28).", "db_changes": ["subscription terms validated (value, term, start)", "company resolved: Nairobi Logistics (C-NAIROBI)", "monthly_revenue_usd derived from value / term"] },
+          { "layer": "silver", "title": "Update business lifecycle", "detail": "silver.business_lifecycle updated: Nairobi Logistics gains $175K in contracted future inflows (2 subscriptions). Booked as forecast_inflows_usd for the period covering T1.", "db_changes": ["+2 silver.business_lifecycle rows (contracted subscriptions)", "forecast_inflows_usd += $175,000 for Nairobi Logistics"] },
+          { "layer": "gold", "title": "Coverage forecast recomputes", "detail": "M3 projected transferable cash at T1 rises: $388K trend + $175K contracted (with haircut) = $560K. Forecast coverage: $560K / $400K = 1.40 (was 0.97). Status flips pre-breach \u2192 clear.", "db_changes": ["+1 gold.company_snapshot (forecast_coverage_t1 1.40, status clear)", "+N gold.metric_lineage rows linking inflows to the Salesforce rows"] },
+          { "layer": "warning", "title": "Pre-breach signal cleared", "detail": "Nairobi Logistics was flagged pre-breach (forecast 0.97). The new subscriptions lift the forecast to 1.40 \u2014 comfortably above 1.0. The pre-breach flag is removed from the digest.", "db_changes": ["+1 app.digest entry (pre-breach cleared, Nairobi Logistics)"] },
+          { "layer": "action", "title": "Credit team notes improvement", "detail": "Analyst confirms the subscription data (2 contracts from Salesforce: KLM Corp + TransKenya) and logs a P3 note: standard monitoring sufficient, no escalation needed.", "db_changes": ["+1 app.action_log (P3, actor=credit-team, outcome resolved)"] },
+          { "layer": "gold", "title": "Updated database state", "detail": "Nairobi Logistics coverage forecast improves from 0.97 (pre-breach) to 1.40 (clear). The P2 action is downgraded to P3 standard monitoring. Every number traces to the Salesforce subscription records.", "db_changes": ["gold reflects forecast_coverage_t1 = 1.40 (clear)", "action_log shows resolved P3", "lineage intact: forecast \u2192 salesforce_subscriptions_sync"] }
+        ],
+        "warning": { "pill_label": "Clear", "pill_class": "Low", "title_text": "Pre-breach signal cleared", "reason": "Two new Salesforce subscriptions ($95K + $80K = $175K contracted inflows) lift projected transferable cash at T1 to $560K. Coverage forecast improves from 0.97 (pre-breach) to 1.40 (clear).", "metrics": [{ "value": "1.40", "label": "forecast coverage (T1)" }, { "value": "$175,000", "label": "contracted inflows" }] },
+        "action": { "priority": "P3", "action_taken": "Pre-breach resolved; downgraded to standard monitoring. Confirmed 2 contracted subscriptions via Salesforce.", "actor": "credit-team", "outcome": "resolved" },
+        "display": [
+          { "type": "money", "label": "Projected inflows (T1)", "before": 0, "after": 175000, "delta": "+$175K" },
+          { "type": "money", "label": "Projected transferable (T1)", "before": 388000, "after": 560000, "delta": "\u25b2 44%" },
+          { "type": "bar", "label": "Forecast coverage at T1", "before": 0.97, "after": 1.40, "threshold": 1.0, "max": 2.0 },
+          { "type": "pill", "label": "Forecast status", "before": "pre-breach", "after": "clear" },
+          { "type": "ratio", "label": "Coverage (spot)", "before": 1.05, "after": 1.05, "delta": "unchanged", "neutral": true },
+          { "type": "money", "label": "Cash to repay (T1)", "before": 400000, "after": 400000, "delta": "unchanged", "neutral": true }
+        ]
+      }
+    ]
   },
 
   "evidence": {
