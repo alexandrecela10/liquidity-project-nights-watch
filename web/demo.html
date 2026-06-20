@@ -1,0 +1,636 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night's Watch — Product demo</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  /* ---- layout ---- */
+  body { overflow: hidden; }
+  .demo-wrap { position: fixed; inset: 0; top: 52px; display: flex; flex-direction: column; }
+  .stage { flex: 1; position: relative; overflow: hidden; }
+  .scene { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    opacity: 0; pointer-events: none; transition: opacity .6s ease; padding: 28px; }
+  .scene.active { opacity: 1; pointer-events: auto; z-index: 2; }
+  .scene-inner { max-width: 960px; width: 100%; }
+
+  /* ---- subtitle bar ---- */
+  .sub-bar { background: var(--ink); color: var(--sand); padding: 14px 28px; min-height: 72px;
+    display: flex; align-items: center; gap: 18px; z-index: 10; }
+  .sub-text { flex: 1; font-size: 15px; line-height: 1.45; }
+  .sub-step { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .06em;
+    color: var(--yellow); white-space: nowrap; min-width: 90px; }
+
+  /* ---- controls ---- */
+  .ctrl { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .ctrl button { background: transparent; border: 1px solid rgba(253,245,240,.3); color: var(--sand);
+    font-family: var(--font); font-size: 13px; font-weight: 600; padding: 6px 14px;
+    border-radius: 999px; cursor: pointer; transition: background .12s; }
+  .ctrl button:hover { background: rgba(253,245,240,.12); }
+  .ctrl button.on { background: var(--yellow); color: var(--ink); border-color: var(--yellow); }
+  .ctrl button:disabled { opacity: .3; cursor: default; }
+
+  /* ---- progress dots ---- */
+  .dots { display: flex; gap: 5px; margin: 0 10px; }
+  .dots span { width: 8px; height: 8px; border-radius: 50%; background: rgba(253,245,240,.25);
+    transition: background .25s, transform .25s; cursor: pointer; }
+  .dots span.done { background: var(--yellow); }
+  .dots span.cur  { background: var(--yellow); transform: scale(1.35); }
+
+  /* ---- scene-specific styles ---- */
+
+  /* S0: title */
+  .s-title { text-align: center; }
+  .s-title h1 { font-size: 44px; line-height: 1.08; margin-bottom: 14px; }
+  .s-title .tag { font-size: 16px; color: var(--taupe); }
+  .s-title .play-cue { margin-top: 28px; display: inline-flex; align-items: center; gap: 10px;
+    font-size: 14px; font-weight: 600; color: var(--ink); background: var(--yellow);
+    padding: 12px 24px; border-radius: 999px; cursor: pointer; border: none; font-family: var(--font); }
+  .s-title .play-cue:hover { filter: brightness(1.05); }
+  .s-title .play-cue svg { width: 18px; height: 18px; }
+
+  /* S1: Teams alert */
+  .teams-card { background: var(--white); border-radius: 12px; box-shadow: var(--shadow-lg);
+    max-width: 520px; margin: 0 auto; overflow: hidden; }
+  .teams-head { background: #464EB8; color: #fff; padding: 12px 18px; display: flex; align-items: center; gap: 10px;
+    font-size: 13px; font-weight: 600; }
+  .teams-head svg { width: 20px; height: 20px; fill: #fff; flex-shrink: 0; }
+  .teams-body { padding: 20px; }
+  .teams-body h3 { font-size: 16px; margin-bottom: 10px; }
+  .teams-body .alert-line { display: flex; align-items: center; gap: 8px; margin: 6px 0; font-size: 13px; }
+  .teams-body .alert-line .al-pill { font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; }
+  .teams-body .alert-line .al-pill.high { background: #f6e4e0; color: var(--risk-high); }
+  .teams-body .alert-line .al-pill.med  { background: #f6ecd9; color: var(--risk-medium); }
+  .teams-body .alert-cta { display: inline-flex; align-items: center; gap: 6px; margin-top: 14px;
+    font-size: 13px; font-weight: 600; color: #464EB8; text-decoration: none; cursor: pointer; }
+  .teams-body .alert-cta:hover { text-decoration: underline; }
+  .teams-ts { padding: 8px 18px; background: #f5f5f5; font-size: 11px; color: #888; }
+
+  /* S2-S7: mock desk panels */
+  .desk-mock { background: var(--white); border-radius: var(--radius); box-shadow: var(--shadow-lg);
+    overflow: hidden; }
+  .dm-topbar { background: var(--ink); color: var(--sand); padding: 10px 18px; display: flex;
+    align-items: center; gap: 10px; font-size: 13px; font-weight: 600; }
+  .dm-topbar .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); }
+  .dm-topbar .dm-nav { margin-left: auto; font-size: 11px; font-weight: 500; color: var(--sand-700); }
+  .dm-topbar .dm-nav b { color: var(--yellow); font-weight: 600; }
+  .dm-body { padding: 20px; }
+  .dm-body h2 { font-size: 18px; margin-bottom: 12px; }
+  .dm-body h3 { font-size: 14px; margin-bottom: 8px; color: var(--ink-700); }
+
+  /* mock ranked table */
+  .mock-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  .mock-table th { text-align: left; padding: 6px 10px; font-size: 10px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .05em; color: var(--taupe); border-bottom: 2px solid var(--sand-500); }
+  .mock-table td { padding: 8px 10px; border-bottom: 1px solid var(--sand-500); }
+  .mock-table tr.highlight { background: #fbf3d6; box-shadow: inset 3px 0 0 var(--yellow); }
+  .mock-table .rk { color: var(--sand-700); font-family: var(--mono); font-size: 11px; }
+  .mock-table .co-name { font-weight: 600; }
+  .mock-table .co-jur { font-size: 11px; color: var(--taupe); }
+  .mock-table .cov { font-family: var(--mono); font-weight: 600; }
+  .mock-table .cov.bad { color: var(--risk-high); }
+  .mock-table .cov.ok  { color: var(--risk-low); }
+  .mock-table .num { font-family: var(--mono); }
+
+  /* mock inspector */
+  .mock-insp { background: var(--sand); border-left: 3px solid var(--ink); border-radius: var(--radius-sm);
+    padding: 18px; margin-top: 16px; }
+  .mock-insp h3 { font-size: 15px; margin-bottom: 4px; }
+  .mock-insp .mi-meta { font-size: 11px; color: var(--taupe); margin-bottom: 12px; }
+  .mock-insp .mi-cov { font-size: 32px; font-weight: 700; font-family: var(--mono); }
+  .mock-insp .mi-cov.bad { color: var(--risk-high); }
+  .mock-insp .mi-note { font-size: 12.5px; color: var(--ink-700); line-height: 1.5; margin-top: 8px; }
+
+  /* mock loan KPIs */
+  .mock-kpis { display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 14px; }
+  .mock-kpi { background: var(--white); border: 1px solid var(--sand-500); border-radius: var(--radius-sm);
+    padding: 10px 12px; }
+  .mock-kpi .mk-k { font-size: 10px; color: var(--taupe); margin-bottom: 3px; }
+  .mock-kpi .mk-v { font-size: 18px; font-weight: 700; font-family: var(--mono); line-height: 1.05; }
+  .mock-kpi .mk-s { font-size: 9.5px; color: var(--sand-700); margin-top: 3px; }
+
+  /* mock recoverability + phased */
+  .mock-phases { display: flex; gap: 10px; margin-bottom: 14px; }
+  .mock-phases span { font-size: 12px; font-weight: 600; padding: 5px 14px; border-radius: 999px;
+    border: 1px solid var(--sand-700); color: var(--taupe); cursor: default; }
+  .mock-phases span.on { background: var(--ink); color: var(--yellow); border-color: var(--ink); }
+
+  /* mock action card */
+  .mock-action { background: var(--white); border: 1px solid var(--sand-500); border-left: 4px solid var(--risk-high);
+    border-radius: var(--radius-sm); padding: 16px; margin-top: 14px; }
+  .mock-action .ma-pri { font-size: 11px; font-weight: 700; background: var(--ink); color: var(--yellow);
+    padding: 2px 8px; border-radius: 999px; display: inline-block; margin-bottom: 6px; }
+  .mock-action .ma-title { font-size: 14px; font-weight: 600; }
+  .mock-action .ma-why { font-size: 12.5px; color: var(--taupe); margin-top: 4px; }
+
+  /* mock form */
+  .mock-form { margin-top: 14px; }
+  .mock-form .mf-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .mock-form label { font-size: 12px; font-weight: 600; color: var(--ink-700); min-width: 80px; }
+  .mock-form .mf-input { flex: 1; font-size: 12.5px; padding: 8px 10px; border: 1px solid var(--sand-700);
+    border-radius: var(--radius-sm); background: var(--white); font-family: var(--font); color: var(--ink); }
+  .mock-form .mf-input.filled { background: #f0f7ee; border-color: var(--risk-low); }
+  .mock-form .mf-btn { font-family: var(--font); font-size: 13px; font-weight: 600; padding: 9px 20px;
+    border-radius: 999px; border: none; cursor: default; }
+  .mock-form .mf-btn.primary { background: var(--ink); color: var(--sand); }
+
+  /* S8: confirmation */
+  .confirm-card { text-align: center; background: var(--white); border-radius: var(--radius);
+    box-shadow: var(--shadow-lg); padding: 44px 36px; max-width: 520px; margin: 0 auto; }
+  .confirm-card .check { width: 60px; height: 60px; border-radius: 50%; background: #e4ecdf;
+    display: flex; align-items: center; justify-content: center; margin: 0 auto 18px; }
+  .confirm-card .check svg { width: 28px; height: 28px; stroke: var(--risk-low); fill: none;
+    stroke-width: 3; stroke-linecap: round; stroke-linejoin: round; }
+  .confirm-card h2 { font-size: 20px; margin-bottom: 8px; }
+  .confirm-card .cc-sub { font-size: 13px; color: var(--taupe); }
+  .confirm-card .cc-next { margin-top: 20px; font-size: 13px; font-weight: 600;
+    color: var(--ink); display: inline-flex; align-items: center; gap: 6px; }
+
+  /* S9: end card */
+  .end-card { text-align: center; }
+  .end-card h1 { font-size: 36px; margin-bottom: 14px; }
+  .end-card .workflow { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin: 20px 0; }
+  .end-card .workflow span { font-size: 14px; font-weight: 600; padding: 8px 18px; border-radius: 999px;
+    background: var(--white); border: 1px solid var(--sand-500); box-shadow: var(--shadow); }
+  .end-card .workflow .arr { background: transparent; border: none; box-shadow: none; color: var(--taupe);
+    padding: 8px 4px; }
+  .end-card .cta { display: inline-flex; align-items: center; gap: 8px; margin-top: 22px;
+    font-size: 15px; font-weight: 600; color: var(--ink); background: var(--yellow);
+    padding: 12px 26px; border-radius: 999px; text-decoration: none; }
+  .end-card .cta:hover { filter: brightness(1.05); }
+
+  /* highlight pulse for "new" data items */
+  @keyframes pulse-in { 0%{opacity:0;transform:scale(.96)} 100%{opacity:1;transform:scale(1)} }
+  .pulse { animation: pulse-in .5s ease forwards; }
+
+  /* responsive */
+  @media (max-width: 700px) {
+    .s-title h1 { font-size: 28px; }
+    .mock-kpis { grid-template-columns: 1fr; }
+    .end-card h1 { font-size: 26px; }
+    .sub-bar { padding: 10px 16px; }
+  }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity &middot; Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="roadmap.html">Data roadmap</a>
+    <a href="dictionary.html">Dictionary</a>
+    <a href="demo.html" class="active">Demo</a>
+  </nav>
+</div>
+
+<div class="demo-wrap">
+<div class="stage">
+
+<!-- S0: Title -->
+<div class="scene active" data-sub="Welcome to the Night's Watch product demo. Press play to see the full end-to-end workflow." data-step="Start">
+<div class="scene-inner s-title">
+  <h1>Night's Watch<br>Product demo</h1>
+  <p class="tag">See &middot; Understand &middot; Prioritise &middot; Decide &middot; Act</p>
+  <button class="play-cue" id="playCue" aria-label="Play demo">
+    <svg viewBox="0 0 24 24" fill="currentColor"><polygon points="6,3 20,12 6,21"/></svg>
+    Play the demo
+  </button>
+</div>
+</div>
+
+<!-- S1: Teams alert -->
+<div class="scene" data-sub="A new set of raw bank files has been ingested overnight. Night's Watch detects 2 companies with coverage below 1.0 and sends a Teams alert to the credit team." data-step="Alert">
+<div class="scene-inner">
+<div class="teams-card pulse">
+  <div class="teams-head">
+    <svg viewBox="0 0 24 24"><path d="M19.3 8.9h-4.6V5.5A2.5 2.5 0 0 0 12.2 3h-4a2.5 2.5 0 0 0-2.5 2.5v8a2.5 2.5 0 0 0 2.5 2.5h1v3.5a2.5 2.5 0 0 0 2.5 2.5h7.6a2.5 2.5 0 0 0 2.5-2.5v-8a2.5 2.5 0 0 0-2.5-2.6z"/></svg>
+    Microsoft Teams &mdash; Night's Watch Bot
+  </div>
+  <div class="teams-body">
+    <h3>&#x1F6A8; Night's Watch Alert &mdash; new data processed</h3>
+    <p style="font-size:13px;color:var(--taupe);margin:0 0 12px;">Today&rsquo;s bank file refresh completed. <b>2 companies flagged High risk</b>, 2 Medium. Executive summary:</p>
+    <div class="alert-line">
+      <span class="al-pill high">High</span>
+      <b>Sahel AgriCorp</b> &mdash; coverage <span style="font-family:var(--mono);color:var(--risk-high)">0.46</span> &middot; $6.0M principal &middot; $378K shortfall at T1
+    </div>
+    <div class="alert-line">
+      <span class="al-pill high">High</span>
+      <b>Lagos FinServe</b> &mdash; coverage <span style="font-family:var(--mono);color:var(--risk-high)">0.71</span> &middot; $3.2M principal &middot; $209K shortfall at T1
+    </div>
+    <div class="alert-line">
+      <span class="al-pill med">Medium</span>
+      <b>Dar Telecom</b> &mdash; coverage <span style="font-family:var(--mono)">0.98</span> &middot; thin margin
+    </div>
+    <div class="alert-line">
+      <span class="al-pill med">Medium</span>
+      <b>Nairobi Logistics</b> &mdash; coverage <span style="font-family:var(--mono)">1.05</span> &middot; deteriorating
+    </div>
+    <a class="alert-cta">See more in Credit Desk &rarr;</a>
+  </div>
+  <div class="teams-ts">Today, 08:00 AM &middot; via Night's Watch automated digest</div>
+</div>
+</div>
+</div>
+
+<!-- S2: SEE — ranked table -->
+<div class="scene" data-sub="The Credit desk ranks companies worst-first by severity, then money at risk. The specialist scans the portfolio in seconds." data-step="See">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar">
+    <span class="dot"></span> Night's Watch
+    <span class="dm-nav"><b>Credit desk</b> &middot; Now horizon</span>
+  </div>
+  <div class="dm-body">
+    <h2>Portfolio &mdash; ranked worst-first</h2>
+    <table class="mock-table">
+      <thead><tr><th>#</th><th>Company</th><th>Risk</th><th>Coverage</th><th>Principal</th><th>Transferable / Total</th><th>Trend</th></tr></thead>
+      <tbody>
+        <tr class="highlight">
+          <td class="rk">1</td>
+          <td><div class="co-name">Sahel AgriCorp</div><div class="co-jur">Cameroon</div></td>
+          <td><span class="nw-pill nw-risk-High">High</span></td>
+          <td class="cov bad">0.46</td>
+          <td class="num">$6,000,000</td>
+          <td class="num">$0.32M / $9.31M</td>
+          <td><span style="color:var(--risk-high)">&darr; worsening</span></td>
+        </tr>
+        <tr>
+          <td class="rk">2</td>
+          <td><div class="co-name">Lagos FinServe</div><div class="co-jur">Nigeria</div></td>
+          <td><span class="nw-pill nw-risk-High">High</span></td>
+          <td class="cov bad">0.71</td>
+          <td class="num">$3,200,000</td>
+          <td class="num">$0.51M / $4.20M</td>
+          <td><span style="color:var(--risk-high)">&darr; worsening</span></td>
+        </tr>
+        <tr>
+          <td class="rk">3</td>
+          <td><div class="co-name">Dar Telecom</div><div class="co-jur">Tanzania</div></td>
+          <td><span class="nw-pill nw-risk-Medium">Medium</span></td>
+          <td class="cov bad">0.98</td>
+          <td class="num">$4,500,000</td>
+          <td class="num">$0.88M / $5.10M</td>
+          <td><span style="color:var(--risk-high)">&darr; worsening</span></td>
+        </tr>
+        <tr>
+          <td class="rk">4</td>
+          <td><div class="co-name">Nairobi Logistics</div><div class="co-jur">Kenya</div></td>
+          <td><span class="nw-pill nw-risk-Medium">Medium</span></td>
+          <td class="cov ok">1.05</td>
+          <td class="num">$1,800,000</td>
+          <td class="num">$0.42M / $1.50M</td>
+          <td><span style="color:var(--risk-high)">&darr; worsening</span></td>
+        </tr>
+        <tr>
+          <td class="rk">5</td>
+          <td><div class="co-name">Kampala Power</div><div class="co-jur">Uganda</div></td>
+          <td><span class="nw-pill nw-risk-Low">Low</span></td>
+          <td class="cov ok">1.30</td>
+          <td class="num">$900,000</td>
+          <td class="num">$0.26M / $0.90M</td>
+          <td>&rarr; stable</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S3: UNDERSTAND — inspector -->
+<div class="scene" data-sub="The specialist clicks Sahel AgriCorp. The look-up panel explains WHY it's flagged: only 46% of cash due at T1 is covered. 97% of cash is trapped in restricted currencies." data-step="Understand">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp</span></div>
+  <div class="dm-body" style="display:flex;gap:20px;">
+    <div style="flex:1;min-width:0;">
+      <table class="mock-table" style="font-size:11.5px;">
+        <thead><tr><th>#</th><th>Company</th><th>Risk</th><th>Coverage</th></tr></thead>
+        <tbody>
+          <tr class="highlight"><td class="rk">1</td><td><div class="co-name">Sahel AgriCorp</div></td><td><span class="nw-pill nw-risk-High">High</span></td><td class="cov bad">0.46</td></tr>
+          <tr><td class="rk">2</td><td><div class="co-name">Lagos FinServe</div></td><td><span class="nw-pill nw-risk-High">High</span></td><td class="cov bad">0.71</td></tr>
+          <tr><td class="rk">3</td><td><div class="co-name">Dar Telecom</div></td><td><span class="nw-pill nw-risk-Medium">Medium</span></td><td class="cov bad">0.98</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mock-insp" style="flex:1.2;min-width:0;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <h3>Sahel AgriCorp</h3>
+        <span class="nw-pill nw-risk-High" style="font-size:11px;">High</span>
+      </div>
+      <div class="mi-meta">Cameroon &middot; LN-SAHEL-1 &middot; feed today</div>
+      <div style="margin-bottom:8px;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--taupe);font-weight:600;">Why it's flagged</div>
+      <div class="mi-cov bad">0.46</div>
+      <div style="font-size:12px;color:var(--taupe);">coverage &middot; high-risk below 1.20</div>
+      <div class="mi-note">
+        Projected transferable cash at T1 covers only <b>46%</b> of the $700,000 due on Jul 15, 2026.
+        <span style="background:#f6e4e0;color:var(--risk-high);padding:2px 8px;border-radius:999px;font-size:11px;font-weight:600;display:inline-block;margin-top:4px;">&asymp; $378,000 short</span>
+      </div>
+      <div style="margin-top:12px;">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--taupe);font-weight:600;margin-bottom:6px;">Transferable vs trapped cash</div>
+        <div style="display:flex;height:18px;border-radius:6px;overflow:hidden;border:1px solid var(--sand-700);">
+          <div style="width:3.5%;background:var(--ink-700);"></div>
+          <div style="flex:1;background:repeating-linear-gradient(45deg,#d8c4b6,#d8c4b6 5px,#ceb6a7 5px,#ceb6a7 10px);"></div>
+        </div>
+        <div style="display:flex;gap:14px;margin-top:6px;font-size:11px;">
+          <span><b style="font-family:var(--mono);">$324,857</b> transferable (3.5%)</span>
+          <span style="color:var(--taupe);"><b style="font-family:var(--mono);">$8,986,818</b> trapped (96.5%)</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S4: DRILL DOWN — loan analytics -->
+<div class="scene" data-sub="The Loan detail and analytics section shows executive-level KPIs. Each metric has a discrete hover showing the formula, source, and evidence behind it." data-step="Drill down">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Loan</span></div>
+  <div class="dm-body">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+      <h2 style="margin:0;">Loan &mdash; detail &amp; analytics</h2>
+      <span style="font-size:10.5px;font-weight:600;color:var(--taupe);background:var(--sand);border:1px solid var(--sand-500);border-radius:999px;padding:1px 8px;font-family:var(--mono);">LN-SAHEL-1</span>
+    </div>
+    <p style="font-size:12.5px;color:var(--ink-700);line-height:1.5;margin:6px 0 14px;">
+      A $6.00M Senior secured loan. <b>$700,000</b> cash due Jul 15, 2026 (in 26 days). Transferable cash covers <b>46%</b> &rarr; <span style="background:#f6e4e0;color:var(--risk-high);font-size:11.5px;font-weight:600;padding:3px 9px;border-radius:999px;">&asymp; $378,000 short</span>.
+    </p>
+    <div class="mock-kpis">
+      <div class="mock-kpi"><div class="mk-k">Coverage @ T1 &#9432;</div><div class="mk-v" style="color:var(--risk-high);">0.46</div><div class="mk-s">transferable &divide; cash due</div></div>
+      <div class="mock-kpi"><div class="mk-k">Cash due (T1) &#9432;</div><div class="mk-v">$700,000</div><div class="mk-s">in 26 days</div></div>
+      <div class="mock-kpi"><div class="mk-k">Shortfall (T1)</div><div class="mk-v" style="color:var(--risk-high);">$378,000</div><div class="mk-s">unfunded portion of the coupon</div></div>
+      <div class="mock-kpi"><div class="mk-k">Next payment</div><div class="mk-v">26d</div><div class="mk-s">Jul 15, 2026</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:14px;font-size:12.5px;">
+      <div><div style="color:var(--taupe);font-size:11px;">Seniority &amp; security</div><div style="font-weight:600;">Senior secured &#9432;</div><div style="color:var(--taupe);font-size:11px;">recovery rank in a workout</div></div>
+      <div><div style="color:var(--taupe);font-size:11px;">Coupon</div><div style="font-weight:600;font-family:var(--mono);">12% &#9432;</div><div style="color:var(--taupe);font-size:11px;">paid in cash</div></div>
+      <div><div style="color:var(--taupe);font-size:11px;">Annual cash coupon</div><div style="font-weight:600;font-family:var(--mono);">$720,000</div><div style="color:var(--taupe);font-size:11px;">principal &times; coupon, per year</div></div>
+      <div><div style="color:var(--taupe);font-size:11px;">Principal at risk</div><div style="font-weight:600;font-family:var(--mono);color:var(--risk-high);">$6,000,000 &#9432;</div><div style="color:var(--taupe);font-size:11px;">100% of principal</div></div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S5: PRIORITISE — recoverability + phased -->
+<div class="scene" data-sub="The recoverability read tells the specialist what can realistically be saved. Step the data horizon from Now to Medium to Later to see deeper analysis as more data lands." data-step="Prioritise">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Recoverability</span></div>
+  <div class="dm-body">
+    <div class="mock-phases">
+      <span class="on">Now</span>
+      <span>Medium</span>
+      <span>Later</span>
+    </div>
+    <h3>Recoverability (first-pass)</h3>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-top:10px;">
+      <div>
+        <div style="color:var(--taupe);font-size:11px;">First-pass read</div>
+        <div style="display:inline-block;font-size:12px;font-weight:700;padding:3px 10px;border-radius:999px;background:#f6ecd9;color:var(--risk-medium);">Partial</div>
+        <div style="font-size:11.5px;color:var(--taupe);margin-top:4px;">loan structure + convertibility + prior misses</div>
+      </div>
+      <div>
+        <div style="color:var(--taupe);font-size:11px;">Savable money</div>
+        <div style="font-size:22px;font-weight:700;font-family:var(--mono);">$3,200,932</div>
+        <div style="font-size:11.5px;color:var(--taupe);margin-top:4px;">recoverable of the principal at risk</div>
+      </div>
+    </div>
+    <div style="background:var(--sand);border:1px solid var(--sand-500);border-radius:var(--radius-sm);padding:12px;margin-top:14px;font-size:12px;color:var(--ink-700);line-height:1.5;">
+      Senior secured; 1 prior miss; cash is overwhelmingly trapped (recoverable only once convertibility or a bridge clears) &rarr; structure-only read of <b>Partial (~0.53)</b>. Financials sharpen this next.
+    </div>
+    <div style="margin-top:16px;padding-top:14px;border-top:1px dashed var(--sand-500);">
+      <h3>Context</h3>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px 18px;margin-top:8px;font-size:12.5px;">
+        <div><div style="color:var(--taupe);font-size:11px;">Runway</div><div style="font-size:18px;font-weight:700;font-family:var(--mono);color:var(--risk-high);">38 days</div></div>
+        <div><div style="color:var(--taupe);font-size:11px;">Trend</div><div style="font-size:15px;font-weight:600;color:var(--risk-high);">&darr; deteriorating</div></div>
+        <div><div style="color:var(--taupe);font-size:11px;">Prior issues</div><div style="font-size:15px;font-weight:600;color:var(--risk-medium);">1</div></div>
+        <div><div style="color:var(--taupe);font-size:11px;">Data freshness</div><div style="font-size:15px;font-weight:600;color:var(--risk-low);">today</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S6: DECIDE — recommended action -->
+<div class="scene" data-sub="The system recommends a prioritised action. P1 means roll up sleeves: protect the coupon, confirm FX convertibility, and prepare a bridge facility." data-step="Decide">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Action</span></div>
+  <div class="dm-body">
+    <h2>Recommended action</h2>
+    <div class="mock-action">
+      <span class="ma-pri">P1</span>
+      <div class="ma-title">Roll up sleeves &mdash; protect the coupon</div>
+      <div class="ma-why">Coverage 0.46 with $6M principal at risk, 1 prior miss, and a deteriorating trend. Time-sensitive: 38-day runway, $700K due Jul 15.</div>
+    </div>
+    <div style="margin-top:14px;">
+      <h3>Steps</h3>
+      <ol style="padding-left:20px;font-size:12.5px;color:var(--ink-700);line-height:1.6;">
+        <li>Confirm FX convertibility path with the borrower (XAF &rarr; USD timeline)</li>
+        <li>Request a cash-sweep instruction on the transferable accounts</li>
+        <li>Model a short-term bridge facility against the $378K shortfall</li>
+        <li>Escalate to the Investment Committee if bridge &gt; 5% of fund NAV</li>
+      </ol>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S7: ACT — log the action -->
+<div class="scene" data-sub="The specialist logs the action taken and its outcome. Everything is recorded for audit and for the team that follows up." data-step="Act">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Act &amp; record</span></div>
+  <div class="dm-body">
+    <h2>Act &amp; record</h2>
+    <p style="font-size:12.5px;color:var(--taupe);margin:4px 0 14px;">Log what was done, by whom, and the outcome. This feeds the action log and triggers downstream monitoring.</p>
+    <div class="mock-form">
+      <div class="mf-row">
+        <label>Action</label>
+        <div class="mf-input filled">Contacted borrower CFO re: XAF convertibility; requested cash-sweep on USD account</div>
+      </div>
+      <div class="mf-row">
+        <label>Outcome</label>
+        <div class="mf-input filled">CFO confirmed FX route via BEAC; $180K arriving in 5 business days. Bridge not needed yet.</div>
+      </div>
+      <div class="mf-row">
+        <label>Owner</label>
+        <div class="mf-input filled">Amara Okonkwo</div>
+      </div>
+      <div class="mf-row" style="justify-content:flex-end;margin-top:6px;">
+        <span class="mf-btn primary">&#10003; Action logged</span>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
+<!-- S8: Confirmation -->
+<div class="scene" data-sub="The action is recorded. Result monitoring is triggered automatically. The team moves on to the next company in the queue." data-step="Processed">
+<div class="scene-inner">
+<div class="confirm-card pulse">
+  <div class="check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+  <h2>Sahel AgriCorp processed</h2>
+  <p class="cc-sub">Action result monitoring triggered &middot; logged by Amara Okonkwo &middot; today</p>
+  <p style="font-size:12px;color:var(--taupe);margin-top:10px;max-width:380px;margin-left:auto;margin-right:auto;">
+    CFO confirmed FX route via BEAC. $180K expected in 5 business days. Re-check scheduled for Jul 1. Bridge deferred.
+  </p>
+  <span class="cc-next">Next in queue: Lagos FinServe &rarr;</span>
+</div>
+</div>
+</div>
+
+<!-- S9: End -->
+<div class="scene" data-sub="That's the end-to-end workflow. Night's Watch turns raw data into ranked, actionable decisions, with every number traceable. Try the live desk now." data-step="End">
+<div class="scene-inner end-card">
+  <h1>See &middot; Understand &middot; Prioritise<br>Decide &middot; Act</h1>
+  <p style="color:var(--taupe);font-size:15px;max-width:50ch;margin:0 auto;">Every number traceable to its raw source. Every action recorded. One screen for the credit specialist.</p>
+  <div class="workflow">
+    <span>Alert</span><span class="arr">&rarr;</span>
+    <span>See</span><span class="arr">&rarr;</span>
+    <span>Understand</span><span class="arr">&rarr;</span>
+    <span>Drill down</span><span class="arr">&rarr;</span>
+    <span>Prioritise</span><span class="arr">&rarr;</span>
+    <span>Decide</span><span class="arr">&rarr;</span>
+    <span>Act</span><span class="arr">&rarr;</span>
+    <span style="background:var(--ink);color:var(--yellow);border-color:var(--ink);">Processed</span>
+  </div>
+  <a class="cta" href="product.html">Try the live Credit desk &rarr;</a>
+</div>
+</div>
+
+</div><!-- /stage -->
+
+<!-- subtitle + controls bar -->
+<div class="sub-bar">
+  <span class="sub-step" id="subStep">Start</span>
+  <span class="sub-text" id="subText">Welcome to the Night's Watch product demo. Press play to see the full end-to-end workflow.</span>
+  <div class="ctrl">
+    <button id="prevBtn" aria-label="Previous" disabled>&lsaquo; Prev</button>
+    <div class="dots" id="dots"></div>
+    <button id="nextBtn" aria-label="Next">Next &rsaquo;</button>
+    <button id="playBtn" aria-label="Play/Pause">&#9654; Play</button>
+    <button id="voiceBtn" aria-label="Toggle voice" title="Toggle voice narration">&#128266;</button>
+  </div>
+</div>
+</div><!-- /demo-wrap -->
+
+<script>
+(function(){
+  var scenes = document.querySelectorAll('.scene');
+  var N = scenes.length;
+  var cur = 0;
+  var playing = false;
+  var timer = null;
+  var voiceOn = false;
+  var DELAY = 9000; // ms per scene when auto-playing
+
+  var subStep = document.getElementById('subStep');
+  var subText = document.getElementById('subText');
+  var dots = document.getElementById('dots');
+  var playBtn = document.getElementById('playBtn');
+  var prevBtn = document.getElementById('prevBtn');
+  var nextBtn = document.getElementById('nextBtn');
+  var voiceBtn = document.getElementById('voiceBtn');
+  var playCue = document.getElementById('playCue');
+
+  // build dots
+  for (var i = 0; i < N; i++){
+    var d = document.createElement('span');
+    d.setAttribute('data-i', i);
+    d.addEventListener('click', function(){ go(parseInt(this.getAttribute('data-i'))); });
+    dots.appendChild(d);
+  }
+
+  function go(idx){
+    if (idx < 0 || idx >= N) return;
+    scenes[cur].classList.remove('active');
+    cur = idx;
+    scenes[cur].classList.add('active');
+    subStep.textContent = scenes[cur].getAttribute('data-step');
+    subText.textContent = scenes[cur].getAttribute('data-sub');
+    prevBtn.disabled = cur === 0;
+    nextBtn.disabled = cur === N - 1;
+    syncDots();
+    speak(scenes[cur].getAttribute('data-sub'));
+    if (playing) scheduleNext();
+  }
+
+  function syncDots(){
+    var ds = dots.querySelectorAll('span');
+    for (var i = 0; i < ds.length; i++){
+      ds[i].className = i < cur ? 'done' : (i === cur ? 'cur' : '');
+    }
+  }
+
+  function scheduleNext(){
+    clearTimeout(timer);
+    if (cur < N - 1){
+      timer = setTimeout(function(){ go(cur + 1); }, DELAY);
+    } else {
+      stopPlay();
+    }
+  }
+
+  function startPlay(){
+    playing = true;
+    playBtn.innerHTML = '&#10074;&#10074; Pause';
+    playBtn.classList.add('on');
+    if (cur === N - 1) go(0); // restart from beginning if at end
+    scheduleNext();
+  }
+  function stopPlay(){
+    playing = false;
+    clearTimeout(timer);
+    playBtn.innerHTML = '&#9654; Play';
+    playBtn.classList.remove('on');
+  }
+
+  playBtn.addEventListener('click', function(){ playing ? stopPlay() : startPlay(); });
+  playCue.addEventListener('click', function(){ go(1); startPlay(); });
+  prevBtn.addEventListener('click', function(){ go(cur - 1); });
+  nextBtn.addEventListener('click', function(){ go(cur + 1); });
+
+  // voice (Web Speech API)
+  function speak(text){
+    if (!voiceOn || !window.speechSynthesis) return;
+    speechSynthesis.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.rate = 0.95; u.pitch = 1; u.volume = 1;
+    // prefer an English voice
+    var voices = speechSynthesis.getVoices();
+    var eng = voices.filter(function(v){ return v.lang && v.lang.indexOf('en') === 0; });
+    if (eng.length) u.voice = eng[0];
+    speechSynthesis.speak(u);
+  }
+  voiceBtn.addEventListener('click', function(){
+    voiceOn = !voiceOn;
+    voiceBtn.classList.toggle('on', voiceOn);
+    if (voiceOn) speak(scenes[cur].getAttribute('data-sub'));
+    else if (window.speechSynthesis) speechSynthesis.cancel();
+  });
+  // preload voices
+  if (window.speechSynthesis) speechSynthesis.getVoices();
+
+  // keyboard
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'ArrowRight' || e.key === ' '){ e.preventDefault(); go(cur + 1); }
+    else if (e.key === 'ArrowLeft'){ e.preventDefault(); go(cur - 1); }
+    else if (e.key === 'p' || e.key === 'P'){ playing ? stopPlay() : startPlay(); }
+  });
+
+  syncDots();
+})();
+</script>
+</body>
+</html>
