@@ -167,6 +167,10 @@
   .ev-delta.pos { color:var(--risk-low); }
   .ev-src { display:block; font-family:var(--mono); font-size:9.5px; color:var(--taupe); margin-top:1px; }
   .ev-head { display:grid; grid-template-columns:52px 1fr 72px 14px 72px 1fr; gap:0 6px; padding:5px 10px; background:var(--sand-500); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--taupe); }
+  /* 4-column variant for recoverability / forecast evidence */
+  .ev-trail.ev-4col .ev-head,
+  .ev-trail.ev-4col .ev-row { grid-template-columns:64px 1fr 90px 1fr; }
+  .ev-trail.ev-4col .ev-head { display:grid; }
 
   /* form */
   .form-row { display:flex; gap: 10px; margin-bottom: 10px; }
@@ -1361,6 +1365,38 @@
     renderInspector(c);
   }
 
+
+  /* ---- build recoverability evidence rows from company data ---- */
+  function recovEvidence(c){
+    var ev = [], loan = c.loan || {};
+    var share = c.total_cash_usd > 0 ? c.transferable_cash_usd / c.total_cash_usd : 0;
+    ev.push({ref:"Structure",field:"Seniority",value:esc(loan.seniority||"—"),note:"recovery rank in a workout",source:"crm_loan"});
+    ev.push({ref:"Cash",field:"Transferable / total",value:usdM(c.transferable_cash_usd)+" / "+usdM(c.total_cash_usd)+" ("+pct(share)+")",note:share<0.25?"restricted — mostly non-convertible":"usable hard-currency share",source:"gold.company_snapshot"});
+    if (c.trapped_cash_usd > 0) ev.push({ref:"Cash",field:"Trapped cash",value:usdM(c.trapped_cash_usd),note:"restricted / non-convertible — never counted",source:"gold.company_snapshot"});
+    if (c.prior_issues > 0) ev.push({ref:"Track record",field:"Prior misses",value:String(c.prior_issues),note:"labelled past servicing failures",source:"gold.company_snapshot"});
+    if (c.principal_at_risk > 0) ev.push({ref:"Exposure",field:"Principal at risk",value:usd(c.principal_at_risk),note:pct(c.principal_at_risk/(loan.principal||1))+" of principal",source:"gold.company_snapshot"});
+    return ev;
+  }
+
+  /* ---- render a collapsible evidence trail (reusable) ---- */
+  function renderEvTrail(id, rows){
+    if (!rows || !rows.length) return "";
+    var h = "";
+    h += '<button class="ev-toggle" onclick="var t=document.getElementById(\''+id+'\');t.classList.toggle(\'hidden\');this.classList.toggle(\'open\')"><span class="ev-icon">&#x25B6;</span>Evidence ('+rows.length+')</button>';
+    h += '<div id="'+id+'" class="ev-trail ev-4col hidden">';
+    h += '<div class="ev-head"><span>Factor</span><span>Field</span><span>Value</span><span>Note · source</span></div>';
+    rows.forEach(function(r){
+      h += '<div class="ev-row">';
+      h += '<span class="ev-ref">'+esc(r.ref)+'</span>';
+      h += '<span class="ev-field">'+esc(r.field)+'</span>';
+      h += '<span class="ev-val after">'+r.value+'</span>';
+      h += '<span class="ev-delta">'+esc(r.note)+'<span class="ev-src">'+esc(r.source)+'</span></span>';
+      h += '</div>';
+    });
+    h += '</div>';
+    return h;
+  }
+
   function renderInspector(c){
     var cm = covMeta(c.coverage);
     var loan = c.loan;
@@ -1440,6 +1476,18 @@
         prose2 += 'Based on these factors, recoverability is '+tip('recoverability-first-pass',recovPill(fp.label))+' \u2014 conservatively '+tip('savable-money-first-pass','<b>'+usd(fp.savable)+'</b>')+' of '+usd(c.principal_at_risk)+' at risk is savable.';
       }
       html += '<div class="cov-note">'+prose2+'</div>';
+      /* why — concise driver */
+      if (fp.label !== 'N/A' && (c.principal_at_risk||0) > 0){
+        var why2 = '';
+        var share = c.total_cash_usd > 0 ? c.transferable_cash_usd / c.total_cash_usd : 0;
+        if (share < 0.10) why2 += 'Only '+pct(share)+' of cash is convertible \u2014 the bulk ('+usdM(c.trapped_cash_usd)+') is trapped in restricted accounts. ';
+        else if (share < 0.50) why2 += pct(share)+' of cash is transferable; '+usdM(c.trapped_cash_usd)+' remains restricted. ';
+        if (c.deteriorating) why2 += 'Coverage trend is worsening, which compresses the recovery window. ';
+        why2 += 'Recovery depends on whether the '+usdM(c.trapped_cash_usd)+' trapped position can be unlocked or bridged before T1.';
+        html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">'+why2+'</div>';
+      }
+      /* evidence trail */
+      html += renderEvTrail('rev-'+c.company_id, recovEvidence(c));
       html += '<div style="font-size:11.5px;color:var(--taupe);margin-top:8px;">First-pass read (loan structure + cash convertibility). <b>Medium</b> sharpens with balance sheet &amp; cashflow.</div>';
       html += '</div>';
     }
@@ -1456,7 +1504,10 @@
       if (r.savable_usd > 0) prose2m += 'Conservatively, '+tip('savable-money-sharpened','<b>'+usd(r.savable_usd)+'</b>')+' of '+usd(c.principal_at_risk||0)+' at risk is recoverable.';
       else prose2m += 'No material recovery expected.';
       html += '<div class="cov-note">'+prose2m+'</div>';
-      html += '<div class="ph-read">'+esc(r.read)+'</div>';
+      /* why — the analyst read */
+      html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">'+esc(r.read)+'</div>';
+      /* evidence trail */
+      html += renderEvTrail('rev-m-'+c.company_id, recovEvidence(c));
       html += '</div>';
     }
 
@@ -1473,10 +1524,19 @@
       else prose2l += 'No breach expected. ';
       prose2l += 'Best case '+f.coverage_t1_best.toFixed(2)+' if FX frees. <b>Size the bridge against worst case.</b>';
       html += '<div class="cov-note">'+prose2l+'</div>';
+      /* why — drivers */
+      html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">Drivers: '+esc(f.drivers)+'. '+esc(f.read)+'</div>';
       html += '<div class="rng">'+rangeBar(f) +
         '<div class="rng-cap">Range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1.</div>' +
       '</div>';
-      html += '<div class="ph-read">Drivers: '+esc(f.drivers)+'.</div>';
+      /* forecast evidence trail */
+      var fev = [];
+      fev.push({ref:"Spot",field:"Coverage now",value:c.coverage.toFixed(2),note:c.coverage<1.0?"below 1.0 — already short":"above 1.0",source:"gold.company_snapshot"});
+      fev.push({ref:"Base",field:"Modelled @ T1",value:f.coverage_t1.toFixed(2),note:"base scenario",source:"gold.forecast"});
+      fev.push({ref:"Worst",field:"Worst case @ T1",value:f.coverage_t1_worst.toFixed(2),note:"FX blocked + rate spike",source:"gold.forecast"});
+      fev.push({ref:"Best",field:"Best case @ T1",value:f.coverage_t1_best.toFixed(2),note:"FX frees",source:"gold.forecast"});
+      if (f.lead_days > 0) fev.push({ref:"Lead",field:"Days to breach",value:String(f.lead_days),note:"warning window",source:"gold.forecast"});
+      html += renderEvTrail('fev-'+c.company_id, fev);
       html += '</div>';
     }
 
