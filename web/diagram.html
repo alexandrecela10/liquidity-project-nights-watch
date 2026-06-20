@@ -163,12 +163,52 @@
   .dg-metric .conf b { color: var(--ink-700); }
   .dg-metric.mhl { box-shadow: 0 0 0 2px var(--yellow), var(--shadow); }
 
-  .dg-foot { color: var(--taupe); font-size: 12px; padding: 8px 0 46px; }
+  .dg-foot { color: var(--taupe); font-size: 12px; padding: 8px 0 16px; }
   .dg-foot code { font-family: var(--mono); }
+
+  /* ---- worked example section ---- */
+  .dg-ex { border-top: 2px solid var(--sand-500); padding: 36px 0 52px; margin-top: 8px; }
+  .dg-ex h2 { font-size: 24px; line-height: 1.15; }
+  .dg-ex .dg-ex-sub { color: var(--taupe); font-size: 14px; margin: 8px 0 0; max-width: 68ch; }
+  .dg-ex-flow { display: flex; flex-direction: column; gap: 28px; margin-top: 26px; }
+  .dg-ex-stage { position: relative; }
+  .dg-ex-stage h3 { font-size: 14px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; color: var(--taupe); margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+  .dg-ex-stage h3 .num { width: 24px; height: 24px; flex: 0 0 24px; border-radius: 50%; background: var(--ink); color: var(--yellow); font-family: var(--mono); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .dg-ex-files { display: flex; gap: 14px; flex-wrap: wrap; }
+  .dg-ex-file { flex: 1 1 300px; min-width: 280px; max-width: 420px; background: var(--white); border: 1px solid var(--sand-500); border-radius: var(--radius-sm); box-shadow: var(--shadow); overflow: hidden; }
+  .dg-ex-file-head { padding: 10px 14px; background: var(--sand-500); display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .dg-ex-file-head .fname { font-family: var(--mono); font-size: 12px; font-weight: 600; color: var(--ink); }
+  .dg-ex-file-head .fmeta { font-size: 10.5px; color: var(--taupe); }
+  .dg-ex-tbl { width: 100%; border-collapse: collapse; font-size: 11.5px; }
+  .dg-ex-tbl th { background: var(--sand-500); color: var(--taupe); font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: .04em; padding: 5px 8px; text-align: left; white-space: nowrap; border-bottom: 1px solid var(--sand-700); }
+  .dg-ex-tbl td { padding: 5px 8px; border-bottom: 1px solid var(--sand-500); font-family: var(--mono); font-size: 11px; color: var(--ink-700); white-space: nowrap; }
+  .dg-ex-tbl td.note-cell { font-family: var(--font); font-style: italic; color: var(--taupe); font-size: 10.5px; white-space: normal; }
+  .dg-ex-tbl tr:last-child td { border-bottom: none; }
+  .dg-ex-file .sample { padding: 8px 14px; font-size: 11px; color: var(--taupe); line-height: 1.4; border-top: 1px dashed var(--sand-500); }
+  .dg-ex-arrow { text-align: center; font-size: 22px; color: var(--sand-700); padding: 6px 0; }
+  .dg-ex-steps { display: flex; flex-wrap: wrap; gap: 10px; }
+  .dg-ex-step { flex: 1 1 220px; min-width: 200px; max-width: 350px; background: var(--white); border: 1px solid var(--sand-500); border-left: 3px solid var(--ink); border-radius: var(--radius-sm); padding: 10px 12px; box-shadow: var(--shadow); }
+  .dg-ex-step.key { border-left-color: var(--yellow); box-shadow: 0 0 0 1px var(--yellow), var(--shadow); }
+  .dg-ex-step .sn { font-weight: 700; font-size: 12.5px; }
+  .dg-ex-step .sr { font-family: var(--mono); font-size: 10.5px; color: var(--ink-700); margin-top: 5px; }
+  .dg-ex-step .sw { font-size: 10.5px; color: var(--taupe); margin-top: 4px; line-height: 1.4; }
+  .dg-ex-gold { background: var(--ink); border-radius: var(--radius); overflow: hidden; box-shadow: var(--shadow-lg); }
+  .dg-ex-gold-head { padding: 14px 18px; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .dg-ex-gold-head .gname { font-weight: 700; font-size: 16px; color: var(--white); }
+  .dg-ex-gold-head .gpill { font-size: 10px; font-weight: 700; padding: 2px 10px; border-radius: 999px; background: var(--yellow); color: var(--ink); }
+  .dg-ex-gold-head .gsub { font-size: 12px; color: var(--sand-700); }
+  .dg-ex-gold .dg-ex-tbl th { background: rgba(253,245,240,.08); color: var(--sand-700); border-bottom-color: rgba(253,245,240,.12); }
+  .dg-ex-gold .dg-ex-tbl td { color: var(--sand); border-bottom-color: rgba(253,245,240,.08); }
+  .dg-ex-gold .dg-ex-tbl td.note-cell { color: var(--sand-700); }
+  .dg-ex-gold .dg-ex-tbl td.val { font-weight: 600; }
+  .dg-ex-gold .dg-ex-tbl tr.hl-row td { background: rgba(255,222,67,.12); }
+  .dg-ex-lineage { background: var(--white); border: 1px solid var(--sand-500); border-radius: var(--radius-sm); box-shadow: var(--shadow); overflow-x: auto; }
+  .dg-ex-lineage .dg-ex-tbl td.src { color: var(--ink); font-weight: 600; font-family: var(--font); }
 
   @media (max-width: 900px) {
     .dg-controls { top: 0; }
     .dg-head h1 { font-size: 25px; }
+    .dg-ex h2 { font-size: 20px; }
   }
 </style>
 </head>
@@ -224,6 +264,8 @@
   </div>
 
   <p class="dg-foot" id="dg-foot"></p>
+
+  <section class="dg-ex" id="dg-example"></section>
 </div>
 
 <script>
@@ -584,6 +626,243 @@
     // ---- initial paint ----
     applyDetail();
     recompute();
+
+    // ---- worked example section ----
+    buildWorkedExample(SPEC);
+  }
+
+  function buildWorkedExample(SPEC){
+    var ex = document.getElementById('dg-example');
+    if(!ex) return;
+    var co = SPEC.portfolio && SPEC.portfolio.filter(function(c){ return c.is_worked_example; })[0];
+    if(!co) return;
+    var lc = SPEC.lifecycle || {};
+    var ev = (SPEC.evidence && SPEC.evidence.files) || [];
+    var goldEnt = SPEC.entities.filter(function(e){ return e.golden; })[0];
+
+    function h(tag, cls, txt){ var e = document.createElement(tag); if(cls) e.className = cls; if(txt != null) e.textContent = txt; return e; }
+    function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+    function fmt(n){ if(n == null) return '—'; if(typeof n === 'number') return n >= 1000 ? '$' + n.toLocaleString('en-US') : String(n); return String(n); }
+
+    // Title
+    ex.appendChild(h('h2', null, 'Worked example: How a golden row is built'));
+    ex.appendChild(h('p', 'dg-ex-sub', co.name + ' (' + co.company_id + ') — tracing one CompanySnapshot row back through standardisation to 3 raw source files.'));
+
+    var flow = h('div', 'dg-ex-flow');
+
+    // ========== STAGE 1: RAW SOURCE FILES ==========
+    var s1 = h('div', 'dg-ex-stage');
+    var h3a = h('h3'); h3a.appendChild(h('span','num','1')); h3a.appendChild(document.createTextNode('Raw source files (Bronze)')); s1.appendChild(h3a);
+    var files = h('div', 'dg-ex-files');
+
+    // Bank balance file
+    var bankFile = ev.filter(function(f){ return f.id === 'f_bank'; })[0];
+    var bankInput = SPEC.inputs.filter(function(i){ return i.id === 'bank_balance'; })[0];
+    if(bankFile && bankInput){
+      var fc1 = buildFileCard(bankFile, bankInput.example_columns, [
+        ['ACC-E144BBED', 'USD', '120,500', '$120,500', 'FI-7B923A', 'Kenya', '2026-07-08'],
+        ['(null)', 'NGN', '1,200,000', '$2,800', 'FI-2C7313E6', 'Nigeria', '2026-07-08'],
+        ['ACC-EA354EF2', 'EUR', '0', '$0', 'FI-EA354EF2', 'France', '2026-07-08']
+      ], [
+        '',
+        'null ID — NBFI rule will synthesize account_key',
+        'EUR operating account swept to $0 — triggers the alert'
+      ]);
+      files.appendChild(fc1);
+    }
+
+    // CRM loan file
+    var crmFile = ev.filter(function(f){ return f.id === 'f_crm'; })[0];
+    var crmInput = SPEC.inputs.filter(function(i){ return i.id === 'crm_loan'; })[0];
+    if(crmFile && crmInput){
+      var crmCols = ['loan_ref','company','principal','seniority','coupon','cash/pik','next_pay_date'];
+      var fc2 = buildFileCard(crmFile, crmCols, [
+        [co.loan.loan_id, co.name, fmt(co.loan.principal), co.loan.seniority, (co.loan.coupon_rate*100)+'%', co.loan.cash_vs_pik, co.loan.next_payment_date]
+      ], ['']);
+      files.appendChild(fc2);
+    }
+
+    // Payment schedule file
+    var payFile = ev.filter(function(f){ return f.id === 'f_pay'; })[0];
+    var payInput = SPEC.inputs.filter(function(i){ return i.id === 'payment_schedule'; })[0];
+    if(payFile && payInput){
+      var fc3 = buildFileCard(payFile, payInput.example_columns, [
+        [co.loan.loan_id, co.loan.next_payment_date, fmt(co.loan.cash_to_repay_t1), 'false']
+      ], ['$700K cash coupon due at T1']);
+      files.appendChild(fc3);
+    }
+    s1.appendChild(files);
+    flow.appendChild(s1);
+
+    flow.appendChild(h('div', 'dg-ex-arrow', '↓'));
+
+    // ========== STAGE 2: KEY STANDARDISATION ==========
+    var s2 = h('div', 'dg-ex-stage');
+    var h3b = h('h3'); h3b.appendChild(h('span','num','2')); h3b.appendChild(document.createTextNode('Key standardisation transforms')); s2.appendChild(h3b);
+    var steps = h('div', 'dg-ex-steps');
+    var keySteps = [2, 4, 5, 7];
+    SPEC.standardisation.forEach(function(st){
+      if(keySteps.indexOf(st.step) === -1) return;
+      var card = h('div', 'dg-ex-step' + (st.step <= 5 ? ' key' : ''));
+      card.appendChild(h('div', 'sn', 'Step ' + st.step + ': ' + st.name));
+      card.appendChild(h('div', 'sr', st.from + ' → ' + st.to));
+      if(st.example) card.appendChild(h('div', 'sw', st.example));
+      else card.appendChild(h('div', 'sw', st.rule));
+      steps.appendChild(card);
+    });
+    s2.appendChild(steps);
+    flow.appendChild(s2);
+
+    flow.appendChild(h('div', 'dg-ex-arrow', '↓'));
+
+    // ========== STAGE 3: GOLDEN TABLE ROW ==========
+    var s3 = h('div', 'dg-ex-stage');
+    var h3c = h('h3'); h3c.appendChild(h('span','num','3')); h3c.appendChild(document.createTextNode('The golden row: gold.CompanySnapshot')); s3.appendChild(h3c);
+
+    var goldCard = h('div', 'dg-ex-gold');
+    var gHead = h('div', 'dg-ex-gold-head');
+    gHead.appendChild(h('span', 'gname', 'CompanySnapshot'));
+    gHead.appendChild(h('span', 'gpill', 'golden'));
+    gHead.appendChild(h('span', 'gsub', co.name + ' · ' + (lc.after ? lc.after.refresh_ts : 'latest refresh')));
+    goldCard.appendChild(gHead);
+
+    // Build golden field value map from portfolio + lifecycle
+    var after = lc.after || {};
+    var vals = {
+      company_id: co.company_id,
+      refresh_ts: after.refresh_ts || '—',
+      total_cash_usd: after.total_cash_usd || co.total_cash_usd,
+      transferable_cash_usd: after.transferable_cash_usd != null ? after.transferable_cash_usd : co.transferable_cash_usd,
+      trapped_cash_usd: after.trapped_cash_usd != null ? after.trapped_cash_usd : co.trapped_cash_usd,
+      burn_per_day_usd: co.runway_days > 0 ? Math.round((after.transferable_cash_usd || co.transferable_cash_usd) / co.runway_days) : '—',
+      runway_days: co.runway_days,
+      projected_transferable_t1: Math.round((after.coverage_ratio || co.coverage) * co.loan.cash_to_repay_t1),
+      cash_to_repay_t1: co.loan.cash_to_repay_t1,
+      next_payment_date: co.loan.next_payment_date,
+      coverage_ratio: after.coverage_ratio || co.coverage,
+      deteriorating: co.deteriorating,
+      prior_issue_count: co.prior_issues,
+      principal_at_risk: co.principal_at_risk,
+      ew_label: after.ew_label || co.label,
+      data_freshness_days: co.data_freshness_days
+    };
+
+
+    var gtbl = document.createElement('table');
+    gtbl.className = 'dg-ex-tbl';
+    var thead = h('thead');
+    var thr = h('tr');
+    ['Field','Value','Metric','Source'].forEach(function(c){ thr.appendChild(h('th', null, c)); });
+    thead.appendChild(thr); gtbl.appendChild(thead);
+    var tbody = document.createElement('tbody');
+
+    // Lineage info per field
+    var lineage = {
+      company_id: { src: 'crm_loan', via: 'Step 7: Resolve company' },
+      refresh_ts: { src: 'system', via: 'Ingestion timestamp' },
+      total_cash_usd: { src: 'bank_balance', via: 'Steps 2→4: resolve ID + re-derive USD' },
+      transferable_cash_usd: { src: 'bank_balance + ref.convertibility', via: 'Steps 4→5: re-derive USD + tag convertibility' },
+      trapped_cash_usd: { src: 'bank_balance + ref.convertibility', via: 'Steps 4→5: re-derive USD + tag convertibility' },
+      burn_per_day_usd: { src: 'bank_balance (snapshot history)', via: 'Steps 2→5: across snapshots' },
+      runway_days: { src: 'bank_balance (snapshot history)', via: 'Derived: transferable_cash / burn_per_day' },
+      projected_transferable_t1: { src: 'bank_balance + crm_loan', via: 'Trend → next_payment_date' },
+      cash_to_repay_t1: { src: 'crm_loan + payment_schedule', via: 'Step 1: parse; cash (not PIK)' },
+      next_payment_date: { src: 'crm_loan', via: 'Step 1: parse' },
+      coverage_ratio: { src: 'all three + ref', via: 'projected_transferable_t1 / cash_to_repay_t1' },
+      deteriorating: { src: 'bank_balance (snapshot history)', via: 'Sign of coverage delta' },
+      prior_issue_count: { src: 'missed_payment', via: 'Step 1: parse; count labels' },
+      principal_at_risk: { src: 'crm_loan', via: 'Step 1: outstanding principal' },
+      ew_label: { src: 'derived', via: 'Coverage thresholds → High|Medium|Low|None' },
+      data_freshness_days: { src: 'bank_balance', via: 'Step 6: now − last_updated' }
+    };
+
+    if(goldEnt){
+      goldEnt.fields.forEach(function(f){
+        var tr = document.createElement('tr');
+        var mid = f.metric || '';
+        if(mid) tr.className = 'hl-row';
+        var v = vals[f.name];
+        var vStr = (typeof v === 'boolean') ? String(v) : fmt(v);
+        tr.appendChild(td(f.name + (f.note ? '  (' + f.note + ')' : ''), 'fn'));
+        tr.appendChild(td(vStr, 'val'));
+        tr.appendChild(td(mid, mid ? 'val' : ''));
+        var lin = lineage[f.name];
+        tr.appendChild(td(lin ? lin.src + ' — ' + lin.via : '', 'note-cell'));
+        tbody.appendChild(tr);
+      });
+    }
+    gtbl.appendChild(tbody);
+    goldCard.appendChild(gtbl);
+    s3.appendChild(goldCard);
+    flow.appendChild(s3);
+
+    flow.appendChild(h('div', 'dg-ex-arrow', '↓'));
+
+    // ========== STAGE 4: LINEAGE MAP ==========
+    var s4 = h('div', 'dg-ex-stage');
+    var h3d = h('h3'); h3d.appendChild(h('span','num','4')); h3d.appendChild(document.createTextNode('Field-level lineage: every gold number drills to its raw rows')); s4.appendChild(h3d);
+
+    var linCard = h('div', 'dg-ex-lineage');
+    var ltbl = document.createElement('table'); ltbl.className = 'dg-ex-tbl';
+    var lth = h('thead'); var lthr = h('tr');
+    ['Gold field','Metric','Value','Raw source table(s)','Standardisation path','How'].forEach(function(c){ lthr.appendChild(h('th',null,c)); });
+    lth.appendChild(lthr); ltbl.appendChild(lth);
+    var ltb = document.createElement('tbody');
+
+    var linRows = [
+      { field:'transferable_cash_usd', metric:'M1', val: vals.transferable_cash_usd, src:'bank_balance_raw', path:'Steps 2→4→5→7', how:'Sum USD balances with convertibility = transferable (hard ccy only)' },
+      { field:'burn_per_day_usd', metric:'M2', val: vals.burn_per_day_usd, src:'bank_balance_raw', path:'Steps 2→4→5', how:'Delta of transferable_cash across stored snapshots / days elapsed' },
+      { field:'runway_days', metric:'M2', val: vals.runway_days, src:'bank_balance_raw', path:'Derived', how:'transferable_cash_usd / burn_per_day_usd' },
+      { field:'projected_transferable_t1', metric:'M3', val: vals.projected_transferable_t1, src:'bank_balance_raw + crm_loan_raw', path:'Steps 2→4→5→7 + Step 1', how:'Project M2 trend forward to next_payment_date' },
+      { field:'cash_to_repay_t1', metric:'', val: vals.cash_to_repay_t1, src:'crm_loan_raw + payment_schedule_raw', path:'Step 1 parse', how:'Read scheduled payment amount (cash, not PIK)' },
+      { field:'coverage_ratio', metric:'signal', val: vals.coverage_ratio, src:'all three + ref tables', path:'All steps', how:'projected_transferable_t1 / cash_to_repay_t1' },
+      { field:'next_payment_date', metric:'', val: vals.next_payment_date, src:'crm_loan_raw', path:'Step 1 parse', how:'Read from CRM loan record' },
+      { field:'prior_issue_count', metric:'', val: vals.prior_issue_count, src:'missed_payment_raw', path:'Step 1 parse', how:'Count labelled past missed-payment events' },
+      { field:'principal_at_risk', metric:'', val: vals.principal_at_risk, src:'crm_loan_raw', path:'Step 1 parse', how:'Outstanding principal on the loan' },
+      { field:'ew_label', metric:'', val: vals.ew_label, src:'derived from coverage', path:'Thresholds', how:'Coverage < 1.0 → High; near 1.0 → Medium; > 1.0 → Low' }
+    ];
+
+    linRows.forEach(function(r){
+      var tr = document.createElement('tr');
+      tr.appendChild(td(r.field, 'fn'));
+      tr.appendChild(td(r.metric, r.metric ? 'val' : ''));
+      tr.appendChild(td(fmt(r.val), 'val'));
+      tr.appendChild(td(r.src, 'src'));
+      tr.appendChild(td(r.path, ''));
+      tr.appendChild(td(r.how, 'note-cell'));
+      ltb.appendChild(tr);
+    });
+    ltbl.appendChild(ltb); linCard.appendChild(ltbl);
+    s4.appendChild(linCard);
+    flow.appendChild(s4);
+
+    ex.appendChild(flow);
+
+    function td(txt, cls){ var d = h('td', cls || null, txt); return d; }
+
+    function buildFileCard(file, cols, rows, notes){
+      var card = h('div', 'dg-ex-file');
+      var head = h('div', 'dg-ex-file-head');
+      head.appendChild(h('span', 'fname', file.file));
+      head.appendChild(h('span', 'fmeta', file.rows + ' rows · ' + file.grain));
+      card.appendChild(head);
+      var tbl = document.createElement('table'); tbl.className = 'dg-ex-tbl';
+      var thead = h('thead'); var thr = h('tr');
+      cols.forEach(function(c){ thr.appendChild(h('th', null, c)); });
+      if(notes && notes[0] !== undefined) thr.appendChild(h('th', null, ''));
+      thead.appendChild(thr); tbl.appendChild(thead);
+      var tbody = document.createElement('tbody');
+      rows.forEach(function(row, i){
+        var tr = document.createElement('tr');
+        row.forEach(function(cell){ tr.appendChild(td(cell)); });
+        if(notes && notes[i]) tr.appendChild(td(notes[i], 'note-cell'));
+        else if(notes) tr.appendChild(td('', 'note-cell'));
+        tbody.appendChild(tr);
+      });
+      tbl.appendChild(tbody); card.appendChild(tbl);
+      card.appendChild(h('div', 'sample', file.sample));
+      return card;
+    }
   }
 </script>
 </body>
