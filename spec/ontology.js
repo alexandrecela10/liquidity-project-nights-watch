@@ -831,7 +831,7 @@ window.NW_SPEC = {
         "label": "Partial",
         "score": 0.55,
         "savable_usd": 3300000,
-        "read": "Senior secured and the cash is trapped, not gone — recoverable if EUR convertibility or a bridge is restored before T1. A sweep problem, not insolvency."
+        "read": "Input: Senior secured loan, $9.31M total cash / $324K transferable, EUR account swept to $0 (FX-blocked). Output: Partial — $3.3M recoverable if FX conversion clears or a bridge is arranged before T1."
       },
       "forecast": {
         "coverage_t1": 0.41,
@@ -840,7 +840,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "breached",
         "drivers": "EUR sweep · 12% cash coupon",
-        "read": "FX unresolved — modelled cash at T1 stays ~0.41; the secured workout path is the lever."
+        "read": "Input: EUR sweep unresolved + 12% cash coupon schedule. Output: modelled coverage 0.41 at T1 (worst 0.18, best 0.60 if FX frees). Bridge must be sized against worst case."
       },
       "principal_at_risk": 6000000,
       "contact": {
@@ -851,7 +851,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P1",
         "title": "Roll up sleeves — protect the coupon",
-        "why": "Largest exposure; the shortfall is an FX/sweep problem that is still fixable before T1.",
+        "why": "Input: $6M principal, coverage 0.46, EUR account swept $471K→$0. Output: P1 — $378K shortfall caused by FX sweep; fixable before T1 if conversion route is confirmed.",
         "steps": [
           "Call treasurer: why did the EUR operating account drop to zero?",
           "Arrange FX conversion or a short bridge to fund the $700K due",
@@ -921,7 +921,7 @@ window.NW_SPEC = {
         "label": "Weak",
         "score": 0.3,
         "savable_usd": 960000,
-        "read": "Two prior misses plus restricted NGN — a structural convertibility gap, so only a fraction of the exposure looks recoverable."
+        "read": "Input: 2 prior missed payments, $4.2M total / $510K transferable, NGN classified restricted (IMF AREAER). Output: Weak — $960K recoverable. Convertibility block is persistent; $3.69M trapped cannot service hard-currency debt."
       },
       "forecast": {
         "coverage_t1": 0.63,
@@ -930,7 +930,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "breached",
         "drivers": "NGN restriction · 14% floating coupon",
-        "read": "Convertibility gap widens at T1 and the floating coupon adds pressure — modelled ~0.63."
+        "read": "Input: NGN restriction persists + 14% floating coupon accruing. Output: modelled coverage 0.63 at T1 (worst 0.40). Convertibility gap widens as coupon accrues."
       },
       "principal_at_risk": 3200000,
       "contact": {
@@ -941,7 +941,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P1",
         "title": "Roll up sleeves — confirm NGN convertibility",
-        "why": "Two prior misses + high principal; NGN is restricted so the headline cash overstates capacity.",
+        "why": "Input: $3.2M principal, coverage 0.71, 2 prior misses, NGN restricted. Output: P1 — headline $4.2M cash overstates capacity; only $510K is actually transferable.",
         "steps": [
           "Confirm how much NGN can actually be converted this week",
           "Request a cash bridge from the sponsor",
@@ -1010,7 +1010,7 @@ window.NW_SPEC = {
         "label": "Partial",
         "score": 0.6,
         "savable_usd": 1320000,
-        "read": "At the line on a large secured balance; a 13-week cashflow will confirm whether the gap is timing or structural."
+        "read": "Input: Senior secured, $5.1M total / $880K transferable, coverage 0.98 (from 1.12), trend deteriorating. Output: Partial — $1.32M recoverable. Gap is $20K on $900K due; 13-week cashflow confirms trajectory."
       },
       "forecast": {
         "coverage_t1": 0.92,
@@ -1019,7 +1019,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "breached",
         "drivers": "energy input cost · receivables timing",
-        "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in — prepare workout options now."
+        "read": "Input: energy cost projections + receivables schedule. Output: modelled coverage 0.92 at T1 (worst 0.70). Energy costs push below 1.0; workout options needed before T1."
       },
       "principal_at_risk": 2200000,
       "contact": {
@@ -1030,7 +1030,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P2",
         "title": "Structured workout prep",
-        "why": "Coverage hovering at 1.0 on a large balance; trend is down.",
+        "why": "Input: $4.5M principal, coverage 0.98 (from 1.12), trend deteriorating. Output: P2 — coverage crossed below 1.0 on a large secured balance; trend confirms not a one-off.",
         "steps": [
           "Request a 13-week cashflow",
           "Review covenants",
@@ -1099,7 +1099,7 @@ window.NW_SPEC = {
         "label": "Strong",
         "score": 0.78,
         "savable_usd": 700000,
-        "read": "A receivables-timing wobble, not a structural hole — collections are expected to close most of the gap."
+        "read": "Input: $1.5M total / $420K transferable, receivables pending $180K (up 89%), coverage 1.05 (from 1.15). Output: Strong — $700K recoverable. Gap maps to receivables in transit; expected collections close most of it within the payment window."
       },
       "forecast": {
         "coverage_t1": 0.97,
@@ -1108,7 +1108,7 @@ window.NW_SPEC = {
         "lead_days": 18,
         "status": "pre-breach",
         "drivers": "receivables timing slips",
-        "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip — ~18 days of lead time to act."
+        "read": "Input: receivables timing slips (pending $180K, up 89%). Output: modelled coverage 0.97 at T1 (worst 0.82). Spot 1.05 appears safe but collections timing creates an 18-day window to act."
       },
       "principal_at_risk": 900000,
       "contact": {
@@ -1119,7 +1119,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P2",
         "title": "Structured — tighten reporting",
-        "why": "Coverage thinning; receivables timing is the swing factor.",
+        "why": "Input: $1.8M principal, coverage 1.05 (from 1.15), receivables pending +89%. Output: P2 — coverage thinning toward 1.0; receivables collection timing is the swing factor.",
         "steps": [
           "Confirm receivables collection timing",
           "Move to weekly cash reporting"
@@ -1179,7 +1179,7 @@ window.NW_SPEC = {
         "label": "Strong",
         "score": 0.88,
         "savable_usd": 158000,
-        "read": "Comfortable coverage on a small exposure with healthy operations."
+        "read": "Input: coverage 1.30, $900K total / $260K transferable, trend stable, 0 prior misses. Output: Strong — $158K at risk on a $900K principal. Coverage well above threshold; no structural risk factors."
       },
       "forecast": {
         "coverage_t1": 1.24,
@@ -1188,7 +1188,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "clear",
         "drivers": "stable",
-        "read": "Holds above the high-risk line through T1."
+        "read": "Input: stable trend, no FX or operational stress. Output: modelled coverage 1.24 at T1 (worst 1.05). Holds above the high-risk threshold through T1."
       },
       "principal_at_risk": 180000,
       "contact": {
@@ -1199,7 +1199,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P3",
         "title": "Lightweight nudge",
-        "why": "Comfortable but small; cheap to keep an eye on.",
+        "why": "Input: $900K principal, coverage 1.30, stable trend. Output: P3 — small exposure, comfortable coverage; standard monitoring cadence.",
         "steps": [
           "Email CFO for an updated forecast"
         ],
@@ -1250,7 +1250,7 @@ window.NW_SPEC = {
         "label": "Strong",
         "score": 0.92,
         "savable_usd": 0,
-        "read": "Healthy coverage; no principal currently at risk."
+        "read": "Input: coverage 2.10, $700K total / $300K transferable, $0 principal at risk. Output: Strong — fully covered; no intervention needed."
       },
       "forecast": {
         "coverage_t1": 2.0,
@@ -1259,7 +1259,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "clear",
         "drivers": "stable",
-        "read": "Comfortable through T1."
+        "read": "Input: stable trend, no stress factors. Output: modelled coverage 2.00 at T1 (worst 1.70). Fully covered through T1."
       },
       "principal_at_risk": 0,
       "contact": {
@@ -1270,7 +1270,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P3",
         "title": "Standard monitoring",
-        "why": "Healthy coverage, low principal.",
+        "why": "Input: $600K principal, coverage 2.10, $0 at risk. Output: P3 — fully covered; monthly check-in only.",
         "steps": [
           "Monthly check-in only"
         ],
@@ -1321,7 +1321,7 @@ window.NW_SPEC = {
         "label": "Strong",
         "score": 0.95,
         "savable_usd": 0,
-        "read": "Next payment is PIK — no cash due, so there is nothing to recover."
+        "read": "Input: payment type PIK, cash_to_repay_t1 = $0. Output: Strong — no cash leaves the borrower at T1; nothing to recover."
       },
       "forecast": {
         "coverage_t1": 2.9,
@@ -1330,7 +1330,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "clear",
         "drivers": "PIK · no cash due",
-        "read": "No cash leaves the borrower at T1."
+        "read": "Input: PIK payment type, no cash due. Output: modelled coverage 2.90 at T1. No cash servicing required."
       },
       "principal_at_risk": 0,
       "contact": {
@@ -1341,7 +1341,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P4",
         "title": "Handle leanly",
-        "why": "Next payment is PIK — no cash due. Automated monitoring is enough.",
+        "why": "Input: PIK loan, $0 cash due at T1, coverage 3.00. Output: P4 — no servicing risk; automated monitoring only.",
         "steps": [
           "Automated monitoring only"
         ],
@@ -1392,7 +1392,7 @@ window.NW_SPEC = {
         "label": "Strong",
         "score": 0.96,
         "savable_usd": 0,
-        "read": "Strong coverage, mostly hard-currency cash."
+        "read": "Input: coverage 4.20, $2M total / $1.5M transferable (75% hard-currency), $0 principal at risk. Output: Strong — fully covered in transferable cash; no intervention needed."
       },
       "forecast": {
         "coverage_t1": 4.1,
@@ -1401,7 +1401,7 @@ window.NW_SPEC = {
         "lead_days": 0,
         "status": "clear",
         "drivers": "stable",
-        "read": "Comfortable; mostly hard-currency cash."
+        "read": "Input: stable trend, 75% hard-currency position. Output: modelled coverage 4.10 at T1 (worst 3.70). Highest in portfolio; fully covered."
       },
       "principal_at_risk": 0,
       "contact": {
@@ -1412,7 +1412,7 @@ window.NW_SPEC = {
       "action": {
         "priority": "P4",
         "title": "Handle leanly",
-        "why": "Strong coverage, mostly hard-currency cash.",
+        "why": "Input: $2M principal, coverage 4.20, 75% hard-currency. Output: P4 — highest coverage in portfolio; automated monitoring only.",
         "steps": [
           "Automated monitoring only"
         ],
@@ -2324,13 +2324,13 @@ window.NW_SPEC = {
       "recoverability-enhanced": {
         "label": "Recoverability (financials-enhanced)",
         "horizon": "Medium",
-        "formula": "first-pass adjusted by net leverage, current/quick ratio and burn quality → separates a timing wobble from a structural hole",
+        "formula": "first-pass adjusted by net leverage, current/quick ratio and burn quality → confirms whether the shortfall is fundable within the payment window",
         "as_at": "2026-06-30",
         "files": [
           "f_bs",
           "f_cfs"
         ],
-        "note": "Adds leverage/liquidity + burn quality to confirm timing vs structural."
+        "note": "Adds leverage/liquidity + burn quality to confirm whether shortfall is fundable before T1."
       },
       "savable-money-sharpened": {
         "label": "Savable money (sharpened)",
@@ -2600,7 +2600,7 @@ window.NW_SPEC = {
       "source": "Balance sheet + cashflow statements",
       "availability": "Medium",
       "phase": "Medium",
-      "method": "Add leverage, liquidity and burn quality to separate a timing wobble from a structural hole; firms up savable money and the P1–P4 grade.",
+      "method": "Input: balance sheet + cashflow (leverage, liquidity, burn quality). Output: confirms whether trapped cash is backed by receivables (gap fundable) or structurally inaccessible (requires intervention); firms up savable money and P1–P4 grade.",
       "confidence": "4/5",
       "difficulty": "Medium",
       "evidence": {
@@ -2609,7 +2609,7 @@ window.NW_SPEC = {
           "f_bs",
           "f_cfs"
         ],
-        "sample": "Balance-sheet leverage + cashflow burn quality confirm whether the gap is timing or structural."
+        "sample": "Input: balance-sheet leverage + cashflow burn quality. Output: confirms whether the shortfall is fundable within the payment window or requires intervention."
       }
     },
     {
@@ -2683,7 +2683,7 @@ window.NW_SPEC = {
         "Balance sheet",
         "Cashflow statements"
       ],
-      "summary": "Sharpen recoverability with balance sheet + cashflow (leverage, liquidity, burn quality) — confirm who can actually repay, tell a timing wobble apart from a structural hole, and firm up the provisional P1–P4 grade."
+      "summary": "Input: balance sheet + cashflow (leverage, liquidity, burn quality). Output: confirms whether trapped cash is backed by receivables (gap fundable within payment window) or is structurally inaccessible (requires bridge/intervention). Firms up the provisional P1–P4 grade."
     },
     "Later": {
       "title": "Forecasting + external signals",
@@ -2758,13 +2758,13 @@ window.NW_SPEC = {
         },
         "Medium": {
           "what": "Add balance-sheet & cashflow context — leverage, liquidity, quality of burn.",
-          "analysis": "Tell a timing wobble apart from a structural hole.",
+          "analysis": "Confirm whether the shortfall is fundable within the payment window or requires intervention.",
           "metrics": [
             "leverage / liquidity",
             "burn quality (CFS)"
           ],
           "actions": [
-            "Classify timing vs structural shortfall"
+            "Classify whether shortfall is fundable or requires intervention"
           ]
         },
         "Later": {
