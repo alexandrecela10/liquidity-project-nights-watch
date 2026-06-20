@@ -260,7 +260,13 @@
       "forecast": {"coverage_t1": 0.41, "coverage_t1_worst": 0.18, "coverage_t1_best": 0.60, "lead_days": 0, "status": "breached", "drivers": "EUR sweep \u00b7 12% cash coupon", "read": "FX unresolved \u2014 modelled cash at T1 stays ~0.41; the secured workout path is the lever."},
       "principal_at_risk": 6000000,
       "contact": {"name": "Amina Bello", "role": "Treasurer", "email": "a.bello@sahelagricorp.cm"},
-      "action": {"priority": "P1", "title": "Roll up sleeves — protect the coupon", "why": "Largest exposure; the shortfall is an FX/sweep problem that is still fixable before T1.", "steps": ["Call treasurer: why did the EUR operating account drop to zero?", "Arrange FX conversion or a short bridge to fund the $700K due", "Confirm the coupon funding source in writing before 2026-07-15"]},
+      "action": {"priority": "P1", "title": "Roll up sleeves — protect the coupon", "why": "Largest exposure; the shortfall is an FX/sweep problem that is still fixable before T1.", "steps": ["Call treasurer: why did the EUR operating account drop to zero?", "Arrange FX conversion or a short bridge to fund the $700K due", "Confirm the coupon funding source in writing before 2026-07-15"],
+        "evidence": [
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-08", "field": "EUR operating account (FI-EA354EF2)", "before": "$471,099", "after": "$0", "delta": "▼ 100% — swept to offshore parent / FX-blocked"},
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Transferable cash (M1)", "before": "$795,714", "after": "$324,857", "delta": "▼ 59%"},
+          {"ref": "Step 2", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "1.14", "after": "0.46", "delta": "Low → High — now below the $700K due"},
+          {"ref": "Step 3", "source": "crm_loan · LN-SAHEL-1", "field": "Next payment date", "before": "—", "after": "2026-07-15", "delta": "27 days away"}
+        ]},
       "is_worked_example": true },
     { "company_id": "C-LAGOS", "name": "Lagos FinServe", "jurisdiction": "Nigeria", "label": "High",
       "coverage": 0.71, "total_cash_usd": 4200000, "transferable_cash_usd": 510000, "trapped_cash_usd": 3690000,
@@ -270,7 +276,13 @@
       "forecast": {"coverage_t1": 0.63, "coverage_t1_worst": 0.40, "coverage_t1_best": 0.78, "lead_days": 0, "status": "breached", "drivers": "NGN restriction \u00b7 14% floating coupon", "read": "Convertibility gap widens at T1 and the floating coupon adds pressure \u2014 modelled ~0.63."},
       "principal_at_risk": 3200000,
       "contact": {"name": "Chukwudi Okafor", "role": "CFO", "email": "c.okafor@lagosfinserve.ng"},
-      "action": {"priority": "P1", "title": "Roll up sleeves — confirm NGN convertibility", "why": "Two prior misses + high principal; NGN is restricted so the headline cash overstates capacity.", "steps": ["Confirm how much NGN can actually be converted this week", "Request a cash bridge from the sponsor", "Escalate to the deal lead"]} },
+      "action": {"priority": "P1", "title": "Roll up sleeves — confirm NGN convertibility", "why": "Two prior misses + high principal; NGN is restricted so the headline cash overstates capacity.", "steps": ["Confirm how much NGN can actually be converted this week", "Request a cash bridge from the sponsor", "Escalate to the deal lead"],
+        "evidence": [
+          {"ref": "Step 1", "source": "ref.convertibility · IMF AREAER", "field": "NGN convertibility class", "before": "—", "after": "restricted", "delta": "$3.69M trapped — cannot service hard-ccy debt"},
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-07", "field": "Transferable cash (M1)", "before": "$680,000", "after": "$510,000", "delta": "▼ 25% over 2 snapshots"},
+          {"ref": "Step 2", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "0.94", "after": "0.71", "delta": "gap widening — $210K short of $720K due"},
+          {"ref": "Step 3", "source": "missed_payment · labels", "field": "Prior misses", "before": "0", "after": "2", "delta": "2025-11 partial + 2026-02 late payment"}
+        ]} },
     { "company_id": "C-DAR", "name": "Dar Telecom", "jurisdiction": "Tanzania", "label": "Medium",
       "coverage": 0.98, "total_cash_usd": 5100000, "transferable_cash_usd": 880000, "trapped_cash_usd": 4220000,
       "runway_days": 70, "deteriorating": true, "prior_issues": 0, "data_freshness_days": 2, "worst_serviced_coverage": 0.90,
@@ -279,7 +291,13 @@
       "forecast": {"coverage_t1": 0.92, "coverage_t1_worst": 0.70, "coverage_t1_best": 1.02, "lead_days": 0, "status": "breached", "drivers": "energy input cost \u00b7 receivables timing", "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in \u2014 prepare workout options now."},
       "principal_at_risk": 2200000,
       "contact": {"name": "Joseph Mwanga", "role": "CFO", "email": "j.mwanga@dartelecom.tz"},
-      "action": {"priority": "P2", "title": "Structured workout prep", "why": "Coverage hovering at 1.0 on a large balance; trend is down.", "steps": ["Request a 13-week cashflow", "Review covenants", "Prepare options ahead of T1"]} },
+      "action": {"priority": "P2", "title": "Structured workout prep", "why": "Coverage hovering at 1.0 on a large balance; trend is down.", "steps": ["Request a 13-week cashflow", "Review covenants", "Prepare options ahead of T1"],
+        "evidence": [
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio (3 snapshots)", "before": "1.12", "after": "0.98", "delta": "▼ steady decline — crossed below 1.0"},
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Transferable cash (M1)", "before": "$1,020,000", "after": "$880,000", "delta": "▼ 14% — gap now $20K vs $900K due"},
+          {"ref": "Step 2", "source": "gold.company_snapshot", "field": "Worst-serviced coverage", "before": "—", "after": "0.90", "delta": "current 0.98 approaching historical floor"},
+          {"ref": "Step 3", "source": "crm_loan · LN-DAR-1", "field": "Principal at risk", "before": "$0", "after": "$2,200,000", "delta": "49% of $4.5M principal now at risk"}
+        ]} },
     { "company_id": "C-NAIROBI", "name": "Nairobi Logistics", "jurisdiction": "Kenya", "label": "Medium",
       "coverage": 1.05, "total_cash_usd": 1500000, "transferable_cash_usd": 420000, "trapped_cash_usd": 1080000,
       "runway_days": 61, "deteriorating": true, "prior_issues": 0, "data_freshness_days": 1, "worst_serviced_coverage": 0.95,
@@ -288,7 +306,12 @@
       "forecast": {"coverage_t1": 0.97, "coverage_t1_worst": 0.82, "coverage_t1_best": 1.08, "lead_days": 18, "status": "pre-breach", "drivers": "receivables timing slips", "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip \u2014 ~18 days of lead time to act."},
       "principal_at_risk": 900000,
       "contact": {"name": "Grace Wanjiku", "role": "CFO", "email": "g.wanjiku@nairobilogistics.ke"},
-      "action": {"priority": "P2", "title": "Structured — tighten reporting", "why": "Coverage thinning; receivables timing is the swing factor.", "steps": ["Confirm receivables collection timing", "Move to weekly cash reporting"]} },
+      "action": {"priority": "P2", "title": "Structured — tighten reporting", "why": "Coverage thinning; receivables timing is the swing factor.", "steps": ["Confirm receivables collection timing", "Move to weekly cash reporting"],
+        "evidence": [
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio (3 snapshots)", "before": "1.15", "after": "1.05", "delta": "▼ declining — nearing 1.0 threshold"},
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-07", "field": "Receivables pending", "before": "$95,000", "after": "$180,000", "delta": "▲ 89% — collections slowing"},
+          {"ref": "Step 2", "source": "gold.company_snapshot", "field": "Forecast coverage @ T1", "before": "1.04", "after": "0.97", "delta": "pre-breach — 18 days lead time to act"}
+        ]} },
     { "company_id": "C-KAMPALA", "name": "Kampala Power", "jurisdiction": "Uganda", "label": "Low",
       "coverage": 1.30, "total_cash_usd": 900000, "transferable_cash_usd": 260000, "trapped_cash_usd": 640000,
       "runway_days": 95, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 2, "worst_serviced_coverage": 1.05,
@@ -297,7 +320,11 @@
       "forecast": {"coverage_t1": 1.24, "coverage_t1_worst": 1.05, "coverage_t1_best": 1.35, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Holds above the high-risk line through T1."},
       "principal_at_risk": 180000,
       "contact": {"name": "Robert Kato", "role": "CFO", "email": "r.kato@kampalapower.ug"},
-      "action": {"priority": "P3", "title": "Lightweight nudge", "why": "Comfortable but small; cheap to keep an eye on.", "steps": ["Email CFO for an updated forecast"]} },
+      "action": {"priority": "P3", "title": "Lightweight nudge", "why": "Comfortable but small; cheap to keep an eye on.", "steps": ["Email CFO for an updated forecast"],
+        "evidence": [
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "1.32", "after": "1.30", "delta": "→ stable — above threshold"},
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-06", "field": "Transferable cash (M1)", "before": "$270,000", "after": "$260,000", "delta": "→ minor movement"}
+        ]} },
     { "company_id": "C-ACCRA", "name": "Accra Retail", "jurisdiction": "Ghana", "label": "Low",
       "coverage": 2.10, "total_cash_usd": 700000, "transferable_cash_usd": 300000, "trapped_cash_usd": 400000,
       "runway_days": 140, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 6, "worst_serviced_coverage": 1.20,
@@ -306,7 +333,11 @@
       "forecast": {"coverage_t1": 2.00, "coverage_t1_worst": 1.70, "coverage_t1_best": 2.20, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable through T1."},
       "principal_at_risk": 0,
       "contact": {"name": "Kwame Asante", "role": "CFO", "email": "k.asante@accraretail.gh"},
-      "action": {"priority": "P3", "title": "Standard monitoring", "why": "Healthy coverage, low principal.", "steps": ["Monthly check-in only"]} },
+      "action": {"priority": "P3", "title": "Standard monitoring", "why": "Healthy coverage, low principal.", "steps": ["Monthly check-in only"],
+        "evidence": [
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "2.05", "after": "2.10", "delta": "→ stable — well above threshold"},
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-02", "field": "Data freshness", "before": "0d", "after": "6d", "delta": "⚠ stale feed — low risk but monitor"}
+        ]} },
     { "company_id": "C-KIGALI", "name": "Kigali Agro", "jurisdiction": "Rwanda", "label": "None",
       "coverage": 3.00, "total_cash_usd": 1200000, "transferable_cash_usd": 480000, "trapped_cash_usd": 720000,
       "runway_days": 210, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 1, "worst_serviced_coverage": 1.10,
@@ -315,7 +346,11 @@
       "forecast": {"coverage_t1": 2.90, "coverage_t1_worst": 2.70, "coverage_t1_best": 3.05, "lead_days": 0, "status": "clear", "drivers": "PIK \u00b7 no cash due", "read": "No cash leaves the borrower at T1."},
       "principal_at_risk": 0,
       "contact": {"name": "Diane Uwimana", "role": "Company Secretary", "email": "d.uwimana@kigaliagro.rw"},
-      "action": {"priority": "P4", "title": "Handle leanly", "why": "Next payment is PIK — no cash due. Automated monitoring is enough.", "steps": ["Automated monitoring only"]} },
+      "action": {"priority": "P4", "title": "Handle leanly", "why": "Next payment is PIK — no cash due. Automated monitoring is enough.", "steps": ["Automated monitoring only"],
+        "evidence": [
+          {"ref": "Step 1", "source": "crm_loan · LN-KIGALI-1", "field": "Payment type", "before": "—", "after": "PIK", "delta": "no cash leaves the borrower at T1"},
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "2.95", "after": "3.00", "delta": "→ stable — well above threshold"}
+        ]} },
     { "company_id": "C-CASA", "name": "Casablanca Foods", "jurisdiction": "Morocco", "label": "None",
       "coverage": 4.20, "total_cash_usd": 2000000, "transferable_cash_usd": 1500000, "trapped_cash_usd": 500000,
       "runway_days": 320, "deteriorating": false, "prior_issues": 0, "data_freshness_days": 0, "worst_serviced_coverage": 1.40,
@@ -324,7 +359,11 @@
       "forecast": {"coverage_t1": 4.10, "coverage_t1_worst": 3.70, "coverage_t1_best": 4.40, "lead_days": 0, "status": "clear", "drivers": "stable", "read": "Comfortable; mostly hard-currency cash."},
       "principal_at_risk": 0,
       "contact": {"name": "Youssef El Fassi", "role": "CFO", "email": "y.elfassi@casablancafoods.ma"},
-      "action": {"priority": "P4", "title": "Handle leanly", "why": "Strong coverage, mostly hard-currency cash.", "steps": ["Automated monitoring only"]} }
+      "action": {"priority": "P4", "title": "Handle leanly", "why": "Strong coverage, mostly hard-currency cash.", "steps": ["Automated monitoring only"],
+        "evidence": [
+          {"ref": "Step 1", "source": "gold.company_snapshot", "field": "Coverage ratio", "before": "4.15", "after": "4.20", "delta": "→ stable — highest in portfolio"},
+          {"ref": "Step 1", "source": "bank_balance · 2026-07-08", "field": "Transferable cash (M1)", "before": "$1,480,000", "after": "$1,500,000", "delta": "75% of total — mostly hard currency"}
+        ]} }
   ],
 
   "lifecycle": {

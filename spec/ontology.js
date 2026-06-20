@@ -856,6 +856,40 @@ window.NW_SPEC = {
           "Call treasurer: why did the EUR operating account drop to zero?",
           "Arrange FX conversion or a short bridge to fund the $700K due",
           "Confirm the coupon funding source in writing before 2026-07-15"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-08",
+            "field": "EUR operating account (FI-EA354EF2)",
+            "before": "$471,099",
+            "after": "$0",
+            "delta": "▼ 100% — swept to offshore parent / FX-blocked"
+          },
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Transferable cash (M1)",
+            "before": "$795,714",
+            "after": "$324,857",
+            "delta": "▼ 59%"
+          },
+          {
+            "ref": "Step 2",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "1.14",
+            "after": "0.46",
+            "delta": "Low → High — now below the $700K due"
+          },
+          {
+            "ref": "Step 3",
+            "source": "crm_loan · LN-SAHEL-1",
+            "field": "Next payment date",
+            "before": "—",
+            "after": "2026-07-15",
+            "delta": "27 days away"
+          }
         ]
       },
       "is_worked_example": true
@@ -912,6 +946,40 @@ window.NW_SPEC = {
           "Confirm how much NGN can actually be converted this week",
           "Request a cash bridge from the sponsor",
           "Escalate to the deal lead"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "ref.convertibility · IMF AREAER",
+            "field": "NGN convertibility class",
+            "before": "—",
+            "after": "restricted",
+            "delta": "$3.69M trapped — cannot service hard-ccy debt"
+          },
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-07",
+            "field": "Transferable cash (M1)",
+            "before": "$680,000",
+            "after": "$510,000",
+            "delta": "▼ 25% over 2 snapshots"
+          },
+          {
+            "ref": "Step 2",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "0.94",
+            "after": "0.71",
+            "delta": "gap widening — $210K short of $720K due"
+          },
+          {
+            "ref": "Step 3",
+            "source": "missed_payment · labels",
+            "field": "Prior misses",
+            "before": "0",
+            "after": "2",
+            "delta": "2025-11 partial + 2026-02 late payment"
+          }
         ]
       }
     },
@@ -967,6 +1035,40 @@ window.NW_SPEC = {
           "Request a 13-week cashflow",
           "Review covenants",
           "Prepare options ahead of T1"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio (3 snapshots)",
+            "before": "1.12",
+            "after": "0.98",
+            "delta": "▼ steady decline — crossed below 1.0"
+          },
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Transferable cash (M1)",
+            "before": "$1,020,000",
+            "after": "$880,000",
+            "delta": "▼ 14% — gap now $20K vs $900K due"
+          },
+          {
+            "ref": "Step 2",
+            "source": "gold.company_snapshot",
+            "field": "Worst-serviced coverage",
+            "before": "—",
+            "after": "0.90",
+            "delta": "current 0.98 approaching historical floor"
+          },
+          {
+            "ref": "Step 3",
+            "source": "crm_loan · LN-DAR-1",
+            "field": "Principal at risk",
+            "before": "$0",
+            "after": "$2,200,000",
+            "delta": "49% of $4.5M principal now at risk"
+          }
         ]
       }
     },
@@ -1021,6 +1123,32 @@ window.NW_SPEC = {
         "steps": [
           "Confirm receivables collection timing",
           "Move to weekly cash reporting"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio (3 snapshots)",
+            "before": "1.15",
+            "after": "1.05",
+            "delta": "▼ declining — nearing 1.0 threshold"
+          },
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-07",
+            "field": "Receivables pending",
+            "before": "$95,000",
+            "after": "$180,000",
+            "delta": "▲ 89% — collections slowing"
+          },
+          {
+            "ref": "Step 2",
+            "source": "gold.company_snapshot",
+            "field": "Forecast coverage @ T1",
+            "before": "1.04",
+            "after": "0.97",
+            "delta": "pre-breach — 18 days lead time to act"
+          }
         ]
       }
     },
@@ -1074,6 +1202,24 @@ window.NW_SPEC = {
         "why": "Comfortable but small; cheap to keep an eye on.",
         "steps": [
           "Email CFO for an updated forecast"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "1.32",
+            "after": "1.30",
+            "delta": "→ stable — above threshold"
+          },
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-06",
+            "field": "Transferable cash (M1)",
+            "before": "$270,000",
+            "after": "$260,000",
+            "delta": "→ minor movement"
+          }
         ]
       }
     },
@@ -1127,6 +1273,24 @@ window.NW_SPEC = {
         "why": "Healthy coverage, low principal.",
         "steps": [
           "Monthly check-in only"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "2.05",
+            "after": "2.10",
+            "delta": "→ stable — well above threshold"
+          },
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-02",
+            "field": "Data freshness",
+            "before": "0d",
+            "after": "6d",
+            "delta": "⚠ stale feed — low risk but monitor"
+          }
         ]
       }
     },
@@ -1180,6 +1344,24 @@ window.NW_SPEC = {
         "why": "Next payment is PIK — no cash due. Automated monitoring is enough.",
         "steps": [
           "Automated monitoring only"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "crm_loan · LN-KIGALI-1",
+            "field": "Payment type",
+            "before": "—",
+            "after": "PIK",
+            "delta": "no cash leaves the borrower at T1"
+          },
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "2.95",
+            "after": "3.00",
+            "delta": "→ stable — well above threshold"
+          }
         ]
       }
     },
@@ -1233,6 +1415,24 @@ window.NW_SPEC = {
         "why": "Strong coverage, mostly hard-currency cash.",
         "steps": [
           "Automated monitoring only"
+        ],
+        "evidence": [
+          {
+            "ref": "Step 1",
+            "source": "gold.company_snapshot",
+            "field": "Coverage ratio",
+            "before": "4.15",
+            "after": "4.20",
+            "delta": "→ stable — highest in portfolio"
+          },
+          {
+            "ref": "Step 1",
+            "source": "bank_balance · 2026-07-08",
+            "field": "Transferable cash (M1)",
+            "before": "$1,480,000",
+            "after": "$1,500,000",
+            "delta": "75% of total — mostly hard currency"
+          }
         ]
       }
     }

@@ -135,6 +135,29 @@
     border-radius: 999px; border: none; cursor: default; }
   .mock-form .mf-btn.primary { background: var(--ink); color: var(--sand); }
 
+  /* evidence trail — before→after for every claim */
+  .demo-ev-toggle { display:inline-flex; align-items:center; gap:5px; font-size:10.5px; font-weight:600; color:var(--taupe); background:none; border:1px dashed var(--sand-700); border-radius:999px; padding:3px 10px; margin-top:10px; cursor:pointer; transition:background .12s; }
+  .demo-ev-toggle:hover { background:var(--sand-500); color:var(--ink); }
+  .demo-ev-toggle .ev-icon { font-size:11px; transition:transform .15s; }
+  .demo-ev-toggle.open .ev-icon { transform:rotate(90deg); }
+  .demo-ev-trail { margin-top:6px; border:1px solid var(--sand-500); border-radius:var(--radius-sm); overflow:hidden; font-size:11px; }
+  .demo-ev-trail.hidden { display:none; }
+  .demo-ev-head { display:grid; grid-template-columns:52px 1fr 68px 12px 68px 1fr; gap:0 6px; padding:4px 8px; background:var(--sand-500); font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.04em; color:var(--taupe); }
+  .demo-ev-row { display:grid; grid-template-columns:52px 1fr 68px 12px 68px 1fr; gap:0 6px; align-items:baseline; padding:5px 8px; border-bottom:1px solid var(--sand-500); }
+  .demo-ev-row:last-child { border-bottom:none; }
+  .demo-ev-row:nth-child(odd) { background:var(--white); }
+  .demo-ev-row:nth-child(even) { background:var(--sand); }
+  .demo-ev-row .ev-ref { font-size:8.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--taupe); }
+  .demo-ev-row .ev-field { font-weight:600; color:var(--ink-700); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .demo-ev-row .ev-val { font-family:var(--mono); font-weight:600; text-align:right; white-space:nowrap; }
+  .demo-ev-row .ev-val.before { color:var(--taupe); }
+  .demo-ev-row .ev-val.after { color:var(--ink); }
+  .demo-ev-row .ev-arrow { text-align:center; color:var(--sand-700); font-size:9px; }
+  .demo-ev-row .ev-delta { font-size:10px; color:var(--ink-700); }
+  .demo-ev-row .ev-delta.neg { color:var(--risk-high); }
+  .demo-ev-row .ev-delta.pos { color:var(--risk-low); }
+  .demo-ev-row .ev-src { display:block; font-family:var(--mono); font-size:8.5px; color:var(--taupe); margin-top:1px; }
+
   /* S8: confirmation */
   .confirm-card { text-align: center; background: var(--white); border-radius: var(--radius);
     box-shadow: var(--shadow-lg); padding: 44px 36px; max-width: 520px; margin: 0 auto; }
@@ -343,6 +366,13 @@
           <span style="color:var(--taupe);"><b style="font-family:var(--mono);">$8,986,818</b> trapped (96.5%)</span>
         </div>
       </div>
+      <button class="demo-ev-toggle" onclick="var t=this.nextElementSibling;t.classList.toggle('hidden');this.classList.toggle('open')"><span class="ev-icon">&#x25B6;</span>Evidence trail (3)</button>
+      <div class="demo-ev-trail hidden">
+        <div class="demo-ev-head"><span>Ref</span><span>Field</span><span>Before</span><span></span><span>After</span><span>Change &middot; source</span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Warning</span><span class="ev-field" title="EUR operating account (FI-EA354EF2)">EUR operating account (FI-EA354EF2)</span><span class="ev-val before">$471,099</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$0</span><span class="ev-delta neg">&darr; 100% &mdash; swept to offshore parent<span class="ev-src">bank_balance &middot; 2026-07-08</span></span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Warning</span><span class="ev-field" title="Transferable cash (M1)">Transferable cash (M1)</span><span class="ev-val before">$795,714</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$324,857</span><span class="ev-delta neg">&darr; 59%<span class="ev-src">gold.company_snapshot</span></span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Warning</span><span class="ev-field" title="Coverage ratio">Coverage ratio</span><span class="ev-val before">1.14</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">0.46</span><span class="ev-delta neg">Low &rarr; High &mdash; below $700K due<span class="ev-src">gold.company_snapshot</span></span></div>
+      </div>
     </div>
   </div>
 </div>
@@ -373,6 +403,13 @@
       <div><div style="color:var(--taupe);font-size:11px;">Coupon</div><div style="font-weight:600;font-family:var(--mono);">12% &#9432;</div><div style="color:var(--taupe);font-size:11px;">paid in cash</div></div>
       <div><div style="color:var(--taupe);font-size:11px;">Annual cash coupon</div><div style="font-weight:600;font-family:var(--mono);">$720,000</div><div style="color:var(--taupe);font-size:11px;">principal &times; coupon, per year</div></div>
       <div><div style="color:var(--taupe);font-size:11px;">Principal at risk</div><div style="font-weight:600;font-family:var(--mono);color:var(--risk-high);">$6,000,000 &#9432;</div><div style="color:var(--taupe);font-size:11px;">100% of principal</div></div>
+    </div>
+    <button class="demo-ev-toggle" onclick="var t=this.nextElementSibling;t.classList.toggle('hidden');this.classList.toggle('open')"><span class="ev-icon">&#x25B6;</span>Evidence trail (3)</button>
+    <div class="demo-ev-trail hidden">
+      <div class="demo-ev-head"><span>Ref</span><span>Field</span><span>Before</span><span></span><span>After</span><span>Change &middot; source</span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Loan</span><span class="ev-field" title="Coverage ratio">Coverage ratio</span><span class="ev-val before">1.14</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">0.46</span><span class="ev-delta neg">Low &rarr; High<span class="ev-src">gold.company_snapshot</span></span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Loan</span><span class="ev-field" title="Transferable cash (M1)">Transferable cash (M1)</span><span class="ev-val before">$795,714</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$324,857</span><span class="ev-delta neg">&darr; 59% &mdash; shortfall $378K<span class="ev-src">gold.company_snapshot</span></span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Loan</span><span class="ev-field" title="Cash to repay (T1)">Cash to repay (T1)</span><span class="ev-val before">$700,000</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$700,000</span><span class="ev-delta">unchanged<span class="ev-src">crm_loan &middot; LN-SAHEL-1</span></span></div>
     </div>
   </div>
 </div>
@@ -415,6 +452,13 @@
         <div><div style="color:var(--taupe);font-size:11px;">Data freshness</div><div style="font-size:15px;font-weight:600;color:var(--risk-low);">today</div></div>
       </div>
     </div>
+    <button class="demo-ev-toggle" onclick="var t=this.nextElementSibling;t.classList.toggle('hidden');this.classList.toggle('open')" style="margin-top:14px;"><span class="ev-icon">&#x25B6;</span>Evidence trail (3)</button>
+    <div class="demo-ev-trail hidden">
+      <div class="demo-ev-head"><span>Ref</span><span>Field</span><span>Before</span><span></span><span>After</span><span>Change &middot; source</span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Recov.</span><span class="ev-field" title="Recoverability label">Recoverability</span><span class="ev-val before">&mdash;</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">Partial</span><span class="ev-delta">first-pass read (loan + convertibility)<span class="ev-src">gold.company_snapshot</span></span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Context</span><span class="ev-field" title="Runway (days of transferable cash)">Runway</span><span class="ev-val before">62d</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">38d</span><span class="ev-delta neg">&darr; 39% &mdash; burn accelerating<span class="ev-src">gold.company_snapshot</span></span></div>
+      <div class="demo-ev-row"><span class="ev-ref">Context</span><span class="ev-field" title="Trend (deteriorating flag)">Trend</span><span class="ev-val before">stable</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">&darr; worsening</span><span class="ev-delta neg">coverage declining across snapshots<span class="ev-src">gold.company_snapshot</span></span></div>
+    </div>
   </div>
 </div>
 </div>
@@ -440,6 +484,14 @@
         <li>Model a short-term bridge facility against the $378K shortfall</li>
         <li>Escalate to the Investment Committee if bridge &gt; 5% of fund NAV</li>
       </ol>
+      <button class="demo-ev-toggle" onclick="var t=this.nextElementSibling;t.classList.toggle('hidden');this.classList.toggle('open')"><span class="ev-icon">&#x25B6;</span>Evidence trail (4)</button>
+      <div class="demo-ev-trail hidden">
+        <div class="demo-ev-head"><span>Ref</span><span>Field</span><span>Before</span><span></span><span>After</span><span>Change &middot; source</span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Step 1</span><span class="ev-field" title="EUR operating account (FI-EA354EF2)">EUR operating account (FI-EA354EF2)</span><span class="ev-val before">$471,099</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$0</span><span class="ev-delta neg">&darr; 100% &mdash; swept to offshore parent<span class="ev-src">bank_balance &middot; 2026-07-08</span></span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Step 1</span><span class="ev-field" title="Transferable cash (M1)">Transferable cash (M1)</span><span class="ev-val before">$795,714</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">$324,857</span><span class="ev-delta neg">&darr; 59%<span class="ev-src">gold.company_snapshot</span></span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Step 3</span><span class="ev-field" title="Coverage ratio">Coverage ratio</span><span class="ev-val before">1.14</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">0.46</span><span class="ev-delta neg">Low &rarr; High &mdash; below $700K due<span class="ev-src">gold.company_snapshot</span></span></div>
+        <div class="demo-ev-row"><span class="ev-ref">Step 4</span><span class="ev-field" title="Next payment date">Next payment date</span><span class="ev-val before">&mdash;</span><span class="ev-arrow">&rarr;</span><span class="ev-val after">2026-07-15</span><span class="ev-delta">27 days away<span class="ev-src">crm_loan &middot; LN-SAHEL-1</span></span></div>
+      </div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--sand-500);">
       <a href="mailto:a.bello@sahelagricorp.cm?subject=Urgent%20%E2%80%94%20FX%20conversion%20%2F%20bridge%20for%20LN-SAHEL-1%20coupon&body=Dear%20Amina%2C%0A%0ARe%3A%20Sahel%20AgriCorp%20%E2%80%94%20LN-SAHEL-1%0A%0ALargest%20exposure%3B%20the%20shortfall%20is%20an%20FX%2Fsweep%20problem%20that%20is%20still%20fixable%20before%20T1.%0A%0APlease%20advise%20at%20your%20earliest%20convenience.%0A%0ABest%20regards%2C%0ACredit%20Team" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--sand);text-decoration:none;">&#x2709; Email Amina Bello</a>
