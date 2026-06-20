@@ -13,13 +13,26 @@
   .lc-head .sub { color:var(--taupe); font-size:14px; margin-top:10px; max-width:58ch; }
   .lc-head .sub b { color:var(--ink); font-weight:600; }
 
+  /* scenario toggle */
+  .lc-toggle { display:flex; gap:6px; margin-bottom:18px; flex-wrap:wrap; }
+  .lc-toggle button { background:var(--sand); border:1.5px solid var(--sand-500); border-radius:999px; padding:7px 18px; font-family:var(--font); font-size:13px; cursor:pointer; color:var(--taupe); transition:all .2s ease; white-space:nowrap; }
+  .lc-toggle button:hover { border-color:var(--ink); color:var(--ink); }
+  .lc-toggle button.active { background:var(--ink); border-color:var(--ink); color:var(--sand); font-weight:600; }
+
   /* new-file banner */
-  .lc-newfile { padding:16px 18px; max-width:430px; }
-  .lc-newfile .row1 { display:flex; align-items:center; gap:10px; }
+  .lc-newfile { padding:16px 18px; }
+  .lc-newfile .row1 { display:flex; align-items:center; gap:10px; flex-wrap:wrap; }
   .lc-newfile .fname { font-family:var(--mono); font-size:13px; font-weight:500; color:var(--ink-700); }
   .lc-newfile .when { color:var(--taupe); font-size:12px; margin-left:auto; }
   .lc-newfile .chg { color:var(--taupe); font-size:13px; margin-top:9px; line-height:1.45; }
   .lc-newfile .rows { display:inline-block; margin-top:9px; font-family:var(--mono); font-size:11.5px; color:var(--ink); background:var(--sand-500); border-radius:999px; padding:2px 10px; }
+
+  /* raw file sample table */
+  .lc-rawsample { margin-top:12px; overflow-x:auto; border:1px solid var(--sand-500); border-radius:8px; }
+  .lc-rawsample table { border-collapse:collapse; font-family:var(--mono); font-size:11px; width:100%; }
+  .lc-rawsample th { background:var(--sand-500); padding:5px 9px; text-align:left; font-weight:600; white-space:nowrap; color:var(--ink); }
+  .lc-rawsample td { padding:5px 9px; border-top:1px solid var(--sand-500); white-space:nowrap; color:var(--taupe); }
+  .lc-rawsample .hl { color:var(--ink); font-weight:600; }
 
   /* layout */
   .lc-grid { display:grid; grid-template-columns: minmax(0,1fr) 392px; gap:22px; align-items:start; margin-top:8px; }
@@ -65,6 +78,7 @@
   .lc-event.show { opacity:1; max-height:420px; margin-top:16px; }
   .lc-event .hd { display:flex; align-items:center; gap:10px; padding:13px 18px; }
   .lc-warn .hd { background:#f6e4e0; }
+  .lc-warn.positive .hd { background:#ddeedd; }
   .lc-act .hd { background:var(--ink); color:var(--sand); }
   .lc-event .hd .ttl { font-size:13px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
   .lc-act .hd .ttl { color:var(--yellow); }
@@ -97,13 +111,13 @@
   .ba-pill-a { justify-self:end; }
   .ba-delta { grid-column:1 / -1; text-align:right; font-size:11px; color:var(--risk-high); font-weight:600; font-family:var(--mono); margin-top:2px; min-height:14px; }
 
-  /* coverage bar */
+  /* coverage / metric bar */
   .cov-wrap { grid-column:1 / -1; margin-top:8px; }
   .cov-track { position:relative; height:26px; background:var(--sand-500); border-radius:7px; overflow:hidden; }
   .cov-fill { position:absolute; left:0; top:0; bottom:0; border-radius:7px 0 0 7px; transition:width .25s linear, background .25s linear; }
   .cov-fill.b { background:rgba(94,125,82,.5); }
   .cov-threshold { position:absolute; top:-3px; bottom:-3px; width:2px; background:var(--ink); }
-  .cov-threshold::after { content:'1.00'; position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:9px; font-family:var(--mono); color:var(--ink); white-space:nowrap; }
+  .cov-threshold::after { content:attr(data-label); position:absolute; top:-15px; left:50%; transform:translateX(-50%); font-size:9px; font-family:var(--mono); color:var(--ink); white-space:nowrap; }
   .cov-threshold.alarm { animation:alarm .5s ease 3; }
   @keyframes alarm { 50%{ background:var(--risk-high); box-shadow:0 0 0 3px rgba(179,64,46,.25); } }
   .cov-legend { grid-column:1 / -1; display:flex; justify-content:space-between; font-family:var(--mono); font-size:12px; margin-top:7px; }
@@ -151,14 +165,16 @@
     <div class="lc-newfile nw-card" id="lc-newfile"></div>
   </header>
 
+  <div class="lc-toggle" id="lc-toggle"></div>
+
   <div class="lc-grid">
     <main class="lc-main">
       <div class="lc-stepper" id="lc-stepper"></div>
 
       <div class="lc-controls">
-        <button class="nw-btn ghost" id="btn-back">‹ Back</button>
-        <button class="nw-btn accent" id="btn-play">▶ Play</button>
-        <button class="nw-btn" id="btn-next">Next ›</button>
+        <button class="nw-btn ghost" id="btn-back">&#8249; Back</button>
+        <button class="nw-btn accent" id="btn-play">&#9654; Play</button>
+        <button class="nw-btn" id="btn-next">Next &#8250;</button>
         <span class="spacer"></span>
         <div class="lc-progress"><i id="lc-progress-bar"></i></div>
         <span class="lc-count" id="lc-count"></span>
@@ -177,14 +193,11 @@
       <section class="lc-event lc-warn nw-card" id="lc-warning">
         <div class="hd">
           <span class="nw-pill nw-risk-High" id="warn-pill">High</span>
-          <span class="ttl">Warning fired</span>
+          <span class="ttl" id="warn-ttl">Warning fired</span>
         </div>
         <div class="bd">
           <p class="reason" id="warn-reason"></p>
-          <div class="lc-metrics">
-            <div class="m"><div class="v" id="warn-cov"></div><div class="l">coverage (signal)</div></div>
-            <div class="m"><div class="v" id="warn-par"></div><div class="l">principal at risk</div></div>
-          </div>
+          <div class="lc-metrics" id="warn-metrics"></div>
         </div>
       </section>
 
@@ -240,15 +253,17 @@
   }
   loadSpec(['../spec/ontology.js','ontology.js'], init, function(){
     document.querySelector('.nw-wrap').insertAdjacentHTML('afterbegin',
-      '<p style="color:var(--risk-high)">Could not load spec/ontology.js — run <code>python3 scripts/build_spec.py</code>.</p>');
+      '<p style="color:var(--risk-high)">Could not load spec/ontology.js \u2014 run <code>python3 scripts/build_spec.py</code>.</p>');
   });
 
   /* ---------- helpers ---------- */
-  var fmtUSD = function(n){ return '$' + Math.round(n).toLocaleString('en-US'); };
-  var cov2   = function(n){ return Number(n).toFixed(2); };
-  var el     = function(id){ return document.getElementById(id); };
+  var fmtUSD = function(n){
+    if (n < 0) return '\u2212$' + Math.abs(Math.round(n)).toLocaleString('en-US');
+    return '$' + Math.round(n).toLocaleString('en-US');
+  };
+  var fmt2  = function(n){ return Number(n).toFixed(2); };
+  var el    = function(id){ return document.getElementById(id); };
 
-  /* layer -> accent + soft halo (drives the per-step emphasis colour) */
   var ACCENT = {
     source:          { c:'var(--taupe)',      h:'rgba(111,95,86,.18)'  },
     bronze:          { c:'#7a4a25',           h:'rgba(122,74,37,.18)'  },
@@ -263,55 +278,111 @@
     silver:'Silver', gold:'Gold', warning:'Warning', action:'Action'
   };
 
-  var COV_MAX = 1.5; /* coverage axis: 0 .. 1.5, threshold at 1.0 */
-  var covPct  = function(v){ return Math.min(100, Math.max(0, v / COV_MAX * 100)); };
-  var covColor= function(v){ return v < 1.0 ? 'var(--risk-high)' : 'var(--risk-low)'; };
+  function pillClass(label){
+    var map = { High:'High', Medium:'Medium', Low:'Low', None:'None',
+                Strong:'Low', Partial:'Medium', Weak:'High',
+                'pre-breach':'Medium', clear:'Low', breached:'High' };
+    return 'nw-risk-' + (map[label] || 'Medium');
+  }
 
   /* ---------- state ---------- */
+  var SCENARIOS, scenarioIdx = 0;
   var L, STEPS, GOLD_I, WARN_I, ACT_I, cur = 0, playing = false, timer = null;
   var covAnim = null;
+  var BAR = null; /* the bar display item for the current scenario */
 
   function init(){
-    L = window.NW_SPEC.lifecycle;
-    STEPS = L.steps;
-    GOLD_I = STEPS.findIndex(function(s){ return s.layer === 'gold'; });   /* first gold = recompute */
-    WARN_I = STEPS.findIndex(function(s){ return s.layer === 'warning'; });
-    ACT_I  = STEPS.findIndex(function(s){ return s.layer === 'action'; });
+    var lc = window.NW_SPEC.lifecycle;
+    SCENARIOS = lc.scenarios || [lc]; /* backward compat: wrap single object */
 
-    el('lc-title').textContent = L.title;
-    el('lc-sub').innerHTML =
-      'One warning for <b>' + L.company_name + '</b>, end to end. ' +
-      'Honest by construction: the only thing that changed in the new file is the EUR operating account dropping to <b>$0</b> — every number below follows from that.';
-
-    renderNewFile();
-    renderStepper();
-    renderBeforeAfterShell();
-    renderWarningStatic();
-    renderActionStatic();
-
-    el('lc-foot').innerHTML =
-      'Lineage stays intact: every figure on this page traces back to <b>' + L.new_file.file_name +
-      '</b> (' + L.new_file.raw_rows + ' raw rows, ingested ' + L.new_file.ingested_at.slice(0,10) +
-      '). Synthetic data · all numbers read from <span class="nw-mono">NW_SPEC.lifecycle</span>.';
+    renderToggle();
 
     el('btn-back').onclick = function(){ stop(); go(cur - 1); };
     el('btn-next').onclick = function(){ stop(); go(cur + 1); };
     el('btn-play').onclick = togglePlay;
     document.addEventListener('keydown', onKey);
 
+    loadScenario(0, false);
+  }
+
+  function renderToggle(){
+    if (SCENARIOS.length <= 1){ el('lc-toggle').style.display = 'none'; return; }
+    el('lc-toggle').innerHTML = SCENARIOS.map(function(s, i){
+      return '<button data-i="' + i + '">' + s.short_title + '</button>';
+    }).join('');
+    Array.prototype.forEach.call(el('lc-toggle').children, function(btn){
+      btn.onclick = function(){
+        var idx = parseInt(btn.dataset.i, 10);
+        if (idx !== scenarioIdx) { stop(); loadScenario(idx, false); }
+      };
+    });
+  }
+
+  function updateToggleActive(){
+    Array.prototype.forEach.call(el('lc-toggle').children, function(btn, i){
+      btn.classList.toggle('active', i === scenarioIdx);
+    });
+  }
+
+  function loadScenario(idx, animate){
+    scenarioIdx = idx;
+    L = SCENARIOS[idx];
+    STEPS = L.steps;
+    GOLD_I = STEPS.findIndex(function(s){ return s.layer === 'gold'; });
+    WARN_I = STEPS.findIndex(function(s){ return s.layer === 'warning'; });
+    ACT_I  = STEPS.findIndex(function(s){ return s.layer === 'action'; });
+    cur = 0;
+    BAR = null;
+
+    el('lc-title').textContent = L.title;
+    el('lc-sub').innerHTML = 'Scenario for <b>' + L.company_name + '</b>: ' + L.subtitle;
+
+    renderNewFile();
+    renderStepper();
+    renderBeforeAfterShell();
+    renderWarningStatic();
+    renderActionStatic();
+    renderFooter();
+    updateToggleActive();
+
     go(0, false);
   }
 
+  /* ---------- new-file banner ---------- */
   function renderNewFile(){
     var f = L.new_file;
-    el('lc-newfile').innerHTML =
+    var html =
       '<div class="row1"><span class="nw-layer nw-layer-source">New file</span>' +
         '<span class="fname">' + f.file_name + '</span>' +
         '<span class="when">' + f.ingested_at.replace('T',' ').replace('Z',' UTC') + '</span></div>' +
       '<div class="chg">' + f.change + '</div>' +
-      '<div class="rows">' + f.raw_rows + ' raw rows</div>';
+      '<div class="rows">' + f.raw_rows + ' raw rows' + (f.source ? ' \u00b7 ' + f.source : '') + '</div>';
+
+    if (f.raw_file_sample) {
+      var s = f.raw_file_sample;
+      html += '<div class="lc-rawsample"><table><thead><tr>';
+      s.columns.forEach(function(c){ html += '<th>' + c + '</th>'; });
+      html += '</tr></thead><tbody>';
+      s.rows.forEach(function(row){
+        html += '<tr>';
+        s.columns.forEach(function(c){
+          var v = row[c];
+          var cls = '';
+          if (typeof v === 'number') {
+            if (v < 0) { v = '\u2212' + Math.abs(v).toLocaleString('en-US'); cls = ' class="hl"'; }
+            else if (Math.abs(v) >= 1000) v = v.toLocaleString('en-US');
+          }
+          html += '<td' + cls + '>' + v + '</td>';
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table></div>';
+    }
+
+    el('lc-newfile').innerHTML = html;
   }
 
+  /* ---------- stepper ---------- */
   function renderStepper(){
     var html = STEPS.map(function(s, i){
       var ac = ACCENT[s.layer] || ACCENT.source;
@@ -329,63 +400,119 @@
     });
   }
 
-  /* ----- before/after panel ----- */
+  /* ---------- before/after panel (driven by L.display) ---------- */
   function renderBeforeAfterShell(){
     var b = L.before, a = L.after;
-    el('ba-as').textContent = b.refresh_ts + ' → ' + a.refresh_ts;
-    var dropPct = Math.round((1 - a.transferable_cash_usd / b.transferable_cash_usd) * 100);
+    el('ba-as').textContent = b.refresh_ts + ' \u2192 ' + a.refresh_ts;
 
-    el('ba-body').innerHTML =
-      money('Transferable cash (M1)', b.transferable_cash_usd, a.transferable_cash_usd, '▼ ' + dropPct + '%') +
-      coverageBlock(b.coverage_ratio, a.coverage_ratio) +
-      labelBlock(b.ew_label, a.ew_label) +
-      money('Total cash', b.total_cash_usd, a.total_cash_usd, '') +
-      money('Cash to repay (T1)', b.cash_to_repay_t1, a.cash_to_repay_t1, 'unchanged', true);
+    var d = L.display;
+    var html = '';
+    d.forEach(function(item){
+      if (item.type === 'money')     html += moneyRow(item);
+      else if (item.type === 'ratio') html += ratioRow(item);
+      else if (item.type === 'bar')  { html += barBlock(item); BAR = item; }
+      else if (item.type === 'pill') html += pillRow(item);
+    });
+    el('ba-body').innerHTML = html;
   }
 
-  function money(label, bv, av, delta, neutral){
-    var d = delta ? '<div class="ba-delta" style="' + (neutral ? 'color:var(--taupe)' : '') + '">' + delta + '</div>' : '';
+  function moneyRow(item){
+    var d = item.delta ? '<div class="ba-delta" style="' + (item.neutral ? 'color:var(--taupe)' : '') + '">' + item.delta + '</div>' : '';
     return '<div class="ba-row">' +
-      '<div class="rl">' + label + '</div>' +
-      '<div class="ba-b">' + fmtUSD(bv) + '</div>' +
-      '<div class="ba-arrow">→</div>' +
-      '<div class="ba-a">' + fmtUSD(av) + '</div>' + d +
+      '<div class="rl">' + item.label + '</div>' +
+      '<div class="ba-b">' + fmtUSD(item.before) + '</div>' +
+      '<div class="ba-arrow">\u2192</div>' +
+      '<div class="ba-a">' + fmtUSD(item.after) + '</div>' + d +
     '</div>';
   }
 
-  function labelBlock(bl, al){
-    return '<div class="ba-row"><div class="rl">Early-warning label</div></div>' +
-      '<div class="ba-pill-row">' +
-        '<span class="nw-pill nw-risk-' + bl + '">' + bl + '</span>' +
-        '<span class="ba-arrow">→</span>' +
-        '<span class="ba-pill-a nw-pill nw-risk-' + al + '">' + al + '</span>' +
-      '</div>';
+  function ratioRow(item){
+    var suffix = item.suffix || '';
+    var bv = fmt2(item.before) + suffix;
+    var av = fmt2(item.after) + suffix;
+    var d = item.delta ? '<div class="ba-delta" style="' + (item.neutral ? 'color:var(--taupe)' : '') + '">' + item.delta + '</div>' : '';
+    return '<div class="ba-row">' +
+      '<div class="rl">' + item.label + '</div>' +
+      '<div class="ba-b">' + bv + '</div>' +
+      '<div class="ba-arrow">\u2192</div>' +
+      '<div class="ba-a">' + av + '</div>' + d +
+    '</div>';
   }
 
-  function coverageBlock(bc, ac){
-    return '<div class="ba-row"><div class="rl">Coverage ratio — the signal</div></div>' +
+  function barBlock(item){
+    var barPct = function(v){ return Math.min(100, Math.max(0, v / item.max * 100)); };
+    var bc = item.before, ac = item.after;
+    return '<div class="ba-row"><div class="rl">' + item.label + '</div></div>' +
       '<div class="cov-wrap">' +
         '<div class="cov-track">' +
-          '<div class="cov-fill b" style="width:' + covPct(bc) + '%"></div>' +
-          '<div class="cov-fill" id="cov-fill-a" style="width:' + covPct(bc) + '%;background:' + covColor(bc) + '"></div>' +
-          '<div class="cov-threshold" id="cov-threshold" style="left:' + covPct(1.0) + '%"></div>' +
+          '<div class="cov-fill b" style="width:' + barPct(bc) + '%"></div>' +
+          '<div class="cov-fill" id="cov-fill-a" style="width:' + barPct(bc) + '%;background:' + barColor(bc, item.threshold) + '"></div>' +
+          '<div class="cov-threshold" id="cov-threshold" data-label="' + fmt2(item.threshold) + '" style="left:' + barPct(item.threshold) + '%"></div>' +
         '</div>' +
         '<div class="cov-legend">' +
-          '<span>before <b>' + cov2(bc) + '</b></span>' +
-          '<span class="now">now <b id="cov-now">' + cov2(bc) + '</b></span>' +
+          '<span>before <b>' + fmt2(bc) + '</b></span>' +
+          '<span class="now">now <b id="cov-now">' + fmt2(bc) + '</b></span>' +
         '</div>' +
       '</div>';
   }
 
-  /* ----- warning / action static content ----- */
+  function pillRow(item){
+    return '<div class="ba-row"><div class="rl">' + item.label + '</div></div>' +
+      '<div class="ba-pill-row">' +
+        '<span class="nw-pill ' + pillClass(item.before) + '">' + item.before + '</span>' +
+        '<span class="ba-arrow">\u2192</span>' +
+        '<span class="ba-pill-a nw-pill ' + pillClass(item.after) + '">' + item.after + '</span>' +
+      '</div>';
+  }
+
+  /* ---------- bar helpers ---------- */
+  function barColor(v, threshold){
+    return v < threshold ? 'var(--risk-high)' : 'var(--risk-low)';
+  }
+
+  function setBar(v){
+    if (!BAR) return;
+    var pct = Math.min(100, Math.max(0, v / BAR.max * 100));
+    var fill = el('cov-fill-a');
+    if (!fill) return;
+    fill.style.width = pct + '%';
+    fill.style.background = barColor(v, BAR.threshold);
+    var now = el('cov-now');
+    if (now) { now.textContent = fmt2(v); now.style.color = barColor(v, BAR.threshold); }
+  }
+
+  function animateBar(from, to, dur){
+    var t0 = null;
+    setBar(from);
+    function frame(ts){
+      if (t0 === null) t0 = ts;
+      var p = Math.min(1, (ts - t0) / dur);
+      var e = 1 - Math.pow(1 - p, 3);
+      setBar(from + (to - from) * e);
+      if (p < 1) covAnim = requestAnimationFrame(frame);
+    }
+    covAnim = requestAnimationFrame(frame);
+  }
+
+  /* ---------- warning / action static ---------- */
   function renderWarningStatic(){
     var w = L.warning;
-    el('warn-pill').textContent = w.ew_label;
-    el('warn-pill').className = 'nw-pill nw-risk-' + w.ew_label;
+    el('warn-pill').textContent = w.pill_label;
+    el('warn-pill').className = 'nw-pill ' + pillClass(w.pill_label);
+    el('warn-ttl').textContent = w.title_text;
     el('warn-reason').textContent = w.reason;
-    el('warn-cov').textContent = cov2(w.coverage_ratio);
-    el('warn-par').textContent = fmtUSD(w.principal_at_risk);
+
+    /* positive signal: green header */
+    var warnEl = el('lc-warning');
+    warnEl.classList.toggle('positive', w.pill_class === 'Low');
+
+    var mhtml = '';
+    (w.metrics || []).forEach(function(m){
+      mhtml += '<div class="m"><div class="v">' + m.value + '</div><div class="l">' + m.label + '</div></div>';
+    });
+    el('warn-metrics').innerHTML = mhtml;
   }
+
   function renderActionStatic(){
     var ac = L.action;
     el('act-pill').textContent = ac.priority;
@@ -393,6 +520,13 @@
     el('act-actor').textContent = ac.actor;
     el('act-outcome').textContent = ac.outcome;
     el('act-record').textContent = '+1 app.action_log';
+  }
+
+  function renderFooter(){
+    el('lc-foot').innerHTML =
+      'Lineage stays intact: every figure on this page traces back to <b>' + L.new_file.file_name +
+      '</b> (' + L.new_file.raw_rows + ' raw rows, ingested ' + L.new_file.ingested_at.slice(0,10) +
+      '). Synthetic data \u00b7 all numbers read from <span class="nw-mono">NW_SPEC.lifecycle</span>.';
   }
 
   /* ---------- navigation / render ---------- */
@@ -437,10 +571,9 @@
     el('btn-next').disabled = (cur === STEPS.length - 1);
     el('lc-progress-bar').style.width = ((cur + 1) / STEPS.length * 100) + '%';
     el('lc-count').innerHTML = 'Step <b>' + (cur + 1) + '</b> of ' + STEPS.length +
-      ' · ' + (LAYER_LABEL[STEPS[cur].layer] || STEPS[cur].layer);
+      ' \u00b7 ' + (LAYER_LABEL[STEPS[cur].layer] || STEPS[cur].layer);
   }
 
-  /* cumulative DB write log (the database state visibly growing) */
   function renderLedger(){
     var ul = el('lc-log');
     var items = [];
@@ -464,22 +597,22 @@
     body.classList.toggle('ba-after-pending', !active);
 
     if (covAnim){ cancelAnimationFrame(covAnim); covAnim = null; }
-    var b = L.before, a = L.after;
+
+    if (!BAR) return;
 
     if (!active){
-      setCoverage(b.coverage_ratio);
-      el('cov-threshold').classList.remove('alarm');
+      setBar(BAR.before);
+      var th = el('cov-threshold');
+      if (th) th.classList.remove('alarm');
       return;
     }
     if (animate){
-      el('cov-threshold').classList.remove('alarm');
-      void el('cov-threshold').offsetWidth;
-      el('cov-threshold').classList.add('alarm');
-      el('ba-as').textContent = b.refresh_ts + ' → ' + a.refresh_ts;
+      var th = el('cov-threshold');
+      if (th){ th.classList.remove('alarm'); void th.offsetWidth; th.classList.add('alarm'); }
       flashAfter();
-      animateCoverage(b.coverage_ratio, a.coverage_ratio, 950);
+      animateBar(BAR.before, BAR.after, 950);
     } else {
-      setCoverage(a.coverage_ratio);
+      setBar(BAR.after);
     }
   }
 
@@ -487,27 +620,6 @@
     Array.prototype.forEach.call(document.querySelectorAll('.ba-a'), function(n){
       n.classList.remove('flash'); void n.offsetWidth; n.classList.add('flash');
     });
-  }
-
-  function setCoverage(v){
-    var fill = el('cov-fill-a');
-    fill.style.width = covPct(v) + '%';
-    fill.style.background = covColor(v);
-    el('cov-now').textContent = cov2(v);
-    el('cov-now').style.color = covColor(v);
-  }
-
-  function animateCoverage(from, to, dur){
-    var t0 = null;
-    setCoverage(from);
-    function frame(ts){
-      if (t0 === null) t0 = ts;
-      var p = Math.min(1, (ts - t0) / dur);
-      var e = 1 - Math.pow(1 - p, 3);            /* easeOutCubic */
-      setCoverage(from + (to - from) * e);
-      if (p < 1) covAnim = requestAnimationFrame(frame);
-    }
-    covAnim = requestAnimationFrame(frame);
   }
 
   function renderEvents(){
@@ -518,9 +630,9 @@
   /* ---------- play / pause ---------- */
   function togglePlay(){ playing ? stop() : play(); }
   function play(){
-    if (cur >= STEPS.length - 1) go(0);          /* replay from start */
+    if (cur >= STEPS.length - 1) go(0);
     playing = true;
-    el('btn-play').innerHTML = '❚❚ Pause';
+    el('btn-play').innerHTML = '\u275a\u275a Pause';
     clearInterval(timer);
     timer = setInterval(function(){
       go(cur + 1);
@@ -530,7 +642,7 @@
   function stop(){
     playing = false;
     clearInterval(timer); timer = null;
-    el('btn-play').innerHTML = (cur >= STEPS.length - 1) ? '↻ Replay' : '▶ Play';
+    el('btn-play').innerHTML = (cur >= STEPS.length - 1) ? '\u21bb Replay' : '\u25b6 Play';
   }
 
   function onKey(e){
