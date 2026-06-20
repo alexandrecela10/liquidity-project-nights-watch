@@ -843,6 +843,11 @@ window.NW_SPEC = {
         "read": "FX unresolved — modelled cash at T1 stays ~0.41; the secured workout path is the lever."
       },
       "principal_at_risk": 6000000,
+      "contact": {
+        "name": "Amina Bello",
+        "role": "Treasurer",
+        "email": "a.bello@sahelagricorp.cm"
+      },
       "action": {
         "priority": "P1",
         "title": "Roll up sleeves — protect the coupon",
@@ -894,6 +899,11 @@ window.NW_SPEC = {
         "read": "Convertibility gap widens at T1 and the floating coupon adds pressure — modelled ~0.63."
       },
       "principal_at_risk": 3200000,
+      "contact": {
+        "name": "Chukwudi Okafor",
+        "role": "CFO",
+        "email": "c.okafor@lagosfinserve.ng"
+      },
       "action": {
         "priority": "P1",
         "title": "Roll up sleeves — confirm NGN convertibility",
@@ -944,6 +954,11 @@ window.NW_SPEC = {
         "read": "Modelled cash slips under 1.0 at T1 once energy costs are layered in — prepare workout options now."
       },
       "principal_at_risk": 2200000,
+      "contact": {
+        "name": "Joseph Mwanga",
+        "role": "CFO",
+        "email": "j.mwanga@dartelecom.tz"
+      },
       "action": {
         "priority": "P2",
         "title": "Structured workout prep",
@@ -994,6 +1009,11 @@ window.NW_SPEC = {
         "read": "Spot coverage 1.05 looks safe, but modelled cash at T1 dips to 0.97 if receivables slip — ~18 days of lead time to act."
       },
       "principal_at_risk": 900000,
+      "contact": {
+        "name": "Grace Wanjiku",
+        "role": "CFO",
+        "email": "g.wanjiku@nairobilogistics.ke"
+      },
       "action": {
         "priority": "P2",
         "title": "Structured — tighten reporting",
@@ -1043,6 +1063,11 @@ window.NW_SPEC = {
         "read": "Holds above the high-risk line through T1."
       },
       "principal_at_risk": 180000,
+      "contact": {
+        "name": "Robert Kato",
+        "role": "CFO",
+        "email": "r.kato@kampalapower.ug"
+      },
       "action": {
         "priority": "P3",
         "title": "Lightweight nudge",
@@ -1091,6 +1116,11 @@ window.NW_SPEC = {
         "read": "Comfortable through T1."
       },
       "principal_at_risk": 0,
+      "contact": {
+        "name": "Kwame Asante",
+        "role": "CFO",
+        "email": "k.asante@accraretail.gh"
+      },
       "action": {
         "priority": "P3",
         "title": "Standard monitoring",
@@ -1139,6 +1169,11 @@ window.NW_SPEC = {
         "read": "No cash leaves the borrower at T1."
       },
       "principal_at_risk": 0,
+      "contact": {
+        "name": "Diane Uwimana",
+        "role": "Company Secretary",
+        "email": "d.uwimana@kigaliagro.rw"
+      },
       "action": {
         "priority": "P4",
         "title": "Handle leanly",
@@ -1187,6 +1222,11 @@ window.NW_SPEC = {
         "read": "Comfortable; mostly hard-currency cash."
       },
       "principal_at_risk": 0,
+      "contact": {
+        "name": "Youssef El Fassi",
+        "role": "CFO",
+        "email": "y.elfassi@casablancafoods.ma"
+      },
       "action": {
         "priority": "P4",
         "title": "Handle leanly",

@@ -139,6 +139,11 @@
   .rec ol li { font-size: 12.5px; margin: 4px 0; }
   .quad { font-size: 11.5px; color: var(--taupe); margin-top: 10px; border-top: 1px dashed var(--sand-700); padding-top: 9px; }
   .quad b { color: var(--ink-700); }
+  .rec-email { display:flex; align-items:center; gap:10px; margin-top:12px; padding-top:10px; border-top:1px solid var(--sand-500); }
+  .rec-email a { display:inline-flex; align-items:center; gap:6px; font-size:12.5px; font-weight:600;
+    padding:7px 14px; border-radius:999px; background:var(--ink); color:var(--sand); text-decoration:none; }
+  .rec-email a:hover { background:var(--ink-700); }
+  .rec-email .contact-info { font-size:11.5px; color:var(--taupe); }
 
   /* form */
   .form-row { display:flex; gap: 10px; margin-bottom: 10px; }
@@ -368,11 +373,11 @@
   <nav class="nw-nav">
     <a href="index.html">Overview</a>
     <a href="product.html" class="active">Credit desk</a>
-    <a href="diagram.html">Data architecture</a>
-    <a href="lifecycle.html">Lifecycle</a>
-    <a href="roadmap.html">Data roadmap</a>
-    <a href="dictionary.html">Dictionary</a>
     <a href="demo.html">Demo</a>
+    <a href="dictionary.html">Dictionary</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="roadmap.html">Data roadmap</a>
     <a href="agent.html">Agent (TBD)</a>
   </nav>
 </div>
@@ -990,7 +995,8 @@
       '</table>' +
       (act ? ('<h2>Recommended action <span class="pill pill-pri">'+esc(act.priority)+'</span></h2>' +
         '<p class="act-title">'+esc(act.title)+'</p><p class="act-why">'+esc(act.why)+'</p>' +
-        ((act.steps&&act.steps.length)?('<ol>'+act.steps.map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol>'):'')) : '') +
+        ((act.steps&&act.steps.length)?('<ol>'+act.steps.map(function(s){return '<li>'+esc(s)+'</li>';}).join('')+'</ol>'):'') +
+        (c.contact ? '<p style="margin-top:8px;"><b>Contact:</b> '+esc(c.contact.name)+' ('+esc(c.contact.role)+') &mdash; '+esc(c.contact.email)+'</p>' : '')) : '') +
       (alerts.length ? ('<h2>Active alerts</h2><ul>'+alerts.map(function(a){return '<li>'+esc(a)+'</li>';}).join('')+'</ul>') : '') +
       '<footer class="rep-foot">'+esc(SPEC.meta.note)+' &middot; '+esc(SPEC.meta.product)+' ('+esc(SPEC.meta.version)+') &middot; synthetic data, illustrative only.</footer>' +
       '</body></html>';
@@ -1471,6 +1477,18 @@
     html += '<div class="rec-top"><span class="nw-p nw-p-'+act.priority+'">'+act.priority+'</span><h3>'+esc(act.title)+'</h3></div>';
     html += '<div class="why">'+esc(act.why)+'</div>';
     html += '<ol>'+act.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ol>';
+    if (c.contact) {
+      var subj = encodeURIComponent(act.title + ' — ' + c.name + ' (' + loan.loan_id + ')');
+      var body = encodeURIComponent('Dear ' + c.contact.name + ',\n\n' +
+        'Re: ' + c.name + ' — ' + loan.loan_id + '\n\n' +
+        act.why + '\n\n' +
+        'Recommended steps:\n' + act.steps.map(function(s,i){return (i+1)+'. '+s;}).join('\n') +
+        '\n\nPlease advise at your earliest convenience.\n\nBest regards,\nCredit Team');
+      html += '<div class="rec-email">';
+      html += '<a href="mailto:'+esc(c.contact.email)+'?subject='+subj+'&body='+body+'">✉ Email '+esc(c.contact.name)+'</a>';
+      html += '<span class="contact-info">'+esc(c.contact.role)+' · '+esc(c.contact.email)+'</span>';
+      html += '</div>';
+    }
     if (quad) html += '<div class="quad"><b>'+quad.priority+' · '+esc(quad.name)+'</b> — '+esc(quad.when)+'. '+esc(quad.posture)+'</div>';
     html += '</div></div>';
 
