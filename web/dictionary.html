@@ -79,8 +79,8 @@
     <div class="dseg" id="hzSeg" role="tablist" aria-label="Filter by data horizon">
       <button type="button" data-hz="All" class="on" role="tab">All</button>
       <button type="button" data-hz="Now" role="tab">Now</button>
-      <button type="button" data-hz="Medium" role="tab">Medium</button>
-      <button type="button" data-hz="Later" role="tab">Later</button>
+      <button type="button" data-hz="Medium" role="tab">1m</button>
+      <button type="button" data-hz="Later" role="tab">2m</button>
     </div>
     <div class="dsearch"><input id="dq" type="search" placeholder="Search metric, formula or evidence…" aria-label="Search the dictionary"></div>
     <span class="dcount" id="dcount"></span>
@@ -132,8 +132,9 @@
     if(/\u2192/.test(iso) || /[A-Za-z]/.test(iso) || /Q/.test(iso)) return iso;  // ranges / quarters left as-is
     var d=new Date(iso+'T00:00:00');
     return isNaN(d) ? iso : d.toLocaleDateString('en-US',{year:'numeric',month:'short',day:'numeric'}); }
+  function phaseLabel(p){ return p==='Medium'?'1m':p==='Later'?'2m':p; }
   function hzChip(h){ var cls = (h==='Now'||h==='Medium'||h==='Later') ? 'nw-phase-'+h : '';
-    return '<span class="nw-phase '+cls+'">'+esc(h||'—')+'</span>'; }
+    return '<span class="nw-phase '+cls+'">'+esc(phaseLabel(h)||'—')+'</span>'; }
 
   function init(){
     EV = (window.NW_SPEC && window.NW_SPEC.evidence) || { metrics:{}, files:[] };
