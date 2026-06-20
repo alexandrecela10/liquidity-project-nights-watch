@@ -145,6 +145,29 @@
   .rec-email a:hover { background:var(--ink-700); }
   .rec-email .contact-info { font-size:11.5px; color:var(--taupe); }
 
+  /* evidence trail — before→after for every claim */
+  .ev-toggle { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:600; color:var(--taupe); background:none; border:1px dashed var(--sand-700); border-radius:999px; padding:4px 11px; margin-top:12px; cursor:pointer; transition:background .12s; }
+  .ev-toggle:hover { background:var(--sand-500); color:var(--ink); }
+  .ev-toggle .ev-icon { font-size:12px; transition:transform .15s; }
+  .ev-toggle.open .ev-icon { transform:rotate(90deg); }
+  .ev-trail { margin-top:8px; border:1px solid var(--sand-500); border-radius:var(--radius-sm); overflow:hidden; }
+  .ev-trail.hidden { display:none; }
+  .ev-row { display:grid; grid-template-columns:52px 1fr 72px 14px 72px 1fr; gap:0 6px; align-items:baseline; padding:7px 10px; font-size:11.5px; border-bottom:1px solid var(--sand-500); }
+  .ev-row:last-child { border-bottom:none; }
+  .ev-row:nth-child(odd) { background:var(--white); }
+  .ev-row:nth-child(even) { background:var(--sand); }
+  .ev-ref { font-size:9.5px; font-weight:700; text-transform:uppercase; letter-spacing:.03em; color:var(--taupe); }
+  .ev-field { font-weight:600; color:var(--ink-700); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+  .ev-val { font-family:var(--mono); font-weight:600; text-align:right; white-space:nowrap; }
+  .ev-val.before { color:var(--taupe); }
+  .ev-val.after { color:var(--ink); }
+  .ev-arrow { text-align:center; color:var(--sand-700); font-size:10px; }
+  .ev-delta { font-size:10.5px; color:var(--ink-700); }
+  .ev-delta.neg { color:var(--risk-high); }
+  .ev-delta.pos { color:var(--risk-low); }
+  .ev-src { display:block; font-family:var(--mono); font-size:9.5px; color:var(--taupe); margin-top:1px; }
+  .ev-head { display:grid; grid-template-columns:52px 1fr 72px 14px 72px 1fr; gap:0 6px; padding:5px 10px; background:var(--sand-500); font-size:9px; font-weight:700; text-transform:uppercase; letter-spacing:.05em; color:var(--taupe); }
+
   /* form */
   .form-row { display:flex; gap: 10px; margin-bottom: 10px; }
   .field { flex:1; display:flex; flex-direction:column; gap: 4px; }
@@ -1477,6 +1500,24 @@
     html += '<div class="rec-top"><span class="nw-p nw-p-'+act.priority+'">'+act.priority+'</span><h3>'+esc(act.title)+'</h3></div>';
     html += '<div class="why">'+esc(act.why)+'</div>';
     html += '<ol>'+act.steps.map(function(s){ return '<li>'+esc(s)+'</li>'; }).join('')+'</ol>';
+    if (act.evidence && act.evidence.length) {
+      var eid = 'ev-'+c.company_id;
+      html += '<button class="ev-toggle" onclick="var t=document.getElementById(\''+eid+'\');t.classList.toggle(\'hidden\');this.classList.toggle(\'open\')"><span class="ev-icon">&#x25B6;</span>Evidence trail ('+act.evidence.length+')</button>';
+      html += '<div id="'+eid+'" class="ev-trail hidden">';
+      html += '<div class="ev-head"><span>Ref</span><span>Field</span><span>Before</span><span></span><span>After</span><span>Change · source</span></div>';
+      act.evidence.forEach(function(ev){
+        var dc = ev.delta.charAt(0)==='\u25BC'?'neg':ev.delta.charAt(0)==='\u25B2'?'pos':'';
+        html += '<div class="ev-row">';
+        html += '<span class="ev-ref">'+esc(ev.ref)+'</span>';
+        html += '<span class="ev-field" title="'+esc(ev.field)+'">'+esc(ev.field)+'</span>';
+        html += '<span class="ev-val before">'+esc(ev.before)+'</span>';
+        html += '<span class="ev-arrow">&rarr;</span>';
+        html += '<span class="ev-val after">'+esc(ev.after)+'</span>';
+        html += '<span class="ev-delta '+dc+'">'+esc(ev.delta)+'<span class="ev-src">'+esc(ev.source)+'</span></span>';
+        html += '</div>';
+      });
+      html += '</div>';
+    }
     if (c.contact) {
       var subj = encodeURIComponent(act.title + ' — ' + c.name + ' (' + loan.loan_id + ')');
       var body = encodeURIComponent('Dear ' + c.contact.name + ',\n\n' +
