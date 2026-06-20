@@ -253,6 +253,32 @@
 .ag-risk .th-challenge b { color:var(--ink); }
 @media (max-width: 700px) { .ag-risk .th-grid { grid-template-columns:1fr; } .ag-skills-grid { grid-template-columns:1fr; } .ag-arch { flex-direction:column; } }
 
+/* ---- collapsible skills ---- */
+.ag-skills-wrap { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); margin-bottom:20px; overflow:hidden; }
+.ag-sk-toggle { display:flex; align-items:center; justify-content:space-between; padding:14px 20px;
+  cursor:pointer; user-select:none; }
+.ag-sk-toggle:hover { background:var(--sand); }
+.ag-sk-toggle .sk-label { font-size:14px; font-weight:600; }
+.ag-sk-toggle .sk-label .sk-count { font-family:var(--mono); color:var(--deep-green); }
+.ag-sk-toggle .sk-chevron { font-size:16px; color:var(--taupe); transition:transform .2s ease; }
+.ag-sk-toggle .sk-chevron.open { transform:rotate(90deg); }
+.ag-sk-body { display:none; border-top:1px solid var(--sand-500); padding:16px 20px; }
+.ag-sk-body.open { display:block; }
+
+/* ---- collapsible audit ---- */
+.ag-audit-wrap { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); margin-bottom:20px; overflow:hidden; }
+.ag-au-toggle { display:flex; align-items:center; justify-content:space-between; padding:14px 20px;
+  cursor:pointer; user-select:none; }
+.ag-au-toggle:hover { background:var(--sand); }
+.ag-au-toggle .au-label { font-size:14px; font-weight:600; }
+.ag-au-toggle .au-label .au-count { font-family:var(--mono); color:var(--taupe); }
+.ag-au-toggle .au-chevron { font-size:16px; color:var(--taupe); transition:transform .2s ease; }
+.ag-au-toggle .au-chevron.open { transform:rotate(90deg); }
+.ag-audit-body { display:none; border-top:1px solid var(--sand-500); }
+.ag-audit-body.open { display:block; }
+
 /* footer */
 .ag-footer { text-align:center; font-size:11px; color:var(--taupe); margin-top:32px; padding-top:16px;
   border-top:1px solid var(--sand-500); }
@@ -385,39 +411,20 @@ function init(){
     var w = document.getElementById('agWrap');
     var html = '';
 
-    /* future marker */
-    html += '<div class="ag-future">Future \u00b7 preview \u2014 later-phase vision</div>';
-
-    /* header */
+    /* header — clean, no badge */
     html += '<div class="ag-header">';
     html += '<h1>Morning briefing</h1>';
     html += '<div class="ag-meta">Agent ran <b>06:00 UTC</b> \u00b7 <b>'+P.length+'</b> companies swept \u00b7 <b>'+needYou.length+'</b> need you</div>';
     html += '</div>';
 
-    /* tool-call chips */
-    html += '<div class="ag-tools">';
-    TOOL_CALLS.forEach(function(t){
-      var dotCls = t.status==='ok'?'ok':t.status==='retry'?'retry':'cached';
-      html += '<div class="ag-tool"><span class="dot '+dotCls+'"></span>';
-      html += '<span class="srv">'+esc(t.srv)+'</span>';
-      html += '<span class="fn">\u00b7 '+esc(t.fn)+'('+esc(t.args)+')</span>';
-      html += '<span class="res">\u2192 '+esc(t.res)+'</span>';
-      if(t.tag) html += '<span class="tag '+dotCls+'">'+esc(t.tag)+'</span>';
-      html += '</div>';
-    });
-    html += '</div>';
-    html += '<div class="ag-mcp-note">The agent reads from the <b>pipeline\u2019s gold layer</b> (deterministic, auditable). Actions are either <b>human-initiated</b> (P1/P2) or <b>deterministic automation</b> (P3/P4 \u2014 template-based, rule-triggered, with a 15-min hold-and-undo buffer). No LLM-driven tool calls into production systems.</div>';
-
-    /* summary */
+    /* summary — tighter */
     var atRisk = P.filter(function(c){return c.coverage<THRESH;}).length;
     var totalPar = P.reduce(function(s,c){return s+c.principal_at_risk;},0);
     html += '<div class="ag-summary">';
-    html += 'Overnight sweep complete. <strong>'+P.length+' portfolio companies</strong> checked against coverage thresholds and the P1\u2013P4 action framework. ';
-    html += '<strong>'+holding.length+' are holding</strong> \u2014 coverage stable or actions already in progress. ';
-    html += '<strong>'+needYou.length+' need your attention:</strong> ';
-    html += '<strong>Sahel AgriCorp</strong> (P1 \u00b7 '+usdM(SAHEL.principal_at_risk)+' at risk \u00b7 coverage '+SAHEL.coverage.toFixed(2)+' \u00b7 FX-blocked EUR account) and ';
-    html += '<strong>Kigali Agro</strong> (P4 \u00b7 compliance certificate 5 days overdue \u00b7 auto-eligible). ';
-    html += 'Total portfolio principal at risk: <strong>'+usdM(totalPar)+'</strong> across '+atRisk+' companies below the '+THRESH.toFixed(2)+' high-risk line.';
+    html += '<strong>'+needYou.length+' need your attention</strong> out of '+P.length+' companies. ';
+    html += '<strong>Sahel AgriCorp</strong> (P1 \u00b7 '+usdM(SAHEL.principal_at_risk)+' at risk \u00b7 coverage '+SAHEL.coverage.toFixed(2)+' \u00b7 FX-blocked) and ';
+    html += '<strong>Kigali Agro</strong> (P4 \u00b7 compliance certificate overdue \u00b7 auto-eligible). ';
+    html += 'The other '+holding.length+' are holding. Total principal at risk: <strong>'+usdM(totalPar)+'</strong>.';
     html += '</div>';
 
     /* section: needs attention */
@@ -444,17 +451,22 @@ function init(){
     html += '<div class="ag-response" id="agResponse"></div>';
     html += '</div>';
 
-    /* audit trail */
-    html += '<div class="ag-section">Agent audit trail</div>';
-    html += '<div class="ag-audit" id="agAudit">';
-    html += '<div class="ag-audit-head"><span class="panel-title">Audit trail</span><span style="font-size:11px;color:var(--taupe);" id="auditCount">'+auditLog.length+' entries</span></div>';
-    html += '<ul class="ag-audit-list" id="agAuditList"></ul>';
-    html += '</div>';
-
-    /* ---- skills section ---- */
+    /* ---- collapsible: how it works (architecture + skills) ---- */
+    html += '<div class="ag-section">How it works</div>';
     html += renderSkills();
 
-    /* ---- guardrails section (collapsed) ---- */
+    /* ---- collapsible: audit trail ---- */
+    html += '<div class="ag-audit-wrap">';
+    html += '<div class="ag-au-toggle" id="auToggle">';
+    html += '<span class="au-label">Agent audit trail <span class="au-count" id="auditCount">'+auditLog.length+' entries</span></span>';
+    html += '<span class="au-chevron" id="auChevron">\u25B8</span>';
+    html += '</div>';
+    html += '<div class="ag-audit-body" id="auBody">';
+    html += '<ul class="ag-audit-list" id="agAuditList"></ul>';
+    html += '</div>';
+    html += '</div>';
+
+    /* ---- collapsible: guardrails ---- */
     html += renderGuardrails();
 
     /* compliance note */
@@ -734,6 +746,34 @@ function init(){
       }
     });
 
+    /* skills toggle */
+    var skToggle = document.getElementById('skToggle');
+    if (skToggle) skToggle.addEventListener('click', function(){
+      var body = document.getElementById('skBody');
+      var chev = document.getElementById('skChevron');
+      if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        chev.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        chev.classList.add('open');
+      }
+    });
+
+    /* audit trail toggle */
+    var auToggle = document.getElementById('auToggle');
+    if (auToggle) auToggle.addEventListener('click', function(){
+      var body = document.getElementById('auBody');
+      var chev = document.getElementById('auChevron');
+      if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        chev.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        chev.classList.add('open');
+      }
+    });
+
     /* conversational input */
     var suggestions = document.querySelectorAll('.ag-suggest');
     Array.prototype.forEach.call(suggestions, function(btn){
@@ -812,12 +852,18 @@ function init(){
 
   function renderSkills(){
     var html = '';
-    html += '<div class="ag-section">Skills \u2014 the Credit team\u2019s playbooks, encoded</div>';
-    html += '<div class="ag-skills-note">Each skill is a <b>SKILL.md</b> file: trigger condition, steps, guardrails \u2014 written by the <b>loan-savior operators</b>, not the model. The agent loads the right skill for the situation. Skills are <b>version-controlled, reviewable</b>, and only vetted ones are installed.</div>';
+
+    /* collapsible wrapper */
+    html += '<div class="ag-skills-wrap">';
+    html += '<div class="ag-sk-toggle" id="skToggle">';
+    html += '<span class="sk-label">Architecture + <span class="sk-count">4</span> credit team skills</span>';
+    html += '<span class="sk-chevron" id="skChevron">\u25B8</span>';
+    html += '</div>';
+    html += '<div class="ag-sk-body" id="skBody">';
 
     /* architecture strip */
-    html += '<div class="ag-arch">';
-    html += '<div class="ag-arch-item"><div class="ai-label">Pipeline \u2014 the intelligence</div><div class="ai-body">Coverage \u00b7 recoverability \u00b7 P1\u2013P4</div></div>';
+    html += '<div class="ag-arch" style="margin-top:0;">';
+    html += '<div class="ag-arch-item"><div class="ai-label">Pipeline</div><div class="ai-body">Coverage \u00b7 recoverability \u00b7 P1\u2013P4</div></div>';
     html += '<span class="ag-arch-arrow">\u2192</span>';
     html += '<div class="ag-arch-item"><div class="ai-label">Credit agent</div><div class="ai-body">Reads the signal, picks the skill</div></div>';
     html += '<span class="ag-arch-arrow">\u2192</span>';
@@ -825,7 +871,7 @@ function init(){
     html += '<span class="ag-arch-arrow">\u2192</span>';
     html += '<div class="ag-arch-item"><div class="ai-label">Deterministic automation</div><div class="ai-body">Template actions \u00b7 human for the rest</div></div>';
     html += '</div>';
-    html += '<div style="font-size:11px;color:var(--taupe);margin:-12px 0 16px;">New data lands \u2192 <b>Pipeline</b> computes the signal (deterministic, auditable) \u2192 <b>Agent</b> reads the pipeline output, determines the situation \u2192 loads the right <b>Skill</b> (the team\u2019s playbook for that case) \u2192 reversible low-stakes actions execute via <b>deterministic automation</b> (template-based, 15-min hold); everything else stays human. Skills never decide; they guide.</div>';
+    html += '<div style="font-size:11px;color:var(--taupe);margin:0 0 16px;">New data lands \u2192 <b>Pipeline</b> computes the signal \u2192 <b>Agent</b> reads the output, picks the <b>Skill</b> \u2192 reversible low-stakes actions execute via <b>deterministic automation</b>; everything else stays human.</div>';
 
     html += '<div class="ag-skills-grid">';
 
@@ -890,15 +936,17 @@ function init(){
 
     html += '</div>'; /* /skills-grid */
 
-    html += '<div style="font-size:11.5px;color:var(--taupe);margin-bottom:8px;"><b>Automation rule:</b> only reversible, low-stakes, low-principal actions auto-run \u2014 every auto-action carries a <b>15-minute hold-and-undo buffer</b> before it commits. Irreversible calls always stay human.</div>';
+    html += '<div style="font-size:11.5px;color:var(--taupe);margin-bottom:0;"><b>Automation rule:</b> only reversible, low-stakes, low-principal actions auto-run \u2014 every auto-action carries a <b>15-minute hold-and-undo buffer</b>. Irreversible calls always stay human.</div>';
+
+    html += '</div>'; /* /sk-body */
+    html += '</div>'; /* /skills-wrap */
 
     return html;
   }
 
   function renderGuardrails(){
     var html = '';
-    html += '<div class="ag-section">Agentic guardrails</div>';
-    html += '<div class="ag-guardrails-wrap" id="agGuardrails">';
+    html += '<div class="ag-guardrails-wrap" id="agGuardrails" style="margin-top:20px;">';
     html += '<div class="ag-gr-toggle" id="grToggle">';
     html += '<span class="gr-label"><span class="gr-count">6</span> risk principles for this pipeline + agent architecture</span>';
     html += '<span class="gr-chevron" id="grChevron">\u25B8</span>';
