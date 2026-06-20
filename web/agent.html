@@ -808,15 +808,15 @@ function init(){
 
     /* architecture strip */
     html += '<div class="ag-arch">';
+    html += '<div class="ag-arch-item"><div class="ai-label">Pipeline \u2014 the intelligence</div><div class="ai-body">Coverage \u00b7 recoverability \u00b7 P1\u2013P4</div></div>';
+    html += '<span class="ag-arch-arrow">\u2192</span>';
+    html += '<div class="ag-arch-item"><div class="ai-label">Credit agent</div><div class="ai-body">Reads the signal, picks the skill</div></div>';
+    html += '<span class="ag-arch-arrow">\u2192</span>';
     html += '<div class="ag-arch-item"><div class="ai-label">Skills</div><div class="ai-body">Credit team\u2019s playbooks</div></div>';
     html += '<span class="ag-arch-arrow">\u2192</span>';
-    html += '<div class="ag-arch-item"><div class="ai-label">Credit agent</div><div class="ai-body">Loads the right skill</div></div>';
-    html += '<span class="ag-arch-arrow">\u2192</span>';
     html += '<div class="ag-arch-item"><div class="ai-label">MCP \u2014 the reach</div><div class="ai-body">banking \u00b7 crm \u00b7 comms \u00b7 calendar</div></div>';
-    html += '<span class="ag-arch-arrow">\u2192</span>';
-    html += '<div class="ag-arch-item"><div class="ai-label">Pipeline \u2014 the intelligence</div><div class="ai-body">Coverage \u00b7 recoverability \u00b7 P1\u2013P4</div></div>';
     html += '</div>';
-    html += '<div style="font-size:11px;color:var(--taupe);margin:-12px 0 16px;"><b>MCP</b> = reach into systems (not where decisions happen). <b>Pipeline</b> = deterministic, tested, auditable intelligence. <b>Skills</b> never decide; they guide.</div>';
+    html += '<div style="font-size:11px;color:var(--taupe);margin:-12px 0 16px;">New data lands \u2192 <b>Pipeline</b> computes the signal (deterministic, auditable) \u2192 <b>Agent</b> reads the output, determines the situation \u2192 loads the right <b>Skill</b> (the team\u2019s playbook for that case) \u2192 executes steps via <b>MCP</b> tools. Skills never decide; they guide.</div>';
 
     html += '<div class="ag-skills-grid">';
 
