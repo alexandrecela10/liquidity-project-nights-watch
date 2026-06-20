@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Data roadmap — what unlocks Now / Medium / Later · Night's Watch</title>
+<title>Data roadmap — what unlocks Now / 1m / 2m · Night's Watch</title>
 <link rel="stylesheet" href="theme.css">
 <style>
   .rm-wrap { max-width: var(--maxw); margin: 0 auto; padding: 0 22px 60px; }
@@ -105,7 +105,7 @@
 <div class="rm-wrap">
   <div class="rm-head">
     <div>
-      <h1>Data roadmap — what unlocks Now / Medium / Later</h1>
+      <h1>Data roadmap — what unlocks Now / 1m / 2m</h1>
       <p class="lede">The credit desk is useful from day one on banking + loan data, and it gets sharper as more data lands. Here's where each signal comes from and how the See → Understand → Prioritise → Decide → Act workflow deepens at each horizon. Pick a horizon to focus the view.</p>
     </div>
     <div class="dg-ctl-group">
@@ -113,8 +113,8 @@
       <div class="dg-seg" id="seg" role="tablist" aria-label="Data horizon">
         <button type="button" data-phase="All" role="tab">All</button>
         <button type="button" data-phase="Now" role="tab">Now</button>
-        <button type="button" data-phase="Medium" role="tab">Medium</button>
-        <button type="button" data-phase="Later" role="tab">Later</button>
+        <button type="button" data-phase="Medium" role="tab">1m</button>
+        <button type="button" data-phase="Later" role="tab">2m</button>
       </div>
     </div>
   </div>
@@ -162,6 +162,7 @@
     return (['All','Now','Medium','Later'].indexOf(m) >= 0) ? m : 'All';
   }
   function idx(p){ return PHASES.indexOf(p); }
+  function phaseLabel(p){ return p==='Medium'?'1m':p==='Later'?'2m':p; }
   // cumulative: a horizon-row is "reached" by the selected phase (All reaches everything)
   function reached(rowPhase){ return PHASE === 'All' || idx(rowPhase) <= idx(PHASE); }
   function isNewAt(rowPhase){ return PHASE !== 'All' && rowPhase === PHASE; }
@@ -205,7 +206,7 @@
       var u = UNLOCKS[p] || {};
       var sets = (u.datasets||[]).map(function(d){ return '<span class="set">'+esc(d)+'</span>'; }).join('');
       return '<div class="u-card h-'+p+'" data-phase="'+p+'">' +
-               '<span class="step"><span class="pin"></span>'+esc(p)+'</span>' +
+               '<span class="step"><span class="pin"></span>'+esc(phaseLabel(p))+'</span>' +
                '<h3>'+esc(u.title||'')+'</h3>' +
                '<div class="sets">'+sets+'</div>' +
                '<div class="sum">'+esc(u.summary||'')+'</div>' +
@@ -227,7 +228,7 @@
         var metricChips = chips(ph.metrics, false, p);
         var actionChips = chips(ph.actions, true, p);
         return '<div class="ph-row ph-'+p+'" data-phase="'+p+'">' +
-                 '<div class="ph-key"><span class="pin"></span><span class="h">'+esc(p)+'</span></div>' +
+                 '<div class="ph-key"><span class="pin"></span><span class="h">'+esc(phaseLabel(p))+'</span></div>' +
                  '<div>' +
                    '<div class="what">'+esc(ph.what||'')+'</div>' +
                    '<div class="analysis">'+esc(ph.analysis||'')+'</div>' +
@@ -253,7 +254,7 @@
                '<td class="method">'+esc(m.method)+'</td>' +
                '<td class="conf">'+esc(m.confidence)+'</td>' +
                '<td><span class="diff diff-'+esc(m.difficulty)+'">'+esc(m.difficulty)+'</span></td>' +
-               '<td><span class="hz-pill hz-'+ph+'">'+esc(ph)+'</span></td>' +
+               '<td><span class="hz-pill hz-'+ph+'">'+esc(phaseLabel(ph))+'</span></td>' +
              '</tr>';
     }).join('');
   }
@@ -277,9 +278,9 @@
       if (on) anyBright = true; else anyDim = true;
     });
     var note = document.getElementById('filterNote');
-    if (PHASE === 'All'){ note.textContent = 'Showing every horizon. Pick Now / Medium / Later to focus.'; }
-    else if (PHASE === 'Medium'){ note.textContent = 'Medium adds no new raw feed — it unlocks analysis (recoverability) on top of the Now signals.'; }
-    else { note.textContent = 'Showing the signals available by ' + PHASE + ' (cumulative); later-horizon signals are dimmed.'; }
+    if (PHASE === 'All'){ note.textContent = 'Showing every horizon. Pick Now / 1m / 2m to focus.'; }
+    else if (PHASE === 'Medium'){ note.textContent = '1m adds no new raw feed — it unlocks analysis (recoverability) on top of the Now signals.'; }
+    else { note.textContent = 'Showing the signals available by ' + phaseLabel(PHASE) + ' (cumulative); later-horizon signals are dimmed.'; }
   }
 </script>
 </body>

@@ -352,7 +352,7 @@
       var card = h('div','dg-node dg-input'); card.id = 'in-' + inp.id;
       var top = h('div','dg-node-top');
       top.appendChild(h('span','nm', inp.name));
-      top.appendChild(h('span','nw-phase nw-phase-' + inp.phase, inp.phase));
+      top.appendChild(h('span','nw-phase nw-phase-' + inp.phase, phaseLabel(inp.phase)));
       card.appendChild(top);
       var grain = h('p','grain'); grain.innerHTML = 'grain: <b>' + esc(inp.grain) + '</b>';
       card.appendChild(grain);
@@ -451,7 +451,7 @@
       top.appendChild(nm);
       if(e.spine) top.appendChild(h('span','nw-pill nw-risk-Low', 'spine'));
       if(e.golden) top.appendChild(h('span','nw-pill nw-risk-Medium', 'golden'));
-      top.appendChild(h('span','nw-phase nw-phase-' + e.phase, e.phase));
+      top.appendChild(h('span','nw-phase nw-phase-' + e.phase, phaseLabel(e.phase)));
       card.appendChild(top);
       var grain = h('p','grain'); grain.innerHTML = 'grain: <b>' + esc(e.grain) + '</b>';
       card.appendChild(grain);
@@ -475,11 +475,14 @@
     function line(label, val){ var p = h('p','dg-mini'); p.innerHTML = '<b>' + esc(label) + ':</b> ' + esc(val); return p; }
     function esc(s){ return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+    // ---- phase label helper ----
+    function phaseLabel(p){ return p==='Medium'?'1m':p==='Later'?'2m':p; }
+
     // ---- phase filter buttons ----
     var phases = ['All']; SPEC.inputs.concat(SPEC.entities).forEach(function(x){ if(x.phase && phases.indexOf(x.phase) === -1) phases.push(x.phase); });
     var phaseSeg = document.getElementById('dg-phase');
     phases.forEach(function(p){
-      var b = h('button', p === 'All' ? 'on' : '', p); b.setAttribute('data-phase', p);
+      var b = h('button', p === 'All' ? 'on' : '', phaseLabel(p)); b.setAttribute('data-phase', p);
       b.addEventListener('click', function(){ state.phase = p; syncSeg(phaseSeg, 'data-phase', p); recompute(); });
       phaseSeg.appendChild(b);
     });
