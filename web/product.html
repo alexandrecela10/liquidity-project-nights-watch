@@ -1132,18 +1132,18 @@
     var par = c.principal_at_risk || 0;
     if (isPik && (loan.cash_to_repay_t1 || 0) === 0)
       return { label:'N/A', score:null, savable:0,
-        read:'Input: payment type PIK, cash due $0. Output: N/A — no cash servicing at T1; nothing to recover.' };
+        read:'PIK payment; $0 cash due at T1. Nothing to recover.' };
     if (par === 0)
       return { label:'Strong', score:0.92, savable:0,
-        read:'Input: ' + sen + ', $0 principal at risk, ' + pct(share) + ' transferable. Output: Strong — fully covered; no intervention needed.' };
+        read:sen + '. $0 at risk, ' + pct(share) + ' transferable. Fully covered; no intervention needed.' };
     var s = 0.35 + 0.20*senior + 0.20*secured - 0.12*(c.prior_issues||0) - 0.10*(1 - share);
     s = Math.max(0.10, Math.min(0.97, s));
     var prior = (c.prior_issues > 0) ? (c.prior_issues + ' prior miss' + (c.prior_issues>1?'es':'')) : 'no prior misses';
     var trap = share < 0.25
-      ? pct(share) + ' transferable (most cash is restricted / non-convertible)'
-      : pct(share) + ' transferable (hard-currency)';
+      ? pct(share) + ' transferable (restricted)'
+      : pct(share) + ' transferable';
     return { label:fpLabel(s), score:s, savable:Math.round(par*s),
-      read:'Input: ' + sen + ', ' + prior + ', ' + trap + '. Output: ' + fpLabel(s) + ' (' + s.toFixed(2) + ') — savable ' + usd(Math.round(par*s)) + ' of ' + usd(par) + ' at risk.' };
+      read:sen + ', ' + prior + ', ' + trap + '. ' + fpLabel(s) + ' (' + s.toFixed(2) + ') — ' + usd(Math.round(par*s)) + ' savable of ' + usd(par) + ' at risk.' };
   }
   function recovPill(label){
     return label==='N/A'
@@ -1428,7 +1428,7 @@
       html += fact('Savable money', tip('savable-money-first-pass', fp.savable>0?usd(fp.savable):'—'), 'recoverable of the principal at risk', fp.savable>0?'var(--ink)':'var(--taupe)', true);
       html += '</div>';
       html += '<div style="font-size:12px;color:var(--ink-700);line-height:1.45;margin-top:10px;">'+esc(fp.read)+'</div>';
-      html += '<div style="font-size:11.5px;color:var(--taupe);line-height:1.45;margin-top:8px;"><b>Input:</b> loan seniority + cash position + convertibility (bank data). <b>Output:</b> first-pass recoverability + savable estimate. <b>Medium</b> adds balance sheet &amp; cashflow \u2192 confirms whether the gap is fundable within the payment window.</div>';
+      html += '<div style="font-size:11.5px;color:var(--taupe);line-height:1.45;margin-top:8px;">From loan seniority, cash position &amp; convertibility. <b>Medium</b> adds balance sheet &amp; cashflow to confirm whether the gap is fundable before T1.</div>';
       html += '</div>';
     }
 
@@ -1444,7 +1444,7 @@
       html += fact('Savable money', tip('savable-money-sharpened', r.savable_usd>0?usd(r.savable_usd):'—'), 'recoverable of the principal at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)', true);
       html += '</div>';
       html += '<div class="ph-read">'+esc(r.read)+'</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> <b>Input</b> — balance sheet + cashflow (Medium). <b>Output</b> — confirms whether trapped cash is backed by receivables (gap closes within payment window) or is structurally inaccessible (requires bridge/intervention). Sharpens P1–P4 classification by savable money.</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> balance sheet + cashflow confirm whether trapped cash is backed by receivables (fundable) or structurally inaccessible (needs bridge). Sharpens P1–P4 by savable money.</div>';
       html += '</div>';
     }
 
@@ -1463,7 +1463,7 @@
         '<div class="rng-cap">Expected range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1 (worst \u2192 base). Best case '+f.coverage_t1_best.toFixed(2)+' if FX frees up. <b>Size the bridge against the worst case</b>, not the mid-point.</div>' +
       '</div>';
       html += '<div class="ph-read">'+esc(f.read)+'. Drivers: '+esc(f.drivers)+'.</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> <b>Input</b> — FX forecasts + rate/input-cost models (Later). <b>Output</b> — modelled coverage at T1 under worst/base/best scenarios. Size any bridge against the worst-case gap; re-run as market inputs change.</div>';
+      html += '<div class="ph-do"><b>Unlocked action:</b> FX forecasts + rate/input-cost models produce worst/base/best coverage at T1. Size any bridge against worst case; re-run as inputs change.</div>';
       html += '</div>';
     }
 
