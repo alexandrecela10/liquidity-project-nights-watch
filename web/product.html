@@ -209,11 +209,9 @@
   .thr .thr-hint b { color: var(--risk-high); font-family: var(--mono); }
 
   /* ---- worst-serviced (historical floor) column ---- */
-  .wsc { display:inline-flex; flex-direction:column; align-items:flex-end; font-family: var(--mono); font-weight:600; color: var(--ink-700); line-height:1.15; }
-  .wsc.uncharted { color: var(--taupe); }
-  .wsc .tag { font-family: var(--font); font-size: 9.5px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
+  .wsc { display:inline-flex; flex-direction:column; align-items:flex-end; font-family: var(--mono); font-weight:600; color: var(--taupe); line-height:1.15; }
+  .wsc .tag { font-family: var(--font); font-size: 9.5px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; color: var(--taupe); }
   .wsc.uncharted .tag { color: var(--risk-high); }
-  .wsc.safe .tag { color: var(--taupe); font-weight:500; }
 
   /* ---- data-horizon control (drives the whole desk) ---- */
   .dg-ctl-group { display:flex; align-items:center; gap:8px; }
@@ -409,7 +407,7 @@
   <div class="desk-head">
     <div>
       <h1>Credit desk</h1>
-      <p class="lede">Portfolio ranked worst-first by early-warning severity, then money at risk. Pick a company to see why it's flagged, pull the loan follow-up, get the recommended action — and log what you did. Step the <b>data horizon</b> (Now → Medium → Later) to watch the desk gain new metrics, new actions and deeper analysis as more data unlocks.</p>
+      <p class="lede">Portfolio ranked worst-first by early-warning severity, then money at risk. Pick a company to see why it's flagged, pull the loan follow-up, get the recommended action — and log what you did. Step the <b>data horizon</b> (Now → 1m → 2m) to watch the desk gain new metrics, new actions and deeper analysis as more data unlocks.</p>
     </div>
     <div class="signal-chip" id="signalChip"></div>
   </div>
@@ -421,8 +419,8 @@
       <span class="lbl">Data horizon</span>
       <div class="dg-seg" id="phaseSeg" role="tablist" aria-label="Data horizon">
         <button type="button" data-phase="Now" role="tab">Now</button>
-        <button type="button" data-phase="Medium" role="tab">Medium</button>
-        <button type="button" data-phase="Later" role="tab">Later</button>
+        <button type="button" data-phase="Medium" role="tab">1m</button>
+        <button type="button" data-phase="Later" role="tab">2m</button>
       </div>
       <span class="hz"><span class="hz-note" id="phaseNote"></span></span>
     </div>
@@ -974,7 +972,7 @@
     var gen = new Date().toISOString().slice(0,16).replace('T',' ');
     function kv(k, v, t){ return '<tr><th'+(t?' title="'+esc(t)+'"':'')+'>'+k+'</th><td>'+v+'</td></tr>'; }
     var fcBlock = c.forecast ? (
-      '<h2>Forecast @ T1 (Later horizon)</h2><table class="kv">' +
+      '<h2>Forecast @ T1 (2m horizon)</h2><table class="kv">' +
         kv('Base case coverage', c.forecast.coverage_t1.toFixed(2)) +
         kv('Worst case coverage', c.forecast.coverage_t1_worst.toFixed(2) + ' &mdash; FX stays blocked + rate / energy spike') +
         kv('Best case coverage', c.forecast.coverage_t1_best.toFixed(2)) +
@@ -1440,7 +1438,7 @@
         prose2 += 'Based on these factors, recoverability is '+tip('recoverability-first-pass',recovPill(fp.label))+' \u2014 conservatively '+tip('savable-money-first-pass','<b>'+usd(fp.savable)+'</b>')+' of '+usd(c.principal_at_risk)+' at risk is savable.';
       }
       html += '<div class="cov-note">'+prose2+'</div>';
-      html += '<div style="font-size:11.5px;color:var(--taupe);margin-top:8px;">First-pass read (loan structure + cash convertibility). <b>Medium</b> sharpens with balance sheet &amp; cashflow.</div>';
+      html += '<div style="font-size:11.5px;color:var(--taupe);margin-top:8px;">First-pass read (loan structure + cash convertibility). <b>1m</b> sharpens with balance sheet &amp; cashflow.</div>';
       html += '</div>';
     }
 
