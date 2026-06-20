@@ -1,0 +1,724 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agent — Project Night's Watch</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+/* ---- page-local styles (kept inside this file per the build contract) ---- */
+.ag-wrap { max-width: 920px; margin: 0 auto; padding: 22px 22px 60px; }
+
+/* future/preview marker */
+.ag-future { display:inline-flex; align-items:center; gap:6px; font-size:11px; font-weight:600;
+  letter-spacing:.05em; text-transform:uppercase; color:var(--taupe); background:var(--sand-500);
+  padding:4px 12px; border-radius:999px; border:1px dashed var(--sand-700); margin-bottom:14px; }
+.ag-future::before { content:''; width:7px; height:7px; border-radius:50%; background:var(--risk-medium); }
+
+/* agent header */
+.ag-header { margin-bottom:18px; }
+.ag-header h1 { font-size:24px; margin-bottom:4px; }
+.ag-header .ag-meta { font-size:13px; color:var(--taupe); font-family:var(--mono); }
+.ag-header .ag-meta b { color:var(--ink); }
+
+/* tool-call chips */
+.ag-tools { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:20px; }
+.ag-tool { display:inline-flex; align-items:center; gap:6px; font-size:11.5px; font-family:var(--mono);
+  background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius-sm);
+  padding:6px 12px; box-shadow:var(--shadow); color:var(--ink-700); }
+.ag-tool .dot { width:6px; height:6px; border-radius:50%; flex-shrink:0; }
+.ag-tool .dot.ok { background:var(--risk-low); }
+.ag-tool .dot.retry { background:var(--risk-medium); }
+.ag-tool .dot.cached { background:var(--sand-700); }
+.ag-tool .srv { font-weight:600; color:var(--ink); }
+.ag-tool .fn { color:var(--taupe); }
+.ag-tool .res { color:var(--risk-low); }
+.ag-tool .tag { font-size:10px; font-weight:600; padding:1px 6px; border-radius:999px; }
+.ag-tool .tag.retry { background:#f6ecd9; color:var(--risk-medium); }
+.ag-tool .tag.cached { background:var(--sand-500); color:var(--taupe); }
+
+/* agent summary */
+.ag-summary { font-size:14.5px; line-height:1.65; color:var(--ink-700); margin-bottom:24px;
+  background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  padding:18px 22px; box-shadow:var(--shadow); }
+.ag-summary strong { color:var(--ink); }
+
+/* section labels */
+.ag-section { font-size:11px; font-weight:700; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--taupe); margin:28px 0 10px; }
+
+/* ---- action cards ---- */
+.ag-card { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); margin-bottom:16px; overflow:hidden; }
+.ag-card-border { border-left:4px solid transparent; }
+.ag-card-border.p1 { border-left-color:var(--risk-high); }
+.ag-card-border.p2 { border-left-color:var(--risk-medium); }
+.ag-card-border.p3 { border-left-color:var(--risk-low); }
+.ag-card-border.p4 { border-left-color:var(--risk-none); }
+.ag-card-inner { padding:18px 22px; }
+
+.ag-card-top { display:flex; align-items:center; gap:10px; margin-bottom:10px; flex-wrap:wrap; }
+.ag-pbadge { font-size:13px; font-weight:700; font-family:var(--mono); padding:3px 10px;
+  border-radius:6px; white-space:nowrap; }
+.ag-pbadge.p1 { background:#f6e4e0; color:var(--risk-high); }
+.ag-pbadge.p2 { background:#f6ecd9; color:var(--risk-medium); }
+.ag-pbadge.p3 { background:#e4ecdf; color:var(--risk-low); }
+.ag-pbadge.p4 { background:#efe8e3; color:var(--risk-none); }
+.ag-card-co { font-size:17px; font-weight:600; }
+.ag-card-money { font-size:13px; font-family:var(--mono); color:var(--risk-high); font-weight:600; }
+.ag-card-money.safe { color:var(--taupe); }
+.ag-card-sub { font-size:12px; color:var(--taupe); }
+
+.ag-card-read { font-size:13.5px; line-height:1.6; color:var(--ink-700); margin:10px 0; }
+.ag-card-read b { color:var(--ink); }
+
+.ag-rec { margin:14px 0; }
+.ag-rec-title { font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--taupe); margin-bottom:6px; }
+.ag-rec-steps { margin:0; padding-left:18px; font-size:13px; line-height:1.7; }
+.ag-rec-steps li { margin-bottom:2px; }
+
+/* evidence chips */
+.ag-evidence { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
+.ag-ev { display:inline-flex; align-items:center; gap:4px; font-size:11px; font-family:var(--mono);
+  background:var(--sand); border:1px solid var(--sand-500); border-radius:6px;
+  padding:3px 10px; color:var(--ink-700); cursor:pointer; text-decoration:none; }
+.ag-ev:hover { background:var(--sand-500); }
+.ag-ev .arrow { font-size:10px; color:var(--taupe); }
+
+/* action buttons */
+.ag-actions { display:flex; align-items:center; gap:12px; margin-top:16px; flex-wrap:wrap; }
+.ag-lock-note { font-size:11.5px; color:var(--taupe); display:flex; align-items:center; gap:5px; }
+.ag-lock-note .lock-icon { font-size:14px; }
+
+/* auto-run states */
+.ag-auto-eligible { font-size:11px; font-weight:600; color:var(--risk-low); display:flex; align-items:center; gap:4px; }
+.ag-countdown { display:flex; align-items:center; gap:12px; margin-top:16px; }
+.ag-countdown .timer { font-family:var(--mono); font-size:16px; font-weight:700; color:var(--risk-medium); }
+.ag-countdown .timer-label { font-size:12px; color:var(--taupe); }
+
+/* draft-review state */
+.ag-draft { background:var(--sand); border:1px solid var(--sand-500); border-radius:var(--radius-sm);
+  padding:14px 16px; margin-top:14px; }
+.ag-draft-head { font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--taupe); margin-bottom:8px; display:flex; align-items:center; gap:6px; }
+.ag-draft pre { font-family:var(--font); font-size:12.5px; line-height:1.6; white-space:pre-wrap;
+  margin:0; color:var(--ink-700); }
+.ag-draft .draft-actions { display:flex; align-items:center; gap:10px; margin-top:12px; }
+
+/* ---- holding strip ---- */
+.ag-holding { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); margin-bottom:16px; overflow:hidden; }
+.ag-hold-bar { display:flex; align-items:center; justify-content:space-between; padding:14px 20px; cursor:pointer; user-select:none; }
+.ag-hold-bar:hover { background:var(--sand); }
+.ag-hold-bar .label { font-size:14px; font-weight:600; }
+.ag-hold-bar .label .count { font-family:var(--mono); color:var(--risk-low); }
+.ag-hold-bar .chevron { font-size:16px; color:var(--taupe); transition:transform .2s ease; }
+.ag-hold-bar .chevron.open { transform:rotate(90deg); }
+.ag-hold-body { display:none; border-top:1px solid var(--sand-500); }
+.ag-hold-body.open { display:block; }
+.ag-hold-tbl { width:100%; border-collapse:collapse; font-size:12.5px; }
+.ag-hold-tbl th { text-align:left; font-size:10.5px; font-weight:600; text-transform:uppercase;
+  letter-spacing:.04em; color:var(--taupe); padding:8px 14px; border-bottom:1px solid var(--sand-500);
+  background:var(--sand-500); }
+.ag-hold-tbl th.r { text-align:right; }
+.ag-hold-tbl td { padding:9px 14px; border-bottom:1px solid var(--sand-500); }
+.ag-hold-tbl td.r { text-align:right; font-family:var(--mono); }
+.ag-hold-tbl tr:last-child td { border-bottom:none; }
+.ag-hold-status { font-size:11px; color:var(--risk-low); font-weight:600; }
+
+/* ---- conversational input ---- */
+.ag-convo { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); padding:18px 22px; margin-bottom:16px; }
+.ag-convo-title { font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--taupe); margin-bottom:10px; }
+.ag-suggestions { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+.ag-suggest { font-size:12px; font-family:var(--font); padding:6px 14px; border-radius:999px;
+  border:1px solid var(--sand-700); background:var(--sand); color:var(--ink); cursor:pointer; font-weight:500; }
+.ag-suggest:hover { background:var(--sand-500); }
+.ag-convo-input { display:flex; gap:8px; }
+.ag-convo-input input { flex:1; font-family:var(--font); font-size:13.5px; padding:10px 14px;
+  border:1px solid var(--sand-700); border-radius:var(--radius-sm); background:var(--white);
+  color:var(--ink); outline:none; }
+.ag-convo-input input:focus { border-color:var(--ink); }
+.ag-convo-input button { flex-shrink:0; }
+
+.ag-response { margin-top:14px; padding:14px 16px; background:var(--sand); border-radius:var(--radius-sm);
+  border:1px solid var(--sand-500); font-size:13.5px; line-height:1.65; color:var(--ink-700); display:none; }
+.ag-response.visible { display:block; }
+.ag-response .ag-resp-label { font-size:11px; font-weight:700; letter-spacing:.04em; text-transform:uppercase;
+  color:var(--taupe); margin-bottom:6px; }
+
+/* ---- audit trail ---- */
+.ag-audit { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius);
+  box-shadow:var(--shadow); overflow:hidden; }
+.ag-audit-head { display:flex; align-items:center; justify-content:space-between; padding:14px 20px;
+  border-bottom:1px solid var(--sand-500); }
+.ag-audit-head .panel-title { font-size:12px; font-weight:700; letter-spacing:.06em; text-transform:uppercase; color:var(--taupe); }
+.ag-audit-list { max-height:320px; overflow:auto; padding:0; margin:0; list-style:none; }
+.ag-audit-list li { display:flex; gap:12px; padding:9px 20px; border-bottom:1px solid var(--sand-500);
+  font-size:12px; align-items:flex-start; }
+.ag-audit-list li:last-child { border-bottom:none; }
+.ag-audit-list .ts { font-family:var(--mono); font-size:11px; color:var(--taupe); white-space:nowrap; flex-shrink:0; min-width:65px; }
+.ag-audit-list .ev { color:var(--ink-700); }
+.ag-audit-list .ev b { color:var(--ink); }
+.ag-audit-list .kind { font-size:10px; font-weight:600; text-transform:uppercase; letter-spacing:.04em;
+  padding:1px 7px; border-radius:999px; white-space:nowrap; flex-shrink:0; }
+.ag-audit-list .kind.tool { background:#e4ecdf; color:var(--risk-low); }
+.ag-audit-list .kind.triage { background:#f6ecd9; color:var(--risk-medium); }
+.ag-audit-list .kind.action { background:#f6e4e0; color:var(--risk-high); }
+.ag-audit-list .kind.system { background:var(--sand-500); color:var(--taupe); }
+
+/* compliance note */
+.ag-compliance { font-size:11px; color:var(--taupe); margin-top:6px; padding:8px 12px;
+  border:1px dashed var(--sand-700); border-radius:var(--radius-sm); }
+
+/* MCP framing note */
+.ag-mcp-note { font-size:11px; color:var(--taupe); margin:6px 0 0; font-style:italic; }
+
+/* guardrail badges */
+.ag-guardrail { display:inline-flex; align-items:center; gap:4px; font-size:10.5px; font-weight:600;
+  padding:2px 8px; border-radius:999px; }
+.ag-guardrail.human { background:#f6e4e0; color:var(--risk-high); }
+.ag-guardrail.auto { background:#e4ecdf; color:var(--risk-low); }
+
+/* footer */
+.ag-footer { text-align:center; font-size:11px; color:var(--taupe); margin-top:32px; padding-top:16px;
+  border-top:1px solid var(--sand-500); }
+
+/* undo success flash */
+@keyframes flashGreen { 0%{background:#e4ecdf} 100%{background:var(--white)} }
+.ag-card.undone { animation: flashGreen .6s ease; }
+</style>
+</head>
+<body>
+
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity &middot; Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="roadmap.html">Data roadmap</a>
+    <a href="dictionary.html">Dictionary</a>
+    <a href="demo.html">Demo</a>
+    <a href="agent.html" class="active">Agent</a>
+  </nav>
+</div>
+
+<div class="ag-wrap" id="agWrap">
+  <noscript><p>This page requires JavaScript.</p></noscript>
+</div>
+
+<script>
+function loadSpec(srcs, done){ if(!srcs.length) return done(new Error('no spec'));
+  var s=document.createElement('script'); s.src=srcs[0];
+  s.onload=done; s.onerror=function(){loadSpec(srcs.slice(1),done);};
+  document.head.appendChild(s); }
+loadSpec(['ontology.js','../spec/ontology.js'], function(){ init(); });
+
+function init(){
+  var SPEC = window.NW_SPEC;
+  if (!SPEC) { document.getElementById('agWrap').innerHTML='<p>Could not load spec.</p>'; return; }
+  var P = SPEC.portfolio;
+  var AF = SPEC.actions_framework;
+  var THRESH = 1.20;
+
+  /* ---- helpers ---- */
+  function esc(s){ var d=document.createElement('div'); d.textContent=s; return d.innerHTML; }
+  function usd(n){ return '$'+n.toLocaleString('en-US'); }
+  function usdM(n){ return n>=1e6?'$'+(n/1e6).toFixed(2)+'M':n>=1e3?'$'+(n/1e3).toFixed(0)+'K':usd(n); }
+  function pct(n){ return (n*100).toFixed(0)+'%'; }
+
+  /* ---- agent simulation data ---- */
+  var SAHEL = P.filter(function(c){return c.company_id==='C-SAHEL';})[0];
+  var KIGALI = P.filter(function(c){return c.company_id==='C-KIGALI';})[0];
+  var needYou = [SAHEL, KIGALI];
+  var holding = P.filter(function(c){ return c.company_id!=='C-SAHEL' && c.company_id!=='C-KIGALI'; });
+
+  var TOOL_CALLS = [
+    { srv:'banking-mcp', fn:'get_balances', args:'all', res:'62 accounts · 8 companies · '+usdM(P.reduce(function(s,c){return s+c.total_cash_usd;},0))+' total', status:'ok' },
+    { srv:'crm-mcp', fn:'get_loan_terms', args:'all', res:'8 loans · '+usdM(P.reduce(function(s,c){return s+c.loan.principal;},0))+' deployed', status:'ok' },
+    { srv:'banking-mcp', fn:'get_balances', args:'Sahel', res:'4 accounts · '+usdM(SAHEL.transferable_cash_usd)+' transferable', status:'retry', tag:'retried \u00d72' },
+    { srv:'comms-mcp', fn:'draft_email', args:'Kigali', res:'compliance reminder drafted', status:'ok' }
+  ];
+
+  var AUDIT = [
+    { ts:'06:00:00', kind:'system', text:'Agent sweep started \u00b7 8 portfolio companies' },
+    { ts:'06:00:02', kind:'tool', text:'<b>banking-mcp</b> \u00b7 get_balances \u2192 62 accounts across 8 companies' },
+    { ts:'06:00:04', kind:'tool', text:'<b>crm-mcp</b> \u00b7 get_loan_terms \u2192 8 loans retrieved' },
+    { ts:'06:00:05', kind:'tool', text:'<b>banking-mcp</b> \u00b7 get_balances(Sahel) \u2192 <span style="color:var(--risk-medium)">retried \u00d72</span>, then 4 accounts, '+usdM(SAHEL.transferable_cash_usd)+' transferable' },
+    { ts:'06:00:07', kind:'triage', text:'Triage complete \u00b7 P1\u2013P4 framework applied \u00b7 <b>2 need attention</b>, 6 holding' },
+    { ts:'06:00:08', kind:'tool', text:'<b>comms-mcp</b> \u00b7 draft_email(Kigali) \u2192 compliance reminder drafted' },
+    { ts:'06:00:09', kind:'system', text:'Briefing ready \u00b7 presented to analyst' }
+  ];
+
+  var CANNED = {
+    'fx': {
+      q: 'Which loans are most FX-exposed?',
+      a: '<b>Sahel AgriCorp</b> (Cameroon) is the most FX-exposed: its EUR operating account was swept to zero, leaving only <b>'+usdM(SAHEL.transferable_cash_usd)+'</b> transferable of '+usdM(SAHEL.total_cash_usd)+' total. The '+pct(SAHEL.coverage)+' coverage ratio is entirely an FX-convertibility problem, not an insolvency one. <b>Lagos FinServe</b> (Nigeria) has a structural NGN convertibility gap \u2014 only '+usdM(510000)+' of '+usdM(4200000)+' is transferable.',
+      chips: [
+        { label:'Sahel \u00b7 '+usdM(SAHEL.transferable_cash_usd)+' transferable', field:'transferable_cash_usd' },
+        { label:'Lagos \u00b7 '+usdM(510000)+' transferable', field:'transferable_cash_usd' },
+        { label:'M1 \u00b7 current transferable cash', field:'M1' }
+      ]
+    },
+    'stable': {
+      q: 'Show me the stable six',
+      a: 'Six companies are holding with no action needed today. Coverage ranges from <b>0.71</b> (Lagos FinServe, High but existing P1 action in progress) to <b>4.20</b> (Casablanca Foods). Three are above the 1.20 high-risk line with stable trends. Lagos and Dar Telecom are below threshold but their actions are already underway \u2014 the agent is monitoring, not escalating.',
+      chips: [
+        { label:'6 / 8 holding', field:'coverage_ratio' },
+        { label:'coverage range 0.71\u20134.20', field:'coverage_ratio' },
+        { label:'0 new actions needed', field:'ew_label' }
+      ]
+    },
+    'changed': {
+      q: 'What changed since yesterday?',
+      a: '<b>Sahel AgriCorp\'s</b> EUR operating account dropped to $0 in the overnight banking feed (was ~$471K). This single change pushed transferable cash from $796K to '+usdM(SAHEL.transferable_cash_usd)+' and coverage from 1.14 to <b>'+SAHEL.coverage.toFixed(2)+'</b>, flipping the label from Low to <b>High</b>. No other company changed status. Kigali Agro\'s compliance certificate is now 5 days overdue (flagged for standard reminder).',
+      chips: [
+        { label:'Sahel EUR \u2192 $0', field:'transferable_cash_usd' },
+        { label:'coverage 1.14 \u2192 0.46', field:'coverage_ratio' },
+        { label:'label Low \u2192 High', field:'ew_label' }
+      ]
+    },
+    'sahel': {
+      q: 'Summarise Sahel\u2019s position',
+      a: '<b>Sahel AgriCorp</b> (Cameroon, Senior secured, '+usd(SAHEL.loan.principal)+' principal). Total cash '+usdM(SAHEL.total_cash_usd)+' but only <b>'+usdM(SAHEL.transferable_cash_usd)+'</b> is hard-currency transferable \u2014 the remaining '+usdM(SAHEL.trapped_cash_usd)+' is restricted/non-convertible and <b>never</b> counted as available. Coverage <b>'+SAHEL.coverage.toFixed(2)+'</b>, deteriorating. '+usd(SAHEL.loan.cash_to_repay_t1)+' due '+SAHEL.loan.next_payment_date+'. Shortfall \u2248'+usd(SAHEL.loan.cash_to_repay_t1 - SAHEL.transferable_cash_usd)+'. The cause is an FX sweep, not insolvency \u2014 the cash is trapped, not gone.',
+      chips: [
+        { label:'coverage '+SAHEL.coverage.toFixed(2), field:'coverage_ratio' },
+        { label:usdM(SAHEL.transferable_cash_usd)+' transferable', field:'transferable_cash_usd' },
+        { label:usdM(SAHEL.trapped_cash_usd)+' trapped', field:'trapped_cash_usd' },
+        { label:usd(SAHEL.loan.cash_to_repay_t1)+' due', field:'cash_to_repay_t1' }
+      ]
+    }
+  };
+
+  /* ---- state ---- */
+  var auditLog = AUDIT.slice();
+  var sahelState = 'ready'; // ready | drafting
+  var kigaliState = 'ready'; // ready | countdown | sent | undone
+  var countdownSec = 900; // 15 min
+  var countdownInterval = null;
+
+  function addAudit(kind, text){
+    var now = new Date();
+    var ts = ('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2)+':'+('0'+now.getSeconds()).slice(-2);
+    auditLog.push({ ts:ts, kind:kind, text:text });
+    renderAudit();
+  }
+
+  /* ---- render ---- */
+  function render(){
+    var w = document.getElementById('agWrap');
+    var html = '';
+
+    /* future marker */
+    html += '<div class="ag-future">Future \u00b7 preview \u2014 later-phase vision</div>';
+
+    /* header */
+    html += '<div class="ag-header">';
+    html += '<h1>Morning briefing</h1>';
+    html += '<div class="ag-meta">Agent ran <b>06:00 UTC</b> \u00b7 <b>'+P.length+'</b> companies swept \u00b7 <b>'+needYou.length+'</b> need you</div>';
+    html += '</div>';
+
+    /* tool-call chips */
+    html += '<div class="ag-tools">';
+    TOOL_CALLS.forEach(function(t){
+      var dotCls = t.status==='ok'?'ok':t.status==='retry'?'retry':'cached';
+      html += '<div class="ag-tool"><span class="dot '+dotCls+'"></span>';
+      html += '<span class="srv">'+esc(t.srv)+'</span>';
+      html += '<span class="fn">\u00b7 '+esc(t.fn)+'('+esc(t.args)+')</span>';
+      html += '<span class="res">\u2192 '+esc(t.res)+'</span>';
+      if(t.tag) html += '<span class="tag '+dotCls+'">'+esc(t.tag)+'</span>';
+      html += '</div>';
+    });
+    html += '</div>';
+    html += '<div class="ag-mcp-note">MCP provides <b>reach</b> into firm systems (balances, loan terms, email) \u2014 the coverage metric, risk model and priority logic live in our own pipeline.</div>';
+
+    /* summary */
+    var atRisk = P.filter(function(c){return c.coverage<THRESH;}).length;
+    var totalPar = P.reduce(function(s,c){return s+c.principal_at_risk;},0);
+    html += '<div class="ag-summary">';
+    html += 'Overnight sweep complete. <strong>'+P.length+' portfolio companies</strong> checked against coverage thresholds and the P1\u2013P4 action framework. ';
+    html += '<strong>'+holding.length+' are holding</strong> \u2014 coverage stable or actions already in progress. ';
+    html += '<strong>'+needYou.length+' need your attention:</strong> ';
+    html += '<strong>Sahel AgriCorp</strong> (P1 \u00b7 '+usdM(SAHEL.principal_at_risk)+' at risk \u00b7 coverage '+SAHEL.coverage.toFixed(2)+' \u00b7 FX-blocked EUR account) and ';
+    html += '<strong>Kigali Agro</strong> (P4 \u00b7 compliance certificate 5 days overdue \u00b7 auto-eligible). ';
+    html += 'Total portfolio principal at risk: <strong>'+usdM(totalPar)+'</strong> across '+atRisk+' companies below the '+THRESH.toFixed(2)+' high-risk line.';
+    html += '</div>';
+
+    /* section: needs attention */
+    html += '<div class="ag-section">Needs your attention ('+needYou.length+')</div>';
+
+    /* P1 card — Sahel */
+    html += renderSahelCard();
+
+    /* P4 card — Kigali */
+    html += renderKigaliCard();
+
+    /* holding strip */
+    html += renderHolding();
+
+    /* conversational input */
+    html += '<div class="ag-section">Ask the desk</div>';
+    html += '<div class="ag-convo" id="agConvo">';
+    html += '<div class="ag-suggestions" id="agSuggestions">';
+    Object.keys(CANNED).forEach(function(k){
+      html += '<button class="ag-suggest" data-q="'+k+'">'+esc(CANNED[k].q)+'</button>';
+    });
+    html += '</div>';
+    html += '<div class="ag-convo-input"><input id="agInput" placeholder="Ask the desk anything\u2026" /><button class="nw-btn" id="agAsk">Ask</button></div>';
+    html += '<div class="ag-response" id="agResponse"></div>';
+    html += '</div>';
+
+    /* audit trail */
+    html += '<div class="ag-section">Agent audit trail</div>';
+    html += '<div class="ag-audit" id="agAudit">';
+    html += '<div class="ag-audit-head"><span class="panel-title">Audit trail</span><span style="font-size:11px;color:var(--taupe);" id="auditCount">'+auditLog.length+' entries</span></div>';
+    html += '<ul class="ag-audit-list" id="agAuditList"></ul>';
+    html += '</div>';
+
+    /* compliance note */
+    html += '<div class="ag-compliance">Actions respect access levels, confidentiality, and UAE data-sovereignty rules (ADGM/PDPL). Irreversible or cross-border actions are always flagged for human review before execution.</div>';
+
+    /* footer */
+    html += '<div class="ag-footer">';
+    html += esc(SPEC.meta.note)+' \u00b7 '+esc(SPEC.meta.product)+' ('+esc(SPEC.meta.version)+').';
+    html += '</div>';
+
+    w.innerHTML = html;
+    renderAudit();
+    bindEvents();
+  }
+
+  function renderSahelCard(){
+    var c = SAHEL;
+    var a = c.action;
+    var af = AF.filter(function(f){return f.priority===a.priority;})[0];
+    var short = c.loan.cash_to_repay_t1 - c.transferable_cash_usd;
+
+    var html = '<div class="ag-card" id="sahelCard"><div class="ag-card-border p1"><div class="ag-card-inner">';
+
+    /* top */
+    html += '<div class="ag-card-top">';
+    html += '<span class="ag-pbadge p1">'+a.priority+'</span>';
+    html += '<span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span>';
+    html += '<span class="ag-card-co">'+esc(c.name)+'</span>';
+    html += '<span class="ag-card-money">'+usdM(c.principal_at_risk)+' at risk</span>';
+    html += '<span class="ag-guardrail human">\uD83D\uDD12 Human only</span>';
+    html += '</div>';
+    html += '<div class="ag-card-sub">'+esc(c.jurisdiction)+' \u00b7 '+c.loan.loan_id+' \u00b7 '+c.loan.seniority+' \u00b7 '+usd(c.loan.principal)+' principal</div>';
+
+    /* agent read */
+    html += '<div class="ag-card-read">';
+    html += 'Coverage <b>'+c.coverage.toFixed(2)+'</b> \u2014 projected transferable cash at T1 covers only <b>'+pct(c.coverage)+'</b> of the '+usd(c.loan.cash_to_repay_t1)+' due '+c.loan.next_payment_date+'. ';
+    html += 'Shortfall \u2248<b>'+usd(short)+'</b>. ';
+    html += 'Total cash '+usdM(c.total_cash_usd)+' but only <b>'+usdM(c.transferable_cash_usd)+'</b> is hard-currency transferable \u2014 the remaining '+usdM(c.trapped_cash_usd)+' is restricted and <b>never</b> counted as available. ';
+    html += 'The cause is an FX sweep (EUR operating account \u2192 $0), not insolvency. The cash is trapped, not gone.';
+    html += '</div>';
+
+    /* agent recommends */
+    html += '<div class="ag-rec">';
+    html += '<div class="ag-rec-title">Agent recommends \u2014 '+esc(a.title)+'</div>';
+    html += '<ol class="ag-rec-steps">';
+    a.steps.forEach(function(s){ html += '<li>'+esc(s)+'</li>'; });
+    html += '</ol>';
+    html += '</div>';
+
+    /* evidence chips */
+    html += '<div class="ag-evidence">';
+    html += '<a class="ag-ev" href="dictionary.html" title="transferable_cash_usd"><span>M1 \u00b7 '+usdM(c.transferable_cash_usd)+' transferable</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="coverage_ratio"><span>coverage '+c.coverage.toFixed(2)+'</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="cash_to_repay_t1"><span>'+usd(c.loan.cash_to_repay_t1)+' due at T1</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="trapped_cash_usd"><span>'+usdM(c.trapped_cash_usd)+' trapped</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="principal_at_risk"><span>'+usdM(c.principal_at_risk)+' principal at risk</span><span class="arrow">trace \u2192</span></a>';
+    html += '</div>';
+
+    /* action button / draft state */
+    if (sahelState === 'ready') {
+      html += '<div class="ag-actions">';
+      html += '<button class="nw-btn" id="sahelApprove">\uD83D\uDD12 Approve plan &amp; draft</button>';
+      html += '<span class="ag-lock-note">Nothing sends until you approve</span>';
+      html += '</div>';
+    } else {
+      html += '<div class="ag-draft" id="sahelDraft">';
+      html += '<div class="ag-draft-head">\uD83D\uDD12 Draft for your review <span class="ag-guardrail human">Human approval required</span></div>';
+      html += '<pre>To: Sahel AgriCorp \u2014 Treasurer\nSubject: Urgent \u2014 FX conversion / bridge for '+c.loan.loan_id+' coupon\n\nDear Treasurer,\n\nWe note the EUR operating account at FI-EA354EF2 now\nshows a zero balance (previously ~$471K). This has reduced\ntransferable cash to '+usdM(c.transferable_cash_usd)+', leaving a shortfall of\n\u2248'+usd(short)+' against the '+usd(c.loan.cash_to_repay_t1)+' coupon due '+c.loan.next_payment_date+'.\n\nCould you please confirm:\n1. The reason for the EUR sweep\n2. Whether an FX conversion or short bridge can be arranged\n3. The expected timeline to restore the coupon funding\n\nWe are available to discuss at your convenience.\n\nBest regards,\nCredit Team</pre>';
+      html += '<div class="draft-actions">';
+      html += '<button class="nw-btn accent" id="sahelSend">Review &amp; send manually</button>';
+      html += '<button class="nw-btn ghost" id="sahelBack">\u2190 Back</button>';
+      html += '</div>';
+      html += '</div>';
+    }
+
+    /* framework note */
+    html += '<div style="margin-top:10px;font-size:11px;color:var(--taupe);"><b>'+af.priority+' \u00b7 '+esc(af.name)+'</b> \u2014 '+esc(af.posture)+'</div>';
+
+    html += '</div></div></div>';
+    return html;
+  }
+
+  function renderKigaliCard(){
+    var c = KIGALI;
+    var a = c.action;
+    var af = AF.filter(function(f){return f.priority===a.priority;})[0];
+
+    var html = '<div class="ag-card" id="kigaliCard"><div class="ag-card-border p4"><div class="ag-card-inner">';
+
+    /* top */
+    html += '<div class="ag-card-top">';
+    html += '<span class="ag-pbadge p4">'+a.priority+'</span>';
+    html += '<span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span>';
+    html += '<span class="ag-card-co">'+esc(c.name)+'</span>';
+    html += '<span class="ag-card-money safe">'+usd(c.principal_at_risk)+' at risk</span>';
+    html += '<span class="ag-guardrail auto">\u2713 Auto-eligible</span>';
+    html += '</div>';
+    html += '<div class="ag-card-sub">'+esc(c.jurisdiction)+' \u00b7 '+c.loan.loan_id+' \u00b7 '+c.loan.seniority+' \u00b7 '+usd(c.loan.principal)+' principal \u00b7 <b>PIK</b> (no cash due)</div>';
+
+    /* agent read */
+    html += '<div class="ag-card-read">';
+    html += 'Coverage <b>'+c.coverage.toFixed(2)+'</b> \u2014 next payment is PIK, so <b>no cash leaves the borrower</b> at T1. ';
+    html += 'No principal at risk. ';
+    html += 'However, the annual compliance certificate is <b>5 days overdue</b>. ';
+    html += 'This is a standard administrative follow-up \u2014 low-stakes and fully reversible.';
+    html += '</div>';
+
+    /* agent recommends */
+    html += '<div class="ag-rec">';
+    html += '<div class="ag-rec-title">Agent recommends \u2014 Send standard compliance reminder</div>';
+    html += '<ol class="ag-rec-steps">';
+    html += '<li>Send compliance certificate reminder to company secretary (drafted via comms-mcp)</li>';
+    html += '<li>Set calendar reminder for 7-day follow-up if no response (via calendar-mcp)</li>';
+    html += '</ol>';
+    html += '</div>';
+
+    /* evidence chips */
+    html += '<div class="ag-evidence">';
+    html += '<a class="ag-ev" href="dictionary.html" title="coverage_ratio"><span>coverage '+c.coverage.toFixed(2)+'</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="cash_vs_pik"><span>PIK \u00b7 no cash due</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="principal_at_risk"><span>'+usd(c.principal_at_risk)+' at risk</span><span class="arrow">trace \u2192</span></a>';
+    html += '<a class="ag-ev" href="dictionary.html" title="transferable_cash_usd"><span>'+usdM(c.transferable_cash_usd)+' transferable</span><span class="arrow">trace \u2192</span></a>';
+    html += '</div>';
+
+    /* action button / countdown / sent / undone */
+    if (kigaliState === 'ready') {
+      html += '<div class="ag-actions">';
+      html += '<button class="nw-btn accent" id="kigaliApprove">Approve &amp; auto-run</button>';
+      html += '<span class="ag-auto-eligible">\u2713 Reversible \u00b7 low-stakes \u00b7 15-min undo window</span>';
+      html += '</div>';
+    } else if (kigaliState === 'countdown') {
+      var m = Math.floor(countdownSec/60);
+      var s = countdownSec%60;
+      html += '<div class="ag-countdown" id="kigaliCountdown">';
+      html += '<span class="timer" id="kigaliTimer">sending in '+('0'+m).slice(-2)+':'+('0'+s).slice(-2)+'\u2026</span>';
+      html += '<button class="nw-btn" id="kigaliUndo" style="background:var(--risk-high);color:var(--white);">Undo</button>';
+      html += '<span class="timer-label">Compliance reminder queued \u2014 will send automatically after the hold window</span>';
+      html += '</div>';
+    } else if (kigaliState === 'sent') {
+      html += '<div style="margin-top:14px;font-size:13px;color:var(--risk-low);font-weight:600;">\u2713 Compliance reminder sent (auto-run completed)</div>';
+    } else if (kigaliState === 'undone') {
+      html += '<div class="ag-actions">';
+      html += '<div style="font-size:13px;color:var(--risk-medium);font-weight:600;">\u21A9 Auto-run cancelled \u2014 reminder was not sent</div>';
+      html += '<button class="nw-btn ghost" id="kigaliReset">Re-enable auto-run</button>';
+      html += '</div>';
+    }
+
+    /* framework note */
+    html += '<div style="margin-top:10px;font-size:11px;color:var(--taupe);"><b>'+af.priority+' \u00b7 '+esc(af.name)+'</b> \u2014 '+esc(af.posture)+'</div>';
+
+    html += '</div></div></div>';
+    return html;
+  }
+
+  function renderHolding(){
+    var html = '<div class="ag-section">Portfolio status</div>';
+    html += '<div class="ag-holding" id="agHolding">';
+    html += '<div class="ag-hold-bar" id="holdToggle">';
+    html += '<span class="label"><span class="count">'+holding.length+'</span> companies holding \u2014 no action needed today</span>';
+    html += '<span class="chevron" id="holdChevron">\u25B8</span>';
+    html += '</div>';
+    html += '<div class="ag-hold-body" id="holdBody">';
+    html += '<table class="ag-hold-tbl"><thead><tr>';
+    html += '<th>Company</th><th>Risk</th><th class="r">Coverage</th><th class="r">Principal at risk</th><th>Agent status</th>';
+    html += '</tr></thead><tbody>';
+
+    var holdStatuses = {
+      'C-LAGOS': 'P1 action in progress \u2014 bridge under discussion',
+      'C-DAR': 'P2 workout prep underway',
+      'C-NAIROBI': 'P2 weekly reporting started',
+      'C-KAMPALA': 'Stable \u2014 monitoring',
+      'C-ACCRA': 'Stable \u2014 monitoring (feed 6d ago)',
+      'C-CASA': 'Stable \u2014 monitoring'
+    };
+
+    holding.forEach(function(c){
+      html += '<tr>';
+      html += '<td><b>'+esc(c.name)+'</b><br><span style="font-size:11px;color:var(--taupe);">'+esc(c.jurisdiction)+'</span></td>';
+      html += '<td><span class="nw-pill nw-risk-'+c.label+'">'+c.label+'</span></td>';
+      html += '<td class="r" style="font-weight:600;'+(c.coverage<1.0?'color:var(--risk-high);':'')+'">'+c.coverage.toFixed(2)+'</td>';
+      html += '<td class="r">'+usd(c.principal_at_risk)+'</td>';
+      html += '<td><span class="ag-hold-status">'+esc(holdStatuses[c.company_id]||'Monitoring')+'</span></td>';
+      html += '</tr>';
+    });
+    html += '</tbody></table>';
+    html += '</div></div>';
+    return html;
+  }
+
+  function renderAudit(){
+    var list = document.getElementById('agAuditList');
+    if (!list) return;
+    var html = '';
+    auditLog.forEach(function(e){
+      html += '<li>';
+      html += '<span class="ts">'+esc(e.ts)+'</span>';
+      html += '<span class="kind '+e.kind+'">'+e.kind+'</span>';
+      html += '<span class="ev">'+e.text+'</span>';
+      html += '</li>';
+    });
+    list.innerHTML = html;
+    list.scrollTop = list.scrollHeight;
+    var cnt = document.getElementById('auditCount');
+    if (cnt) cnt.textContent = auditLog.length+' entries';
+  }
+
+  function bindEvents(){
+    /* P1 Sahel — approve */
+    var sahelBtn = document.getElementById('sahelApprove');
+    if (sahelBtn) sahelBtn.addEventListener('click', function(){
+      sahelState = 'drafting';
+      addAudit('action', '<b>Analyst</b> approved plan for <b>Sahel AgriCorp</b> \u2014 draft email generated for review');
+      render();
+    });
+    var sahelSend = document.getElementById('sahelSend');
+    if (sahelSend) sahelSend.addEventListener('click', function(){
+      addAudit('action', '<b>Analyst</b> reviewed and sent communication to Sahel AgriCorp treasurer');
+      alert('Draft opened for manual review and send. In a live system, this would open your email client with the pre-filled draft.');
+    });
+    var sahelBack = document.getElementById('sahelBack');
+    if (sahelBack) sahelBack.addEventListener('click', function(){
+      sahelState = 'ready';
+      addAudit('system', 'Sahel AgriCorp draft discarded \u2014 returned to ready state');
+      render();
+    });
+
+    /* P4 Kigali — auto-run */
+    var kigaliBtn = document.getElementById('kigaliApprove');
+    if (kigaliBtn) kigaliBtn.addEventListener('click', function(){
+      kigaliState = 'countdown';
+      countdownSec = 900;
+      addAudit('action', '<b>Analyst</b> approved auto-run for <b>Kigali Agro</b> \u2014 15-min hold window started');
+      render();
+      startCountdown();
+    });
+    var kigaliUndo = document.getElementById('kigaliUndo');
+    if (kigaliUndo) kigaliUndo.addEventListener('click', function(){
+      kigaliState = 'undone';
+      if (countdownInterval) { clearInterval(countdownInterval); countdownInterval = null; }
+      addAudit('action', '<b>Analyst</b> undid auto-run for <b>Kigali Agro</b> \u2014 compliance reminder cancelled before send');
+      render();
+      var card = document.getElementById('kigaliCard');
+      if (card) card.classList.add('undone');
+    });
+    var kigaliReset = document.getElementById('kigaliReset');
+    if (kigaliReset) kigaliReset.addEventListener('click', function(){
+      kigaliState = 'ready';
+      addAudit('system', 'Kigali Agro auto-run re-enabled');
+      render();
+    });
+
+    /* holding strip */
+    var holdToggle = document.getElementById('holdToggle');
+    if (holdToggle) holdToggle.addEventListener('click', function(){
+      var body = document.getElementById('holdBody');
+      var chev = document.getElementById('holdChevron');
+      if (body.classList.contains('open')) {
+        body.classList.remove('open');
+        chev.classList.remove('open');
+      } else {
+        body.classList.add('open');
+        chev.classList.add('open');
+      }
+    });
+
+    /* conversational input */
+    var suggestions = document.querySelectorAll('.ag-suggest');
+    Array.prototype.forEach.call(suggestions, function(btn){
+      btn.addEventListener('click', function(){
+        var key = btn.getAttribute('data-q');
+        showAnswer(key);
+      });
+    });
+    var askBtn = document.getElementById('agAsk');
+    var askInput = document.getElementById('agInput');
+    if (askBtn) askBtn.addEventListener('click', function(){ handleFreeText(); });
+    if (askInput) askInput.addEventListener('keydown', function(e){ if(e.key==='Enter') handleFreeText(); });
+  }
+
+  function startCountdown(){
+    if (countdownInterval) clearInterval(countdownInterval);
+    countdownInterval = setInterval(function(){
+      countdownSec--;
+      if (countdownSec <= 0) {
+        clearInterval(countdownInterval);
+        countdownInterval = null;
+        kigaliState = 'sent';
+        addAudit('action', 'Auto-run completed \u2014 <b>Kigali Agro</b> compliance reminder sent via comms-mcp');
+        render();
+        return;
+      }
+      var timer = document.getElementById('kigaliTimer');
+      if (timer) {
+        var m = Math.floor(countdownSec/60);
+        var s = countdownSec%60;
+        timer.textContent = 'sending in '+('0'+m).slice(-2)+':'+('0'+s).slice(-2)+'\u2026';
+      }
+    }, 1000);
+  }
+
+  function showAnswer(key){
+    var resp = document.getElementById('agResponse');
+    var data = CANNED[key];
+    if (!data) return;
+    var html = '<div class="ag-resp-label">Agent</div>';
+    html += '<div>'+data.a+'</div>';
+    html += '<div class="ag-evidence" style="margin-top:10px;">';
+    data.chips.forEach(function(ch){
+      html += '<a class="ag-ev" href="dictionary.html" title="'+esc(ch.field)+'"><span>'+esc(ch.label)+'</span><span class="arrow">trace \u2192</span></a>';
+    });
+    html += '</div>';
+    resp.innerHTML = html;
+    resp.classList.add('visible');
+    addAudit('system', 'Analyst asked: \u201c'+esc(data.q)+'\u201d \u2014 agent responded with grounded answer');
+    document.getElementById('agInput').value = data.q;
+  }
+
+  function handleFreeText(){
+    var input = document.getElementById('agInput');
+    var text = (input.value||'').trim().toLowerCase();
+    if (!text) return;
+
+    /* try to match a canned answer */
+    var matched = null;
+    if (text.indexOf('fx')>=0 || text.indexOf('exposed')>=0 || text.indexOf('currency')>=0) matched = 'fx';
+    else if (text.indexOf('stable')>=0 || text.indexOf('holding')>=0 || text.indexOf('six')>=0) matched = 'stable';
+    else if (text.indexOf('changed')>=0 || text.indexOf('yesterday')>=0 || text.indexOf('overnight')>=0) matched = 'changed';
+    else if (text.indexOf('sahel')>=0 || text.indexOf('agri')>=0) matched = 'sahel';
+
+    if (matched) { showAnswer(matched); return; }
+
+    /* fallback */
+    var resp = document.getElementById('agResponse');
+    var html = '<div class="ag-resp-label">Agent</div>';
+    html += '<div>I can answer questions about the portfolio based on the spec data \u2014 try one of the suggested questions above for the best demo experience. ';
+    html += 'In a live system, this input would route to an LLM with full access to the portfolio context and grounding against the data dictionary.</div>';
+    resp.innerHTML = html;
+    resp.classList.add('visible');
+    addAudit('system', 'Analyst asked: \u201c'+esc(input.value)+'\u201d \u2014 no grounded answer available (demo mode)');
+  }
+
+  render();
+}
+</script>
+</body>
+</html>
