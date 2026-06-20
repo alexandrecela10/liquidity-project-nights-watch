@@ -833,14 +833,22 @@ window.NW_SPEC = {
         "savable_usd": 3300000,
         "read": "Senior secured. $324K of $9.31M transferable; EUR account swept to $0 (FX-blocked). $3.3M recoverable if FX clears or bridge arranged before T1."
       },
+      "recoverability_medium": {
+        "label": "Partial",
+        "score": 0.63,
+        "savable_usd": 3800000,
+        "read": "Balance sheet reveals $1.2M receivables (Cocoa Board contract) collectible within 22 days. 13-week cashflow confirms EUR sweep was a related-party transfer to parent, not a regulatory freeze — conversion may be negotiable. Savable increases from $3.3M to $3.8M with the receivables pathway. Leverage 2.1×, liquidity ratio 0.35 (tight)."
+      },
+      "coverage_medium": 0.52,
+      "coverage_medium_note": "Balance sheet adds $1.2M receivables (Cocoa Board, due within 22d) to transferable pool. Coverage improves from 0.46 to 0.52, but remains below 1.0.",
       "forecast": {
         "coverage_t1": 0.41,
         "coverage_t1_worst": 0.18,
         "coverage_t1_best": 0.6,
         "lead_days": 0,
         "status": "breached",
-        "drivers": "EUR sweep · 12% cash coupon",
-        "read": "EUR sweep unresolved, 12% cash coupon accruing. Modelled coverage 0.41 at T1 (worst 0.18, best 0.60 if FX frees). Size bridge against worst case."
+        "drivers": "EUR sweep · 12% cash coupon · receivables timing",
+        "read": "EUR sweep unresolved, 12% cash coupon accruing. Receivables from balance sheet ($1.2M) partially offset, but timing risk remains. Modelled coverage 0.41 at T1 (worst 0.18, best 0.60 if FX frees). Size bridge against worst case."
       },
       "principal_at_risk": 6000000,
       "contact": {
