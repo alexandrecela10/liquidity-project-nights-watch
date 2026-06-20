@@ -180,11 +180,12 @@
   <nav class="nw-nav">
     <a href="index.html">Overview</a>
     <a href="product.html">Credit desk</a>
-    <a href="diagram.html">Data architecture</a>
-    <a href="lifecycle.html">Lifecycle</a>
-    <a href="roadmap.html">Data roadmap</a>
-    <a href="dictionary.html">Dictionary</a>
     <a href="demo.html" class="active">Demo</a>
+    <a href="dictionary.html">Dictionary</a>
+    <a href="lifecycle.html">Lifecycle</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="roadmap.html">Data roadmap</a>
+    <a href="agent.html">Agent (TBD)</a>
   </nav>
 </div>
 
@@ -419,8 +420,8 @@
 </div>
 </div>
 
-<!-- S6: DECIDE — recommended action -->
-<div class="scene" data-sub="The system recommends a prioritised action. P1 means roll up sleeves: protect the coupon, confirm FX convertibility, and prepare a bridge facility." data-step="Decide">
+<!-- S6: DECIDE — recommended action + email -->
+<div class="scene" data-sub="The system recommends a prioritised action and provides a one-click email to the company contact. P1 means roll up sleeves: protect the coupon." data-step="Decide">
 <div class="scene-inner">
 <div class="desk-mock">
   <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Action</span></div>
@@ -439,6 +440,10 @@
         <li>Model a short-term bridge facility against the $378K shortfall</li>
         <li>Escalate to the Investment Committee if bridge &gt; 5% of fund NAV</li>
       </ol>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:12px;border-top:1px solid var(--sand-500);">
+      <a href="mailto:a.bello@sahelagricorp.cm?subject=Urgent%20%E2%80%94%20FX%20conversion%20%2F%20bridge%20for%20LN-SAHEL-1%20coupon&body=Dear%20Amina%2C%0A%0ARe%3A%20Sahel%20AgriCorp%20%E2%80%94%20LN-SAHEL-1%0A%0ALargest%20exposure%3B%20the%20shortfall%20is%20an%20FX%2Fsweep%20problem%20that%20is%20still%20fixable%20before%20T1.%0A%0APlease%20advise%20at%20your%20earliest%20convenience.%0A%0ABest%20regards%2C%0ACredit%20Team" style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:600;padding:7px 14px;border-radius:999px;background:var(--ink);color:var(--sand);text-decoration:none;">&#x2709; Email Amina Bello</a>
+      <span style="font-size:11.5px;color:var(--taupe);">Treasurer &middot; a.bello@sahelagricorp.cm</span>
     </div>
   </div>
 </div>
