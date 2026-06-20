@@ -213,7 +213,7 @@
   .wsc.uncharted { color: var(--risk-high); }
   .wsc .tag { font-family: var(--font); font-size: 9.5px; font-weight:600; letter-spacing:.02em; text-transform:uppercase; }
   .wsc.uncharted .tag { color: var(--risk-high); }
-  .wsc.safe .tag { color: var(--taupe); font-weight:500; }
+  .wsc.safe .tag { color: var(--risk-low); font-weight:600; }
 
   /* ---- data-horizon control (drives the whole desk) ---- */
   .dg-ctl-group { display:flex; align-items:center; gap:8px; }
@@ -978,7 +978,7 @@
         kv('Base case coverage', c.forecast.coverage_t1.toFixed(2)) +
         kv('Worst case coverage', c.forecast.coverage_t1_worst.toFixed(2) + ' &mdash; FX stays blocked + rate / energy spike') +
         kv('Best case coverage', c.forecast.coverage_t1_best.toFixed(2)) +
-        kv('Expected range', '<b>'+c.forecast.coverage_t1_worst.toFixed(2)+'&ndash;'+c.forecast.coverage_t1.toFixed(2)+'</b> &mdash; size the bridge against the worst case') +
+        '<div class="rng-cap">Range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1. Best '+f.coverage_t1_best.toFixed(2)+' if FX frees. <b>Size the bridge against worst case.</b></div>' +
       '</table>') : '';
     return '<!doctype html><html lang="en"><head><meta charset="utf-8">' +
       '<meta name="viewport" content="width=device-width, initial-scale=1">' +
@@ -1257,7 +1257,7 @@
         '<th class="l">Risk</th>' +
         '<th>Coverage</th>' +
         (showFc ? '<th title="Modelled transferable cash at T1 ÷ cash due — forward-looking, includes rates &amp; input costs.">Forecast @ T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</th>' : '') +
-        '<th title="Worst coverage at which this company still serviced a payment — its historical floor. Current below this = uncharted territory.">Worst serviced</th>' +
+        '<th title="Worst coverage at which this company still paid — its historical floor. Current below = new territory; above = it has serviced at worse.">Worst serviced</th>' +
         '<th>Principal at risk</th>' +
         '<th>Recoverability' + (showRecov
             ? (unlockedHere('Medium') ? ' <span class="nw-new">new</span>' : '')
@@ -1303,7 +1303,7 @@
         '</td>' +
         (showFc ? '<td>'+fcCellHtml(c)+'</td>' : '') +
         '<td>' + (typeof ws === 'number'
-            ? tipc('worst-serviced-floor','<span class="wsc '+(uncharted?'uncharted':'safe')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ uncharted':'held')+'</span></span>')
+            ? tipc('worst-serviced-floor','<span class="wsc '+(uncharted?'uncharted':'safe')+'">'+ws.toFixed(2)+'<span class="tag">'+(uncharted?'↓ below floor':'✓ above')+'</span></span>')
             : '<span class="nw-muted">—</span>') + '</td>' +
         '<td>'+tipc('principal-at-risk','<span class="num">'+(c.principal_at_risk>0?usd(c.principal_at_risk):'<span class="nw-muted">$0</span>')+'</span>')+'</td>' +
         '<td>' + (showRecov ? recovCellHtml(c) : recovCellFirstPass(c)) + '</td>' +
@@ -1384,98 +1384,88 @@
 
     var html = '';
 
-    /* 1. WHY — coverage */
+    /* ======== BEAT 1: NOW -- what we know ======== */
     html += '<div class="sec">';
-    html += '<span class="panel-title">Why it\'s flagged</span>';
+    html += '<span class="panel-title">What we know now</span>';
     html += '<div class="cov-big">'+tip('coverage-ratio','<span class="v '+(cm.bad?'bad':'ok')+'">'+c.coverage.toFixed(2)+'</span>')+'<span class="vs">coverage · high-risk below '+THRESH.toFixed(2)+'</span></div>';
     html += '<div class="cov-track"><i style="width:'+cm.fillPct+'%;background:'+cm.color+'"></i><u></u></div>';
     if (c.coverage < 1.0){
-      html += '<div class="cov-note">Projected transferable cash at T1 covers only <b>'+pct(c.coverage)+'</b> of the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+'. <span class="flag">≈ '+usd(shortfall)+' short</span></div>';
+      html += '<div class="cov-note">'+tip('transferable-vs-trapped','<b>'+usdM(c.transferable_cash_usd)+'</b> transferable')+' of '+usdM(c.total_cash_usd)+' total covers <b>'+pct(c.coverage)+'</b> of '+usd(loan.cash_to_repay_t1)+' due '+fmtDate(loan.next_payment_date)+'. <span class="flag">\u2248 '+usd(shortfall)+' short</span></div>';
     } else if (c.coverage < THRESH){
-      html += '<div class="cov-note">Covers the '+usd(loan.cash_to_repay_t1)+' due on '+fmtDate(loan.next_payment_date)+', but coverage <b>'+c.coverage.toFixed(2)+'</b> sits below the <b>'+THRESH.toFixed(2)+'</b> high-risk line — thin margin. <span class="flag">below threshold</span></div>';
+      html += '<div class="cov-note">'+tip('transferable-vs-trapped','<b>'+usdM(c.transferable_cash_usd)+'</b> transferable')+' covers the '+usd(loan.cash_to_repay_t1)+' due, but <b>'+c.coverage.toFixed(2)+'</b> is below the '+THRESH.toFixed(2)+' line. <span class="flag">thin margin</span></div>';
     } else {
-      html += '<div class="cov-note">Projected transferable cash at T1 covers the '+usd(loan.cash_to_repay_t1>0?loan.cash_to_repay_t1:0)+ (loan.cash_to_repay_t1>0?' due on '+fmtDate(loan.next_payment_date):' (no cash due — PIK)')+'.</div>';
+      html += '<div class="cov-note">'+tip('transferable-vs-trapped','<b>'+usdM(c.transferable_cash_usd)+'</b> transferable')+' covers the '+(loan.cash_to_repay_t1>0?usd(loan.cash_to_repay_t1)+' due '+fmtDate(loan.next_payment_date):'$0 (PIK)')+'.</div>';
     }
-    html += '</div>';
-
-    /* 1b. transferable vs trapped */
-    html += '<div class="sec">';
-    html += '<span class="panel-title">'+tip('transferable-vs-trapped','Transferable vs trapped cash')+'</span>';
+    /* compact cash split (inside beat 1) */
     html += '<div class="split-bar"><div class="tr" style="width:'+trPct.toFixed(2)+'%"></div><div class="tp" style="width:'+tpPct.toFixed(2)+'%"></div></div>';
     html += '<div class="split-legend">' +
-              '<span class="it"><span class="sw" style="background:var(--ink-700)"></span>Transferable <span class="v">'+usd(c.transferable_cash_usd)+'</span> <span class="nw-muted">('+usdM(c.transferable_cash_usd)+')</span></span>' +
-              '<span class="it"><span class="sw" style="background:#cdb5a6"></span>Trapped <span class="v">'+usd(c.trapped_cash_usd)+'</span> <span class="nw-muted">('+usdM(c.trapped_cash_usd)+')</span></span>' +
+              '<span class="it"><span class="sw" style="background:var(--ink-700)"></span>Transferable '+tip('transferable-vs-trapped','<span class="v">'+usdM(c.transferable_cash_usd)+'</span>')+'</span>' +
+              '<span class="it"><span class="sw" style="background:#cdb5a6"></span>Trapped '+tip('trapped-cash','<span class="v">'+usdM(c.trapped_cash_usd)+'</span>')+'</span>' +
             '</div>';
-    html += '<div class="honest">Total cash <b>'+usd(c.total_cash_usd)+'</b> ('+usdM(c.total_cash_usd)+'), but only <b>'+usd(c.transferable_cash_usd)+'</b> is hard-currency cash usable to service this loan. The trapped '+usd(c.trapped_cash_usd)+' is restricted / non-convertible and is <b>never</b> counted as available.</div>';
+    /* key signals */
+    html += '<div class="facts" style="margin-top:10px;">';
+    html += fact('Runway', tip('runway-days', c.runway_days + 'd'), null, null, true);
+    html += fact('Trend', tip('coverage-trend', c.deteriorating ? '\u2193 worsening' : '\u2192 stable'), null, c.deteriorating?'var(--risk-high)':'var(--ink)', true);
+    html += fact('Prior misses', tip('prior-issues', String(c.prior_issues)), null, c.prior_issues>0?'var(--risk-medium)':'var(--ink)', true);
+    html += fact('Floor', tip('worst-serviced-floor', (typeof ws === 'number' ? ws.toFixed(2) : '\u2014')), uncharted?'below \u2014 new territory':'above \u2014 has paid at worse', uncharted?'var(--risk-high)':'var(--risk-low)', true);
+    if (stale) html += fact('Feed', tip('data-freshness', freshLabel(c.data_freshness_days)), 'stale \u2014 verify', 'var(--risk-high)', true);
     html += '</div>';
 
-    /* 1c. runway / trend / prior */
-    html += '<div class="sec"><span class="panel-title">Context</span><div class="facts">';
-    html += fact('Runway', tip('runway-days', c.runway_days + ' days'), 'transferable cash at current burn', null, true);
-    html += fact('Trend', tip('coverage-trend', c.deteriorating ? '↓ deteriorating' : '→ stable'), 'coverage direction', c.deteriorating?'var(--risk-high)':'var(--ink)', true);
-    html += fact('Prior issues', tip('prior-issues', String(c.prior_issues)), 'labelled past misses', c.prior_issues>0?'var(--risk-medium)':'var(--ink)', true);
-    html += fact('Data freshness', tip('data-freshness', freshLabel(c.data_freshness_days)), stale?'stale — verify before acting':'feed is current', stale?'var(--risk-high)':'var(--ink)', true);
-    html += fact('Worst serviced', tip('worst-serviced-floor', (typeof ws === 'number' ? ws.toFixed(2) : '—')), uncharted?'below its own floor — uncharted':'lowest coverage it still paid at', uncharted?'var(--risk-high)':'var(--ink)', true);
-    html += '</div></div>';
-
-    /* 1d. NOW — first-pass recoverability (loan structure + convertibility + prior misses, no financials) */
+    /* ======== BEAT 2: EXPECT -- what the data points tell us ======== */
     if (!phaseReached('Medium')){
       var fp = firstPassRecov(c);
       html += '<div class="sec">';
-      html += '<span class="panel-title">Recoverability (first-pass)</span>';
+      html += '<span class="panel-title">What we expect</span>';
       html += '<div class="facts" style="margin-top:8px;">';
-      html += fact('First-pass', tip('recoverability-first-pass', recovPill(fp.label)), 'loan structure + convertibility + prior misses', null, true);
-      html += fact('Savable money', tip('savable-money-first-pass', fp.savable>0?usd(fp.savable):'—'), 'recoverable of the principal at risk', fp.savable>0?'var(--ink)':'var(--taupe)', true);
+      html += fact('Recoverability', tip('recoverability-first-pass', recovPill(fp.label)), 'structure + convertibility', null, true);
+      html += fact('Savable', tip('savable-money-first-pass', fp.savable>0?usd(fp.savable):'\u2014'), 'of '+usd(c.principal_at_risk||0)+' at risk', fp.savable>0?'var(--ink)':'var(--taupe)', true);
       html += '</div>';
-      html += '<div style="font-size:12px;color:var(--ink-700);line-height:1.45;margin-top:10px;">'+esc(fp.read)+'</div>';
-      html += '<div style="font-size:11.5px;color:var(--taupe);line-height:1.45;margin-top:8px;">From loan seniority, cash position &amp; convertibility. <b>Medium</b> adds balance sheet &amp; cashflow to confirm whether the gap is fundable before T1.</div>';
+      html += '<div style="font-size:11.5px;color:var(--taupe);margin-top:8px;">First-pass (seniority + cash + convertibility). <b>Medium</b> sharpens with balance sheet &amp; cashflow.</div>';
       html += '</div>';
     }
 
-    /* 2a. MEDIUM unlock — recoverability sharpened: first-pass → financials-enhanced */
+    /* BEAT 2 (Medium): recoverability sharpened */
     if (phaseReached('Medium') && c.recoverability){
       var r = c.recoverability;
       var fpm = firstPassRecov(c);
       html += '<div class="sec phase">';
-      html += '<span class="panel-title">Recoverability — can the shortfall be funded before T1?'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</span>';
+      html += '<span class="panel-title">What we expect'+(unlockedHere('Medium')?' <span class="nw-new">new</span>':'')+'</span>';
       html += '<div class="facts" style="margin-top:8px;">';
-      html += fact('First-pass', tip('recoverability-first-pass', recovPill(fpm.label)), 'structure + convertibility (Now)', null, true);
-      html += fact('Enhanced', tip('recoverability-enhanced', recovPill(r.label)), 'balance sheet + cashflow', null, true);
-      html += fact('Savable money', tip('savable-money-sharpened', r.savable_usd>0?usd(r.savable_usd):'—'), 'recoverable of the principal at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)', true);
+      html += fact('First-pass', tip('recoverability-first-pass', recovPill(fpm.label)), 'structure only', null, true);
+      html += fact('Enhanced', tip('recoverability-enhanced', recovPill(r.label)), '+ balance sheet + cashflow', null, true);
+      html += fact('Savable', tip('savable-money-sharpened', r.savable_usd>0?usd(r.savable_usd):'\u2014'), 'of '+usd(c.principal_at_risk||0)+' at risk', r.savable_usd>0?'var(--ink)':'var(--taupe)', true);
       html += '</div>';
       html += '<div class="ph-read">'+esc(r.read)+'</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> balance sheet + cashflow confirm whether trapped cash is backed by receivables (fundable) or structurally inaccessible (needs bridge). Sharpens P1–P4 by savable money.</div>';
       html += '</div>';
     }
 
-    /* 2b. LATER unlock — forecast & scenarios (cash at T1, rates + input costs) */
+    /* BEAT 2 (Later): forecast + scenarios */
     if (phaseReached('Later') && c.forecast){
       var f = c.forecast;
-      var leadTxt = f.status==='pre-breach' ? '~'+f.lead_days+' days' : (f.status==='breached' ? 'already short' : 'clear');
+      var leadTxt = f.status==='pre-breach' ? '~'+f.lead_days+'d' : (f.status==='breached' ? 'short' : 'clear');
       html += '<div class="sec phase">';
-      html += '<span class="panel-title">Forecast &amp; scenarios — modelled cash at T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</span>';
+      html += '<span class="panel-title">Forecast at T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</span>';
       html += '<div class="facts" style="margin-top:8px;">';
-      html += fact('Base @ T1', tip('forecast-coverage-at-t1-base', f.coverage_t1.toFixed(2)), 'modelled coverage vs spot '+c.coverage.toFixed(2), f.coverage_t1<1.0?'var(--risk-high)':'var(--risk-low)', true);
-      html += fact('Worst @ T1', tip('worst-case-coverage-at-t1', f.coverage_t1_worst.toFixed(2)), 'FX stays blocked + rate / energy spike', 'var(--risk-high)', true);
-      html += fact('Lead time to breach', tip('lead-time-to-breach', leadTxt), 'warning before a shortfall', f.status==='clear'?'var(--ink)':'var(--risk-medium)', true);
+      html += fact('Base', tip('forecast-coverage-at-t1-base', f.coverage_t1.toFixed(2)), 'vs spot '+c.coverage.toFixed(2), f.coverage_t1<1.0?'var(--risk-high)':'var(--risk-low)', true);
+      html += fact('Worst', tip('worst-case-coverage-at-t1', f.coverage_t1_worst.toFixed(2)), 'FX blocked + rate spike', 'var(--risk-high)', true);
+      html += fact('Lead', tip('lead-time-to-breach', leadTxt), 'to breach', f.status==='clear'?'var(--ink)':'var(--risk-medium)', true);
       html += '</div>';
       html += '<div class="rng">'+rangeBar(f) +
-        '<div class="rng-cap">Expected range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1 (worst \u2192 base). Best case '+f.coverage_t1_best.toFixed(2)+' if FX frees up. <b>Size the bridge against the worst case</b>, not the mid-point.</div>' +
+        '<div class="rng-cap">Range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1. Best '+f.coverage_t1_best.toFixed(2)+' if FX frees. <b>Size the bridge against worst case.</b></div>' +
       '</div>';
       html += '<div class="ph-read">'+esc(f.read)+'. Drivers: '+esc(f.drivers)+'.</div>';
-      html += '<div class="ph-do"><b>Unlocked action:</b> FX forecasts + rate/input-cost models produce worst/base/best coverage at T1. Size any bridge against worst case; re-run as inputs change.</div>';
       html += '</div>';
     }
 
-    /* 3. LOAN — drill-down: structure + executive analytics */
+    /* Loan drill-down */
     var la = loanAnalytics(c);
     html += '<div class="sec loan-sec" id="loanSec">';
     html += '<span class="panel-title">Loan &mdash; detail &amp; analytics <span class="loan-tag nw-mono">'+esc(loan.loan_id)+'</span></span>';
     var lead;
     if (la.isPik && la.cashDue===0){
-      lead = 'A '+usdM(loan.principal)+' '+esc(loan.seniority)+' loan. Next payment is <b>PIK</b> — no cash leaves the borrower at T1, so coverage isn\u2019t tested this cycle.';
+      lead = usdM(loan.principal)+' '+esc(loan.seniority)+'. Next: <b>PIK</b> \u2014 no cash due at T1.';
     } else {
-      lead = 'A '+usdM(loan.principal)+' '+esc(loan.seniority)+' loan. <b>'+usd(la.cashDue)+'</b> cash due '+fmtDate(loan.next_payment_date)+' ('+dueInLabel(loan.next_payment_date)+'). Transferable cash covers <b>'+pct(Math.min(la.cov,1))+'</b>'+(la.gap>0?' &rarr; <span class="flag">&approx; '+usd(la.gap)+' short</span>.':' of it.');
+      lead = usdM(loan.principal)+' '+esc(loan.seniority)+'. <b>'+usd(la.cashDue)+'</b> due '+fmtDate(loan.next_payment_date)+' ('+dueInLabel(loan.next_payment_date)+')'+(la.gap>0?' \u2014 <span class="flag">\u2248'+usd(la.gap)+' short</span>':'')+'.'; 
     }
     html += '<div class="loan-lead">'+lead+'</div>';
     html += '<div class="loan-kpis">';
@@ -1494,8 +1484,8 @@
     html += fact('Recovery (savable)', tip(la.rec.basis==='financials-enhanced'?'savable-money-sharpened':'savable-money-first-pass', la.rec.savable>0?usd(la.rec.savable):'—'), la.rec.basis==='financials-enhanced'?'financials-enhanced':'first-pass read', la.rec.savable>0?'var(--ink)':'var(--taupe)', true);
     html += '</div></div>';
 
-    /* 4. RECOMMENDED ACTION */
-    html += '<div class="sec"><span class="panel-title">Recommended action</span>';
+    /* ======== BEAT 3: THEREFORE -- what to do ======== */
+    html += '<div class="sec"><span class="panel-title">Therefore</span>';
     html += '<div class="rec">';
     html += '<div class="rec-top"><span class="nw-p nw-p-'+act.priority+'">'+act.priority+'</span><h3>'+esc(act.title)+'</h3></div>';
     html += '<div class="why">'+esc(act.why)+'</div>';
