@@ -76,6 +76,11 @@
 .ag-rec-title { font-size:12px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; color:var(--taupe); margin-bottom:6px; }
 .ag-rec-steps { margin:0; padding-left:18px; font-size:13px; line-height:1.7; }
 .ag-rec-steps li { margin-bottom:2px; }
+.ag-rec-source { display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin-top:8px; font-size:11.5px; color:var(--taupe); }
+.ag-rec-source .src-label { font-weight:600; }
+.ag-rec-source .src-skill { font-family:var(--mono); font-size:11px; padding:3px 10px; border-radius:6px;
+  background:var(--sand); border:1px solid var(--sand-500); color:var(--ink-700); cursor:pointer; text-decoration:none; }
+.ag-rec-source .src-skill:hover { background:var(--sand-500); }
 
 /* evidence chips */
 .ag-evidence { display:flex; flex-wrap:wrap; gap:6px; margin:12px 0; }
@@ -514,6 +519,11 @@ function init(){
     html += '<ol class="ag-rec-steps">';
     a.steps.forEach(function(s){ html += '<li>'+esc(s)+'</li>'; });
     html += '</ol>';
+    html += '<div class="ag-rec-source">';
+    html += '<span class="src-label">Sourced from:</span>';
+    html += '<a class="src-skill" href="#" onclick="document.getElementById(\'skToggle\').click();return false;" title="FX-bridge playbook \u2014 P1 \u00b7 FX shortfall">FX-bridge playbook</a>';
+    html += '<a class="src-skill" href="#" onclick="document.getElementById(\'skToggle\').click();return false;" title="Recoverability assessment \u2014 P1/P3 \u00b7 curable">Recoverability assessment</a>';
+    html += '</div>';
     html += '</div>';
 
     /* evidence chips */
@@ -581,6 +591,10 @@ function init(){
     html += '<li>Send compliance certificate reminder to company secretary (deterministic template)</li>';
     html += '<li>Set calendar reminder for 7-day follow-up if no response (automation service)</li>';
     html += '</ol>';
+    html += '<div class="ag-rec-source">';
+    html += '<span class="src-label">Sourced from:</span>';
+    html += '<span class="src-skill" style="cursor:default;" title="P4 template action \u2014 no skill needed, deterministic automation">Deterministic automation \u00b7 template</span>';
+    html += '</div>';
     html += '</div>';
 
     /* evidence chips */
