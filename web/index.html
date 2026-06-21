@@ -19,10 +19,7 @@
   .tile p { color: var(--taupe); margin: 0; font-size: 14px; }
   .tile .go { margin-top:auto; font-weight:600; color: var(--ink); }
   .tile .go::after { content:' →'; }
-  .rm-jump { display:flex; align-items:center; flex-wrap:wrap; gap:10px; margin-top: 22px; }
-  .rm-jump .lbl { font-size:12px; font-weight:600; text-transform:uppercase; letter-spacing:.05em; color:var(--taupe); }
-  .rm-jump a { font-size:13px; font-weight:600; text-decoration:none; color:var(--ink); background:var(--white); border:1px solid var(--sand-500); border-radius:999px; padding:6px 14px; box-shadow:var(--shadow); transition: background .12s ease, color .12s ease; }
-  .rm-jump a:hover { background:var(--ink); color:var(--sand); }
+
   .stat-row { display:flex; gap: 26px; flex-wrap:wrap; margin-top: 26px; }
   .stat { background:var(--white); border:1px solid var(--sand-500); border-radius:var(--radius); padding:16px 20px; box-shadow:var(--shadow); }
   .stat .n { font-size: 26px; font-weight:700; }
@@ -83,7 +80,7 @@
       <span class="go">Play it through</span>
     </a>
     <a class="tile nw-card" href="roadmap.html">
-      <span class="k">Now → Medium → Later</span>
+      <span class="k">Now → 1m → 2m</span>
       <h3>Data roadmap</h3>
       <p>What each data horizon unlocks and how the See → Decide → Act workflow sharpens as more data lands.</p>
       <span class="go">See the roadmap</span>
@@ -108,13 +105,7 @@
     </a>
   </section>
 
-  <div class="rm-jump">
-    <span class="lbl">Jump to a horizon</span>
-    <a href="roadmap.html?h=Now">Now</a>
-    <a href="roadmap.html?h=Medium">Medium</a>
-    <a href="roadmap.html?h=Later">Later</a>
-    <a href="roadmap.html">All</a>
-  </div>
+
 
   <p class="foot">
     Synthetic data only. One company mirrors the numeric distribution of a real bank export as the worked example.
