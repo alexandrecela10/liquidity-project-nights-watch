@@ -465,6 +465,69 @@
 </div>
 </div>
 
+<!-- S5b: ENHANCE — how new data at 1m and 2m strengthens the signal -->
+<div class="scene" data-sub="Each phase adds new data sources that sharpen the signal. At 1m, cashflow narrows the coverage range. At 2m, business lifecycle data (contract renewals, new subscriptions) tightens it further." data-step="Enhance">
+<div class="scene-inner">
+<div class="desk-mock">
+  <div class="dm-topbar"><span class="dot"></span> Night's Watch <span class="dm-nav"><b>Credit desk</b> &middot; Sahel AgriCorp &middot; Signal enhancement</span></div>
+  <div class="dm-body">
+    <h2>How new data sharpens the signal</h2>
+    <p style="font-size:12.5px;color:var(--ink-700);line-height:1.5;margin:4px 0 18px;">Each phase adds a data source. The estimate narrows. Confidence increases.</p>
+    <!-- Now -->
+    <div style="display:grid;grid-template-columns:60px 1fr;gap:0;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <span style="font-size:11px;font-weight:700;background:var(--ink);color:var(--yellow);padding:3px 10px;border-radius:999px;">Now</span>
+        <div style="width:2px;flex:1;background:var(--sand-700);margin-top:6px;"></div>
+      </div>
+      <div style="padding:4px 0 16px;">
+        <div style="display:flex;gap:24px;align-items:baseline;">
+          <div><span style="font-size:11px;color:var(--taupe);">Coverage</span><br><span style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--risk-high);">0.46</span></div>
+          <div><span style="font-size:11px;color:var(--taupe);">Savable</span><br><span style="font-size:18px;font-weight:700;font-family:var(--mono);">$3.2M</span></div>
+        </div>
+        <div style="font-size:11.5px;color:var(--taupe);margin-top:4px;">Source: bank balances + loan structure</div>
+      </div>
+    </div>
+    <!-- 1m -->
+    <div style="display:grid;grid-template-columns:60px 1fr;gap:0;margin-bottom:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <span style="font-size:11px;font-weight:700;background:var(--ink);color:var(--yellow);padding:3px 10px;border-radius:999px;">1m</span>
+        <div style="width:2px;flex:1;background:var(--sand-700);margin-top:6px;"></div>
+      </div>
+      <div style="padding:4px 0 16px;">
+        <div style="display:flex;gap:24px;align-items:baseline;">
+          <div><span style="font-size:11px;color:var(--taupe);">Coverage estimate</span><br><span style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--risk-medium);">0.52</span> <span style="font-size:12px;color:var(--taupe);">range 0.38&ndash;0.62</span></div>
+          <div><span style="font-size:11px;color:var(--taupe);">Savable</span><br><span style="font-size:18px;font-weight:700;font-family:var(--mono);">$3.8M</span> <span style="font-size:11px;color:var(--risk-low);">&uarr;+$500K</span></div>
+        </div>
+        <div style="margin-top:6px;font-size:11.5px;">
+          <span style="font-family:var(--mono);font-size:10.5px;color:var(--taupe);background:var(--sand);padding:1px 6px;border-radius:3px;border:1px solid var(--sand-500);">gold.cashflow</span> &rarr; 58% of trapped cash historically available for debt repayment<br>
+          <span style="font-family:var(--mono);font-size:10.5px;color:var(--taupe);background:var(--sand);padding:1px 6px;border-radius:3px;border:1px solid var(--sand-500);">gold.balance_sheet</span> &rarr; $1.2M receivables (Cocoa Board, due 22d)
+        </div>
+      </div>
+    </div>
+    <!-- 2m -->
+    <div style="display:grid;grid-template-columns:60px 1fr;gap:0;">
+      <div style="display:flex;flex-direction:column;align-items:center;">
+        <span style="font-size:11px;font-weight:700;background:var(--ink);color:var(--yellow);padding:3px 10px;border-radius:999px;">2m</span>
+      </div>
+      <div style="padding:4px 0 0;">
+        <div style="display:flex;gap:24px;align-items:baseline;">
+          <div><span style="font-size:11px;color:var(--taupe);">Coverage estimate</span><br><span style="font-size:22px;font-weight:700;font-family:var(--mono);color:var(--risk-medium);">0.48</span> <span style="font-size:12px;color:var(--taupe);">range 0.41&ndash;0.55 <span style="color:var(--risk-low);font-weight:600;">(tighter)</span></span></div>
+          <div><span style="font-size:11px;color:var(--taupe);">Savable</span><br><span style="font-size:18px;font-weight:700;font-family:var(--mono);">$3.8M</span> <span style="font-size:11px;color:var(--taupe);">confirmed</span></div>
+        </div>
+        <div style="margin-top:6px;font-size:11.5px;">
+          <span style="font-family:var(--mono);font-size:10.5px;color:var(--taupe);background:var(--sand);padding:1px 6px;border-radius:3px;border:1px solid var(--sand-500);">gold.business_lifecycle</span> &rarr; Cocoa Board renewal ($800K Q3) offsets coupon accrual<br>
+          <span style="font-family:var(--mono);font-size:10.5px;color:var(--taupe);background:var(--sand);padding:1px 6px;border-radius:3px;border:1px solid var(--sand-500);">gold.cashflow</span> &rarr; confirms debt service pattern; EUR sweep = related-party
+        </div>
+        <div style="margin-top:10px;background:var(--sand);border:1px solid var(--sand-500);border-radius:var(--radius-sm);padding:8px 12px;font-size:11.5px;color:var(--ink-700);">
+          <b>Result:</b> range narrowed from &plusmn;0.24 &rarr; &plusmn;0.14. More data = higher confidence in the estimate.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+
 <!-- S6: DECIDE — recommended action + email -->
 <div class="scene" data-sub="The system recommends a prioritised action and provides a one-click email to the company contact. P1 means roll up sleeves: protect the coupon." data-step="Decide">
 <div class="scene-inner">
@@ -559,6 +622,7 @@
     <span>Understand</span><span class="arr">&rarr;</span>
     <span>Drill down</span><span class="arr">&rarr;</span>
     <span>Prioritise</span><span class="arr">&rarr;</span>
+    <span>Enhance</span><span class="arr">&rarr;</span>
     <span>Decide</span><span class="arr">&rarr;</span>
     <span>Act</span><span class="arr">&rarr;</span>
     <span style="background:var(--ink);color:var(--yellow);border-color:var(--ink);">Processed</span>
