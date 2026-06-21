@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Night's Watch — Assignment presentation</title>
+<link rel="stylesheet" href="theme.css">
+<style>
+  .pres-wrap { max-width: 1100px; margin: 0 auto; padding: 32px 24px 60px; }
+  .pres-head { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
+  .pres-head h1 { font-size: 28px; margin: 0; }
+  .pres-dl { display: inline-flex; align-items: center; gap: 8px; font-size: 13px; font-weight: 600;
+    padding: 9px 20px; border-radius: 999px; background: var(--ink); color: var(--sand);
+    text-decoration: none; border: none; cursor: pointer; font-family: var(--font); transition: filter .12s; }
+  .pres-dl:hover { filter: brightness(1.15); }
+  .pres-dl svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2;
+    stroke-linecap: round; stroke-linejoin: round; }
+  .pdf-frame { width: 100%; height: calc(100vh - 170px); min-height: 500px; border: 1px solid var(--sand-500);
+    border-radius: var(--radius); box-shadow: var(--shadow); }
+  .pres-note { font-size: 12.5px; color: var(--taupe); margin-top: 12px; }
+</style>
+</head>
+<body>
+<div class="nw-topbar">
+  <span class="nw-logo"><span class="dot"></span> Night's Watch</span>
+  <span class="nw-tag">Liquidity &middot; Credit early-warning</span>
+  <nav class="nw-nav">
+    <a href="index.html">Overview</a>
+    <a href="product.html">Credit desk</a>
+    <a href="demo.html">Demo</a>
+    <a href="agent.html">Agent (TBD)</a>
+    <a href="dictionary.html">Dictionary</a>
+    <a href="lifecycle.html">Data lifecycle</a>
+    <a href="diagram.html">Data architecture</a>
+    <a href="roadmap.html">Data roadmap</a>
+    <a href="presentation.html" class="active">Presentation</a>
+  </nav>
+</div>
+
+<div class="pres-wrap">
+  <div class="pres-head">
+    <h1>Assignment presentation</h1>
+    <a class="pres-dl" href="ACELA-LiquidityAssignment-NightsWatch-v2.pdf" download>
+      <svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Download PDF
+    </a>
+  </div>
+  <iframe class="pdf-frame" src="ACELA-LiquidityAssignment-NightsWatch-v2.pdf" title="Assignment presentation PDF"></iframe>
+  <p class="pres-note">ACELA &mdash; Liquidity Assignment &mdash; Night's Watch v2</p>
+</div>
+
+</body>
+</html>
