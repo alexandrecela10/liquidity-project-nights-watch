@@ -825,7 +825,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.12,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-07-15",
-        "cash_to_repay_t1": 700000
+        "cash_to_repay_t1": 700000,
+        "contract_url": "contracts/LN-SAHEL-1.pdf"
       },
       "recoverability": {
         "label": "Partial",
@@ -923,7 +924,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.14,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-07-20",
-        "cash_to_repay_t1": 720000
+        "cash_to_repay_t1": 720000,
+        "contract_url": "contracts/LN-LAGOS-1.pdf"
       },
       "recoverability": {
         "label": "Weak",
@@ -1012,7 +1014,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.11,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-08-01",
-        "cash_to_repay_t1": 900000
+        "cash_to_repay_t1": 900000,
+        "contract_url": "contracts/LN-DAR-1.pdf"
       },
       "recoverability": {
         "label": "Partial",
@@ -1101,7 +1104,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.13,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-07-28",
-        "cash_to_repay_t1": 400000
+        "cash_to_repay_t1": 400000,
+        "contract_url": "contracts/LN-NAIROBI-1.pdf"
       },
       "recoverability": {
         "label": "Strong",
@@ -1181,7 +1185,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.12,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-08-10",
-        "cash_to_repay_t1": 200000
+        "cash_to_repay_t1": 200000,
+        "contract_url": "contracts/LN-KAMPALA-1.pdf"
       },
       "recoverability": {
         "label": "Strong",
@@ -1252,7 +1257,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.12,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-08-15",
-        "cash_to_repay_t1": 140000
+        "cash_to_repay_t1": 140000,
+        "contract_url": "contracts/LN-ACCRA-1.pdf"
       },
       "recoverability": {
         "label": "Strong",
@@ -1323,7 +1329,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.1,
         "cash_vs_pik": "pik",
         "next_payment_date": "2026-09-01",
-        "cash_to_repay_t1": 0
+        "cash_to_repay_t1": 0,
+        "contract_url": "contracts/LN-KIGALI-1.pdf"
       },
       "recoverability": {
         "label": "Strong",
@@ -1394,7 +1401,8 @@ window.NW_SPEC = {
         "coupon_rate": 0.09,
         "cash_vs_pik": "cash",
         "next_payment_date": "2026-09-05",
-        "cash_to_repay_t1": 300000
+        "cash_to_repay_t1": 300000,
+        "contract_url": "contracts/LN-CASA-1.pdf"
       },
       "recoverability": {
         "label": "Strong",
