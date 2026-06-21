@@ -894,8 +894,14 @@
   }
 
   function recovOf(c){
-    var rm = phaseReached('Medium') && (c.recoverability_medium || c.recoverability);
-    if (rm) return { label:rm.label, savable:rm.savable_usd||0, basis:'financials-enhanced', read:rm.read };
+    if (phaseReached('Medium') && c.recoverability_medium){
+      var rm = c.recoverability_medium;
+      return { label:rm.label, savable:rm.savable_usd||0, basis:'financials-enhanced', read:rm.read };
+    }
+    if (phaseReached('Medium') && c.recoverability){
+      var r = c.recoverability;
+      return { label:r.label, savable:r.savable_usd||0, basis:'first-pass', read:r.read };
+    }
     var fp = firstPassRecov(c); return { label:fp.label, savable:fp.savable||0, basis:'first-pass', read:fp.read };
   }
 
@@ -1190,6 +1196,20 @@
       '<div class="rng-tick best"  style="left:'+be+'%"><span class="lab">best '+f.coverage_t1_best.toFixed(2)+'</span></div>' +
     '</div>';
   }
+  /* ---- coverage estimate range bar (reusable for 1m/2m estimates) ---- */
+  function estRangeBar(est){
+    var dmax = Math.max(1.2, (est.best || 0) + 0.2);
+    var sc = function(v){ return Math.max(0, Math.min(v/dmax, 1)) * 100; };
+    var w = sc(est.worst), b = sc(est.base), be = sc(est.best);
+    var lo = Math.min(w,b), hi = Math.max(w,b), one = sc(1.0);
+    return '<div class="rng-bar">' +
+      '<div class="rng-band" style="left:'+lo+'%;width:'+(hi-lo)+'%"></div>' +
+      '<div class="rng-1" style="left:'+one+'%"><span class="lab">1.00</span></div>' +
+      '<div class="rng-tick worst" style="left:'+w+'%"><span class="lab">worst '+est.worst.toFixed(2)+'</span></div>' +
+      '<div class="rng-tick base"  style="left:'+b+'%"><span class="lab">base '+est.base.toFixed(2)+'</span></div>' +
+      '<div class="rng-tick best"  style="left:'+be+'%"><span class="lab">best '+est.best.toFixed(2)+'</span></div>' +
+    '</div>';
+  }
 
   /* ---- metric trust popover: as-at · formula · raw source(s) · evidence · lineage ---- */
   function hasEv(slug){ return !!(EV && EV.metrics && EV.metrics[slug]); }
@@ -1478,6 +1498,30 @@
     html += '<div class="cov-note" style="margin-top:6px;">'+ctx+'</div>';
     html += '</div>';
 
+    /* ======== STEP 1b: Coverage estimate — where we believe it can be ======== */
+    if (phaseReached('Medium')){
+      var est = phaseReached('Later') ? (c.coverage_estimate_2m || c.coverage_estimate_1m) : c.coverage_estimate_1m;
+      if (est){
+        html += '<div class="sec phase">';
+        var estPhaseLabel = phaseReached('Later') ? '2m' : '1m';
+        html += '<span class="panel-title">Step 1b \u00b7 Coverage estimate'+(unlockedHere(phaseReached('Later')?'Later':'Medium')?' <span class="nw-new">new</span>':'')+'</span>';
+        var prose1b = '';
+        prose1b += 'We believe coverage can reach '+tip('coverage-estimate-base','<b>'+est.base.toFixed(2)+'</b>')+' (range '+est.worst.toFixed(2)+'\u2013'+est.best.toFixed(2)+'). ';
+        prose1b += esc(est.read);
+        html += '<div class="cov-note">'+prose1b+'</div>';
+        html += '<div class="rng">'+estRangeBar(est)+
+          '<div class="rng-cap">Range <b>'+est.worst.toFixed(2)+'\u2013'+est.best.toFixed(2)+'</b> \u00b7 source: '+esc(est.source)+'</div>'+
+        '</div>';
+        var eev = [];
+        eev.push({ref:"Spot",field:"Coverage now",value:cov.toFixed(2),note:cov<1.0?"below 1.0 \u2014 already short":"above 1.0",source:"gold.company_snapshot"});
+        eev.push({ref:"Estimate",field:"Base case",value:est.base.toFixed(2),note:"most likely scenario",source:est.source});
+        eev.push({ref:"Estimate",field:"Worst case",value:est.worst.toFixed(2),note:"downside",source:est.source});
+        eev.push({ref:"Estimate",field:"Best case",value:est.best.toFixed(2),note:"upside",source:est.source});
+        html += renderEvTrail('est-'+c.company_id, eev);
+        html += '</div>';
+      }
+    }
+
     /* ======== STEP 2: Recoverability — what can we expect? ======== */
     if (!phaseReached('Medium')){
       var fp = firstPassRecov(c);
@@ -1510,66 +1554,77 @@
       html += '</div>';
     }
 
-    /* STEP 2 (Medium): recoverability sharpened with financials */
-    if (phaseReached('Medium') && (c.recoverability_medium || c.recoverability)){
-      var r = c.recoverability_medium || c.recoverability;
+    /* STEP 2 (Medium): recoverability — enhanced only when recoverability_medium exists */
+    if (phaseReached('Medium')){
       var fpm = firstPassRecov(c);
-      var savDelta = r.savable_usd - (fpm.savable||0);
-      html += '<div class="sec phase">';
-      html += '<span class="panel-title">Step 2 \u00b7 Recoverability'+(unlockedHere('Medium')?' <span class="nw-new">enhanced</span>':'')+'</span>';
-      var prose2m = '';
-      prose2m += 'First-pass read was '+tip('recoverability-first-pass',recovPill(fpm.label))+' (structure + convertibility only), with '+tip('savable-money-first-pass','<b>'+usd(fpm.savable||0)+'</b>')+' savable. ';
-      prose2m += 'With balance sheet and cashflow data, the enhanced assessment is '+tip('recoverability-enhanced',recovPill(r.label))+'. ';
-      if (r.savable_usd > 0){
-        prose2m += 'Conservatively, '+tip('savable-money-sharpened','<b>'+usd(r.savable_usd)+'</b>')+' of '+usd(c.principal_at_risk||0)+' at risk is recoverable';
-        if (savDelta > 0) prose2m += ' <span class="nw-new" style="font-size:11px;">\u25b2 +'+usd(savDelta)+' vs first-pass</span>';
-        else if (savDelta < 0) prose2m += ' <span style="color:var(--risk-high);font-size:11px;">\u25bc '+usd(Math.abs(savDelta))+' vs first-pass</span>';
-        prose2m += '.';
-      } else {
-        prose2m += 'No material recovery expected.';
-      }
-      html += '<div class="cov-note">'+prose2m+'</div>';
-      /* why — the analyst read explaining what new signal changed */
-      html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">'+esc(r.read)+'</div>';
-      /* evidence trail */
-      var mev = recovEvidence(c);
       if (c.recoverability_medium){
+        /* truly enhanced — new signal from balance sheet / cashflow */
+        var r = c.recoverability_medium;
+        var savDelta = r.savable_usd - (fpm.savable||0);
+        html += '<div class="sec phase">';
+        html += '<span class="panel-title">Step 2 \u00b7 Recoverability'+(unlockedHere('Medium')?' <span class="nw-new">enhanced</span>':'')+'</span>';
+        var prose2m = '';
+        prose2m += 'First-pass read was '+tip('recoverability-first-pass',recovPill(fpm.label))+' (structure + convertibility only), with '+tip('savable-money-first-pass','<b>'+usd(fpm.savable||0)+'</b>')+' savable. ';
+        prose2m += 'With new signal, the enhanced assessment is '+tip('recoverability-enhanced',recovPill(r.label))+'. ';
+        if (r.savable_usd > 0){
+          prose2m += 'Conservatively, '+tip('savable-money-sharpened','<b>'+usd(r.savable_usd)+'</b>')+' of '+usd(c.principal_at_risk||0)+' at risk is recoverable';
+          if (savDelta > 0) prose2m += ' <span class="nw-new" style="font-size:11px;">\u25b2 +'+usd(savDelta)+' vs first-pass</span>';
+          else if (savDelta < 0) prose2m += ' <span style="color:var(--risk-high);font-size:11px;">\u25bc '+usd(Math.abs(savDelta))+' vs first-pass</span>';
+          prose2m += '.';
+        } else {
+          prose2m += 'No material recovery expected.';
+        }
+        html += '<div class="cov-note">'+prose2m+'</div>';
+        /* signal sources — explicit attribution */
+        var signals = c.recoverability_medium.signals;
+        if (signals && signals.length){
+          var sigHtml = '<div class="sig-sources" style="margin-top:6px;font-size:12px;">';
+          signals.forEach(function(sig){
+            sigHtml += '<div style="margin-bottom:3px;"><span style="font-family:var(--font-mono);font-size:11px;color:var(--taupe);background:var(--sand3);padding:1px 5px;border-radius:3px;">'+esc(sig.source)+'</span> \u2192 '+esc(sig.finding)+'</div>';
+          });
+          sigHtml += '</div>';
+          html += sigHtml;
+        } else {
+          /* fallback: show the read as italic why */
+          html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">'+esc(r.read)+'</div>';
+        }
+        /* evidence trail */
+        var mev = recovEvidence(c);
         mev.push({ref:"New signal",field:"Balance sheet read",value:recovPill(r.label)+" (was "+recovPill(fpm.label)+")",note:"enhanced with financials",source:"gold.balance_sheet"});
         if (savDelta !== 0) mev.push({ref:"New signal",field:"Savable delta",value:(savDelta>0?"+":"")+usd(savDelta),note:savDelta>0?"receivables unlock new pathway":"financials narrow the window",source:"gold.cashflow"});
+        html += renderEvTrail('rev-m-'+c.company_id, mev);
+        html += '</div>';
+      } else {
+        /* no enhanced data — show same first-pass Step 2 as Now */
+        html += '<div class="sec">';
+        html += '<span class="panel-title">Step 2 \u00b7 Recoverability</span>';
+        var prose2 = '';
+        if (fpm.label === 'N/A'){
+          prose2 += 'Next payment is PIK \u2014 $0 cash due at T1. Nothing to recover.';
+        } else if ((c.principal_at_risk||0) === 0){
+          prose2 += 'No principal at risk. Fully covered.';
+        } else {
+          prose2 += 'The loan is '+tip('seniority-security','<b>'+esc(loan.seniority)+'</b>')+' with '+tip('transferable-vs-trapped',pct(c.total_cash_usd>0?c.transferable_cash_usd/c.total_cash_usd:0)+' of cash transferable')+'. ';
+          if (c.prior_issues > 0) prose2 += c.prior_issues+' prior miss'+(c.prior_issues>1?'es':'')+' on record. ';
+          prose2 += 'Recoverability is '+tip('recoverability-first-pass',recovPill(fpm.label))+' \u2014 conservatively '+tip('savable-money-first-pass','<b>'+usd(fpm.savable)+'</b>')+' of '+usd(c.principal_at_risk)+' at risk is savable.';
+        }
+        html += '<div class="cov-note">'+prose2+'</div>';
+        if (fpm.label !== 'N/A' && (c.principal_at_risk||0) > 0){
+          var why2m = '';
+          var shareM = c.total_cash_usd > 0 ? c.transferable_cash_usd / c.total_cash_usd : 0;
+          if (shareM < 0.10) why2m += 'Only '+pct(shareM)+' of cash is convertible \u2014 the bulk ('+usdM(c.trapped_cash_usd)+') is trapped in restricted accounts. ';
+          else if (shareM < 0.50) why2m += pct(shareM)+' of cash is transferable; '+usdM(c.trapped_cash_usd)+' remains restricted. ';
+          if (c.deteriorating) why2m += 'Coverage trend is worsening, which compresses the recovery window. ';
+          why2m += 'Recovery depends on whether the '+usdM(c.trapped_cash_usd)+' trapped position can be unlocked or bridged before T1.';
+          html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">'+why2m+'</div>';
+        }
+        html += renderEvTrail('rev-'+c.company_id, recovEvidence(c));
+        html += '<div style="font-size:11.5px;color:var(--taupe);margin-top:8px;">Balance sheet &amp; cashflow not yet available \u2014 assessment unchanged from first-pass.</div>';
+        html += '</div>';
       }
-      html += renderEvTrail('rev-m-'+c.company_id, mev);
-      html += '</div>';
     }
 
-    /* STEP 2b (Later): forecast + scenarios */
-    if (phaseReached('Later') && c.forecast){
-      var f = c.forecast;
-      html += '<div class="sec phase">';
-      html += '<span class="panel-title">Step 2b \u00b7 Forecast at T1'+(unlockedHere('Later')?' <span class="nw-new">new</span>':'')+'</span>';
-      var prose2l = '';
-      var spotCov = (typeof c.coverage_medium === 'number') ? c.coverage_medium : c.coverage;
-      prose2l += 'Modelling FX and rate scenarios, coverage at T1 is expected to '+(f.coverage_t1 < spotCov ? 'drop to' : 'hold at')+' '+tip('forecast-coverage-at-t1-base','<b>'+f.coverage_t1.toFixed(2)+'</b>')+' (from '+(typeof c.coverage_medium==='number'?'enhanced ':'')+'spot '+spotCov.toFixed(2)+'). ';
-      prose2l += 'In the worst case (FX stays blocked + rate spike), it falls to '+tip('worst-case-coverage-at-t1','<b>'+f.coverage_t1_worst.toFixed(2)+'</b>')+'. ';
-      if (f.status === 'breached') prose2l += 'The shortfall is <b>already breached</b>. ';
-      else if (f.status === 'pre-breach') prose2l += 'Breach is \u2248'+f.lead_days+' days away. ';
-      else prose2l += 'No breach expected. ';
-      prose2l += 'Best case '+f.coverage_t1_best.toFixed(2)+' if FX frees. <b>Size the bridge against worst case.</b>';
-      html += '<div class="cov-note">'+prose2l+'</div>';
-      /* why — drivers */
-      html += '<div class="cov-note" style="margin-top:4px;color:var(--ink-700);font-style:italic;">Drivers: '+esc(f.drivers)+'. '+esc(f.read)+'</div>';
-      html += '<div class="rng">'+rangeBar(f) +
-        '<div class="rng-cap">Range '+tip('forecast-range-worst-base','<b>'+f.coverage_t1_worst.toFixed(2)+'\u2013'+f.coverage_t1.toFixed(2)+'</b>')+' at T1.</div>' +
-      '</div>';
-      /* forecast evidence trail */
-      var fev = [];
-      fev.push({ref:"Spot",field:"Coverage now",value:c.coverage.toFixed(2),note:c.coverage<1.0?"below 1.0 — already short":"above 1.0",source:"gold.company_snapshot"});
-      fev.push({ref:"Base",field:"Modelled @ T1",value:f.coverage_t1.toFixed(2),note:"base scenario",source:"gold.forecast"});
-      fev.push({ref:"Worst",field:"Worst case @ T1",value:f.coverage_t1_worst.toFixed(2),note:"FX blocked + rate spike",source:"gold.forecast"});
-      fev.push({ref:"Best",field:"Best case @ T1",value:f.coverage_t1_best.toFixed(2),note:"FX frees",source:"gold.forecast"});
-      if (f.lead_days > 0) fev.push({ref:"Lead",field:"Days to breach",value:String(f.lead_days),note:"warning window",source:"gold.forecast"});
-      html += renderEvTrail('fev-'+c.company_id, fev);
-      html += '</div>';
-    }
+    /* (Step 2b removed — coverage forecast now in Step 1b above) */
 
     /* Loan drill-down */
     var la = loanAnalytics(c);

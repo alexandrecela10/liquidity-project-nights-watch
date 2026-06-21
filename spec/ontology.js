@@ -838,10 +838,34 @@ window.NW_SPEC = {
         "label": "Partial",
         "score": 0.63,
         "savable_usd": 3800000,
-        "read": "Balance sheet reveals $1.2M receivables (Cocoa Board contract) collectible within 22 days. 13-week cashflow confirms EUR sweep was a related-party transfer to parent, not a regulatory freeze — conversion may be negotiable. Savable increases from $3.3M to $3.8M with the receivables pathway. Leverage 2.1×, liquidity ratio 0.35 (tight)."
+        "read": "Balance sheet reveals $1.2M receivables (Cocoa Board contract) collectible within 22 days. 13-week cashflow confirms EUR sweep was a related-party transfer to parent, not a regulatory freeze — conversion may be negotiable. Savable increases from $3.3M to $3.8M with the receivables pathway. Leverage 2.1×, liquidity ratio 0.35 (tight).",
+        "signals": [
+          {
+            "source": "gold.balance_sheet",
+            "finding": "$1.2M receivables (Cocoa Board contract, due 22d) — adds to transferable pool"
+          },
+          {
+            "source": "gold.cashflow",
+            "finding": "EUR sweep was related-party transfer to parent — conversion negotiable, not regulatory freeze"
+          }
+        ]
       },
       "coverage_medium": 0.52,
       "coverage_medium_note": "Balance sheet adds $1.2M receivables (Cocoa Board, due within 22d) to transferable pool. Coverage improves from 0.46 to 0.52, but remains below 1.0.",
+      "coverage_estimate_1m": {
+        "base": 0.52,
+        "worst": 0.38,
+        "best": 0.62,
+        "source": "gold.cashflow",
+        "read": "13-week cashflow shows 58% of restricted cash historically available for debt repayment at worst scenario. With $1.2M receivables due within 22d, base case coverage reaches 0.52. Worst case 0.38 if receivables delayed and EUR remains blocked."
+      },
+      "coverage_estimate_2m": {
+        "base": 0.48,
+        "worst": 0.41,
+        "best": 0.55,
+        "source": "gold.cashflow + gold.business_lifecycle",
+        "read": "Business lifecycle shows Cocoa Board contract renewal ($800K expected Q3) partially offsets 12% coupon accrual. Cashflow confirms debt service pattern. Range narrows: worst 0.41 (EUR stays blocked, no renewal), best 0.55 (renewal lands + partial FX conversion)."
+      },
       "forecast": {
         "coverage_t1": 0.41,
         "coverage_t1_worst": 0.18,
