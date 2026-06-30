@@ -1,55 +1,101 @@
-# Project Night's Watch
+# Night's Watch — Distressed Loan Detection & Intervention System
 
-Real-time cash monitoring & early-warning for Liquidity's **Credit team**: catch a portfolio company's cash trouble *before* it becomes a missed payment.
+A working prototype of an end-to-end system that detects cash distress in a private credit portfolio and guides the credit team from signal to intervention — before a payment is missed.
 
-> **Signal:** `coverage = expected transferable cash at the next payment (T1) ÷ cash to repay at T1`. Below **1.0** = at risk.
+Built as a demonstration of how I would design, architect, and ship a credit early-warning product for a private credit investment fund.
 
-Synthetic data only. One company (**Sahel AgriCorp**) mirrors the numeric distribution of the provided real bank export — **$9.31M total cash but only $796K transferable** — as the worked example.
+> **Core signal:** `coverage = transferable cash at T1 ÷ cash due at T1`. Below **1.0** = the borrower cannot cover the next payment with available funds.
 
-## What's here (six outputs, one product)
+## The problem this solves
 
-| Output | Where | What it answers |
+Private credit funds lend to companies across multiple jurisdictions, currencies, and financial institutions. Cash sits in dozens of accounts — but not all of it is transferable. A company can hold $9.3M in total cash and still default on a $700K coupon because 96% of that cash is trapped in restricted currencies or blocked accounts.
+
+Most funds discover this too late: when the payment is already missed.
+
+**Night's Watch catches it early** — the moment a bank file lands, the system computes coverage, ranks the portfolio by severity, and tells the credit team exactly what to do, with every number traceable to its raw source.
+
+## How the system works
+
+**Detection pipeline** (deterministic, auditable):
+1. Raw bank files land daily → ingested into a bronze layer (append-only, immutable)
+2. Standardised to silver (currency normalisation, account ID resolution, FI classification)
+3. Golden metrics computed: coverage ratio, transferable vs trapped cash, runway, trend, recoverability
+4. Companies ranked worst-first → P1–P4 priority assignment → Teams alert to credit team
+
+**Intervention workflow** (See → Understand → Prioritise → Decide → Act):
+1. **See** — portfolio ranked by severity. Worst-first. One screen.
+2. **Understand** — click any company: WHY it's flagged, transferable vs trapped cash bar, evidence trail
+3. **Prioritise** — recoverability assessment (structure-based → enhanced with balance sheet + cashflow), savable money estimate, runway
+4. **Decide** — P1–P4 action recommendation with steps, one-click email to borrower contact
+5. **Act** — log the action, trigger monitoring, move to the next company
+
+**Signal enhancement across data horizons:**
+- **Now**: bank balances + loan structure → first-pass coverage and recoverability
+- **1m**: add cashflow analysis → coverage estimate with range (wider band, more uncertainty)
+- **2m**: add business lifecycle data (contract renewals, new subscriptions) → range narrows, confidence increases
+
+Each phase adds a data source. The estimate tightens. The credit team sees exactly which new signal changed the assessment and why.
+
+## What's in this repo
+
+| Component | Location | Purpose |
 |---|---|---|
-| **Ontology & data architecture** | [`docs/ontology.md`](docs/ontology.md), [`docs/schema.sql`](docs/schema.sql) | The golden level of detail + the level of detail of each input + the bronze→silver standardisation. |
-| **Interactive data-architecture diagram** | `web/diagram.html` | Explore Source → Bronze → Standardisation → Silver → Golden; click an input to trace its lineage. |
-| **Lifecycle mock** | `web/lifecycle.html` | A new bank file → a High warning → a credit-team action → the updated database, step by step. |
-| **Credit-team product** | `web/product.html` | At-risk companies ranked worst-first; understand why; loan follow-up; recoverability (first-pass → financials-enhanced); worst-case T1 forecast + expected range; P1–P4 action; log it. Hover any key metric for as-at date · formula · raw source(s) · evidence · lineage. Collapsible **filter panel** with a **company search** ("Find a company…", matches name / jurisdiction / loan ID) plus ontology filters (country, risk, principal size, seniority, coupon, coverage); **drill any row into the company + loan** (clear hover cue); a **Loan — detail & analytics** block in the look-up panel (coverage @ T1, cash due, shortfall, days to next payment, annual cash coupon, seniority, principal at risk, recovery — each with the same trust hover); row **quick actions** (assign, trigger alert) on hover; table **Export CSV** + **Share** (filter state encoded in the URL); inspector **Share** + **Download executive summary** (now carries the full loan-analytics block with discrete hover definitions). |
-| **Data roadmap** | `web/roadmap.html` | What each horizon (Now/Medium/Later) unlocks and how the See→Decide→Act workflow deepens; deep-linkable via `?h=Now`. |
-| **Data & formula dictionary** | `web/dictionary.html` | Every metric with its formula, as-at date, raw source file(s) and evidence, plus the raw-source-files registry. The desk hover popovers link straight into it. |
-| **Product demo** | `web/demo.html` | Animated end-to-end walkthrough: a Teams alert fires → credit desk → see → understand → drill into loan → prioritise → decide → act → "Company processed — monitoring triggered." Auto-plays with subtitles and optional TTS voice narration; keyboard + button nav. |
+| **Credit desk** | [`web/product.html`](web/product.html) | The operational tool — ranked portfolio, inspector panel with step-by-step analyst reasoning, loan analytics, evidence trails, filters, search, export |
+| **Product demo** | [`web/demo.html`](web/demo.html) | Animated end-to-end walkthrough: Teams alert → see → understand → prioritise → enhance → decide → act → processed |
+| **Agent design** | [`web/agent.html`](web/agent.html) | How credit team expertise is codified as skills (not prompts), loaded by an agent, executed via deterministic automation — with 6 risk principles |
+| **Data architecture** | [`web/diagram.html`](web/diagram.html) | Interactive Source → Bronze → Silver → Golden lineage diagram |
+| **Data lifecycle** | [`web/lifecycle.html`](web/lifecycle.html) | Step-by-step: new bank file → High warning → credit-team action → updated state |
+| **Data roadmap** | [`web/roadmap.html`](web/roadmap.html) | What each horizon (Now / 1m / 2m) unlocks and how the workflow deepens |
+| **Data dictionary** | [`web/dictionary.html`](web/dictionary.html) | Every metric: formula, as-at date, raw source, evidence. The desk's hover popovers link into it |
+| **Presentation** | [`web/presentation.html`](web/presentation.html) | Assignment presentation (PDF, downloadable) |
 
-### Live site (GitHub Pages)
-Enable once in **Settings → Pages → Build and deployment → Deploy from a branch → Branch: `devin/nights-watch-spec` (or rename it to `main`), folder: `/ (root)` → Save**. The root [`index.html`](index.html) redirects to the landing page, so the site is served at:
+### Live site
 
-```
-https://alexandrecela10.github.io/liquidity-project-nights-watch/
-```
+**[https://alexandrecela10.github.io/liquidity-project-nights-watch/](https://alexandrecela10.github.io/liquidity-project-nights-watch/)**
 
-(`.nojekyll` is included so the static files are served as-is.)
+## Key design decisions
 
-## Single source of truth
-All outputs read from one spec, [`spec/ontology.json`](spec/ontology.json) — the data model, the synthetic portfolio, the lifecycle scenario, and the brand. The interactive pages load it via the generated `spec/ontology.js`:
+**Every number is traceable.** Hover any metric in the credit desk → see the formula, the as-at date, the raw source file, and the evidence trail. No black boxes.
+
+**Deterministic pipeline, not LLM-generated scores.** Coverage, recoverability, and priority are computed by code — not generated by a model. The agent reads the pipeline's output; it never overrides it.
+
+**Phased data enhancement.** The system is designed to get smarter as more data sources come online. The 1m and 2m horizons aren't roadmap items — they're built into the architecture. The credit team sees coverage estimates narrow in real time as new signals land.
+
+**Skills, not prompts.** The agent doesn't freestyle. Credit team expertise is encoded as structured playbooks (recoverability assessment, forbearance structuring, FX-bridge, enforcement & exit). The agent loads the right skill based on the pipeline's signal.
+
+**Actions are either human-initiated or deterministic.** No LLM-driven tool calls into production systems. High-stakes actions (P1/P2) require human judgment. Low-stakes actions (P3/P4) use template-based automation with a 15-minute hold-and-undo window.
+
+## Technical details
+
+### The 3 bank metrics
+- **M1 — current transferable cash**: sum of hard-currency (transferable) balances
+- **M2 — history of transferable cash**: M1 across snapshots → burn rate, runway
+- **M3 — proxy of transferable cash at T1**: M2 trend projected to the next payment date
+
+### Single source of truth
+All pages read from [`spec/ontology.json`](spec/ontology.json) — the data model, synthetic portfolio, lifecycle scenario, and configuration. Regenerate the JS bundle:
 
 ```bash
-python3 scripts/build_spec.py     # regenerate spec/ontology.js from spec/ontology.json
+python3 scripts/build_spec.py
 ```
 
-## Run locally
-The pages are fully static. Serve the repo root and open the site:
-
+### Run locally
 ```bash
 python3 -m http.server 8000
-# then open http://localhost:8000/web/index.html
+# open http://localhost:8000/web/index.html
 ```
 
-## The 3 bank metrics (all from the bank file)
-- **M1 — current transferable cash**: sum of hard-currency (transferable) balances → **$796K** of $9.31M.
-- **M2 — history of transferable cash**: M1 across snapshots → burn/day, runway.
-- **M3 — proxy of transferable cash at T1**: the M2 trend projected to the next payment date.
+### Account ID resolution
+Bank files from non-bank FIs often lack native account IDs (28% of cash in the worked example). Resolved as:
+`account_key = COALESCE(native_id, 'NBFI:' + FI + ':' + country + ':' + currency)`
 
-## ID creation (NBFI rule)
-The bank file has 17 of 62 rows with **no account id** (non-bank FIs) holding **28% of all cash**. Resolved as:
-`account_key = COALESCE(native id, 'NBFI:'+FI+':'+country+':'+currency)` — currency is required because FI+country alone collides in the real file.
+## Worked example: Sahel AgriCorp
 
-## Goal prompts
-One per output, in [`docs/goals/`](docs/goals): `ontology.md`, `diagram.md`, `lifecycle.md`, `product.md`.
+The prototype uses synthetic data. Sahel AgriCorp mirrors the numeric distribution of a real bank export:
+- **$9.31M total cash** across 62 accounts, 8 FIs, 4 currencies
+- **$325K transferable** (3.5%) — the rest is trapped in restricted currencies or swept to offshore parent
+- **Coverage: 0.46** — only 46% of the $700K coupon due Jul 15 is fundable
+- **$378K shortfall** at T1
+- **P1: Roll up sleeves** — confirm FX convertibility, request cash-sweep, model bridge facility
+
+The system detects this the moment the bank file lands, ranks Sahel #1 in the portfolio, and walks the credit team through exactly what to do about it.
